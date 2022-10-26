@@ -1,5 +1,8 @@
-import 'package:board_front/drawable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+
+import 'model.dart';
+import 'model_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,65 +11,61 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const Home(),
     );
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  Offset origin = Offset(0, 0);
+  Offset cur = Offset(0, 0);
+  final controller = TransformationController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('test'),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.ac_unit))],
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final v = ValueNotifier<Offset?>(null);
-          return GestureDetector(
-            onPanUpdate: (DragUpdateDetails d) {
-              v.value = d.localPosition;
-              // print(v.value);
-            },
-            child: ValueListenableBuilder<Offset?>(
-              valueListenable: v,
-              builder: (BuildContext context, Offset? value, Widget? child) {
-                print(value);
-
-                return CustomPaint(
-                  painter: MyCustomPainter(RectDrawable(
-                    transformState: TransformState(
-                      position: value ?? Offset(0, 0),
-                      rotation: 1,
-                      scale: Size(100, 100),
-                    ),
-                    paint: Paint()..color = Colors.blue,
-                  )),
-                  size: constraints.biggest,
-                );
-              },
+      body: CanvasViewModelWidget(
+        // 视口变换控制器
+        controller: controller,
+        viewModel: CanvasViewModel(
+          models: [
+            Model(id: 1, type: ModelType.text, data: TextModelData(content: 'HeelloWorld')),
+            Model(
+              id: 2,
+              type: ModelType.image,
+              size: const Size(100, 100),
+              transform: Matrix4.translationValues(100, 200, 0),
+              data: ImageModelData('https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg'),
             ),
-          );
-        },
+            Model(
+              id: 3,
+              type: ModelType.rect,
+              size: const Size(100, 100),
+              // 模型变换矩阵
+              transform: Matrix4.translationValues(100, 100, 0),
+              data: RectModelData(
+                fillColor: Colors.red,
+                borderColor: Colors.blue,
+                borderWidth: 10,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
