@@ -29,43 +29,54 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Offset origin = Offset(0, 0);
-  Offset cur = Offset(0, 0);
+  final models = {
+    1: Model(
+      id: 1,
+      type: ModelType.text,
+      data: TextModelData(content: 'HeelloWorld'),
+    ),
+    2: Model(
+      id: 2,
+      type: ModelType.image,
+      data: ImageModelData('https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg'),
+    ),
+    3: Model(
+      id: 3,
+      type: ModelType.rect,
+      data: RectModelData(
+        fillColor: Colors.red,
+        borderColor: Colors.blue,
+        borderWidth: 10,
+      ),
+    ),
+  };
+  @override
+  void initState() {
+    super.initState();
+  }
+
   final controller = TransformationController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('test'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.ac_unit))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                controller.value = Matrix4.identity();
+              },
+              icon: Icon(Icons.ac_unit))
+        ],
       ),
       body: CanvasViewModelWidget(
         // 视口变换控制器
         controller: controller,
-        viewModel: CanvasViewModel(
-          models: [
-            Model(id: 1, type: ModelType.text, data: TextModelData(content: 'HeelloWorld')),
-            Model(
-              id: 2,
-              type: ModelType.image,
-              size: const Size(100, 100),
-              transform: Matrix4.translationValues(100, 200, 0),
-              data: ImageModelData('https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg'),
-            ),
-            Model(
-              id: 3,
-              type: ModelType.rect,
-              size: const Size(100, 100),
-              // 模型变换矩阵
-              transform: Matrix4.translationValues(100, 100, 0),
-              data: RectModelData(
-                fillColor: Colors.red,
-                borderColor: Colors.blue,
-                borderWidth: 10,
-              ),
-            ),
-          ],
-        ),
+        viewModel: CanvasViewModel(models: models),
+        onChanged: (List<dynamic> value) {
+          print(value);
+        },
       ),
     );
   }

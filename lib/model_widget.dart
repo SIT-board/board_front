@@ -1,84 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:interactive_infinity_container/interactive_infinity_container.dart';
 
+import 'base_model_widget.dart';
 import 'model.dart';
 
-class TextModelWidget extends StatelessWidget {
-  final TextModelData data;
-  const TextModelWidget({Key? key, required this.data}) : super(key: key);
+class ModelWidget extends StatefulWidget {
+  final Model model;
+  final ValueSetter<Model>? onTap;
+  final ValueSetter<List> onChanged;
+  const ModelWidget({
+    Key? key,
+    required this.model,
+    this.onTap,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      data.content,
-      style: TextStyle(color: data.color),
-    );
-  }
+  State<ModelWidget> createState() => _ModelWidgetState();
 }
 
-class RectModelWidget extends StatelessWidget {
-  final RectModelData data;
-  const RectModelWidget({Key? key, required this.data}) : super(key: key);
+/// 角落按钮直径
+const _floatingActionDiameter = 18.0;
+const _floatingActionPadding = 24.0;
+
+/// 悬浮按钮
+class _FloatingActionIcon extends StatelessWidget {
+  const _FloatingActionIcon({
+    Key? key,
+    required this.iconData,
+    this.onTap,
+  }) : super(key: key);
+
+  final IconData iconData;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: data.fillColor,
-        border: Border.all(
-          color: data.borderColor ?? const Color(0xFF000000),
-          width: data.borderWidth ?? 1.0,
+    return Material(
+      color: Colors.white,
+      clipBehavior: Clip.hardEdge,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: _floatingActionDiameter,
+          width: _floatingActionDiameter,
+          child: Center(
+            child: Icon(iconData, color: Colors.blue, size: 12),
+          ),
         ),
       ),
     );
   }
 }
 
-class ImageModelWidget extends StatelessWidget {
-  final ImageModelData data;
-  const ImageModelWidget({Key? key, required this.data}) : super(key: key);
+class _ModelWidgetState extends State<ModelWidget> {
+  bool showEditor = true;
 
-  @override
-  Widget build(BuildContext context) {
-    return Image.network(
-      data.url,
-      fit: BoxFit.fill,
+  Widget buildResize() {
+    return GestureDetector(
+      child: const Icon(Icons.zoom_out_map),
+      onPanUpdate: (d) {
+        setState(() => widget.model.size += d.delta);
+        widget.onChanged(['size', widget.model.size]);
+      },
     );
   }
-}
 
-class ModelWidget extends StatelessWidget {
-  final Model model;
-  const ModelWidget({Key? key, required this.model}) : super(key: key);
+  Widget buildRotate() {
+    return GestureDetector(
+      child: const Icon(Icons.rotate_left),
+      onPanUpdate: (d) {
+        setState(() => widget.model.angle += (d.delta.dx + d.delta.dy) / 50);
+        widget.onChanged(['angle', widget.model.angle]);
+      },
+    );
+  }
+
+  Widget buildDelete() {
+    return InkWell(
+      child: const Icon(Icons.delete),
+      onTap: () {
+        setState(() => widget.model.enable = false);
+        widget.onChanged(['enable', widget.model.enable]);
+      },
+    );
+  }
+
+  Widget withController({required Widget child}) {
+    // 添加边界顺便约束
+    child = Container(
+      alignment: Alignment.center,
+      height: widget.model.size.height,
+      width: widget.model.size.width,
+      child: child,
+    );
+
+    // 添加按钮stack
+    child = Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        Transform.rotate(angle: widget.model.angle, child: child),
+        if (showEditor) Positioned(top: 0, right: 0, child: buildRotate()),
+        if (showEditor) Positioned(bottom: 0, right: 0, child: buildResize()),
+        if (showEditor) Positioned(left: 0, bottom: 0, child: buildDelete()),
+      ],
+    );
+
+    // 为stack添加边界
+    child = Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 2, color: Colors.blue),
+      ),
+      child: child,
+    );
+    return child;
+  }
 
   @override
   Widget build(BuildContext context) {
-    late Widget modelWidget;
-    if (model.type == ModelType.text) modelWidget = TextModelWidget(data: model.data as TextModelData);
-    if (model.type == ModelType.rect) modelWidget = RectModelWidget(data: model.data as RectModelData);
-    if (model.type == ModelType.image) modelWidget = ImageModelWidget(data: model.data as ImageModelData);
-
-    if (model.size != null) {
-      modelWidget = SizedBox.fromSize(
-        size: model.size!,
-        child: modelWidget,
-      );
-    }
-    if (model.transform != null) {
-      modelWidget = Transform(
-        transform: model.transform!,
-        child: modelWidget,
-      );
-    }
-
-    return modelWidget;
+    if (!widget.model.enable) return Container();
+    Widget modelWidget = ModelWidgetBuilder(widget.model).build();
+    return withController(
+      child: modelWidget,
+    );
   }
 }
 
 class CanvasViewModelWidget extends StatelessWidget {
   final CanvasViewModel viewModel;
   final TransformationController controller;
-  const CanvasViewModelWidget({Key? key, required this.viewModel, required this.controller}) : super(key: key);
+  final ValueSetter<Model>? onTap;
+  final ValueSetter<List<dynamic>> onChanged;
+  const CanvasViewModelWidget({
+    Key? key,
+    required this.viewModel,
+    required this.controller,
+    this.onTap,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +150,20 @@ class CanvasViewModelWidget extends StatelessWidget {
       viewerTransformationController: controller,
       minScale: 0.3,
       maxScale: 100,
-      children: viewModel.models.map((e) {
-        return ModelWidget(model: e);
+      children: viewModel.models.entries.map((e) {
+        final widget = ModelWidget(
+          model: e.value,
+          onTap: onTap,
+          onChanged: (p) => onChanged([e.key, ...p]),
+        );
+        return Panel(
+          widget: widget,
+          position: e.value.position,
+          onMoved: (position) {
+            e.value.position = position;
+            onChanged([e.key, 'position', position]);
+          },
+        );
       }).toList(),
     );
   }

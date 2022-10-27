@@ -33,27 +33,37 @@ class RectModelData implements ModelData {
 
 class Model {
   /// 模型id
-  final int id;
+  int id;
 
   /// 模型类型
-  final ModelType type;
+  ModelType type;
 
   /// 模型数据
-  final ModelData data;
+  ModelData data;
 
-  /// 模型变换
-  final Matrix4? transform;
+  /// 模型角度变换
+  double angle = 0;
+
+  /// 模型位置
+  Offset position = const Offset(0, 0);
 
   /// 模型大小
-  final Size? size;
+  Size size = const Size(100, 100);
 
-  Model({required this.id, required this.type, required this.data, this.size, this.transform});
+  /// 是否显示
+  bool enable = true;
+
+  Model({
+    required this.id,
+    required this.type,
+    required this.data,
+  });
 }
 
 class CanvasViewModel {
   /// 视口变换
   final Matrix4? viewerTransform;
-  final List<Model> models;
+  final Map<int, Model> models;
 
   CanvasViewModel({this.viewerTransform, required this.models});
 }
