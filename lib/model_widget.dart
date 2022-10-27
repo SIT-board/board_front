@@ -7,7 +7,7 @@ import 'model.dart';
 class ModelWidget extends StatefulWidget {
   final Model model;
   final ValueSetter<Model>? onTap;
-  final ValueSetter<List> onChanged;
+  final void Function(List<String> path, dynamic value) onChanged;
   const ModelWidget({
     Key? key,
     required this.model,
@@ -64,7 +64,7 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.zoom_out_map),
       onPanUpdate: (d) {
         setState(() => modelCommon.size += d.delta);
-        widget.onChanged(['common', 'size', modelCommon.size]);
+        widget.onChanged(['common', 'size'], modelCommon.map['size']);
       },
     );
   }
@@ -74,7 +74,7 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.rotate_left),
       onPanUpdate: (d) {
         setState(() => modelCommon.angle += (d.delta.dx + d.delta.dy) / 50);
-        widget.onChanged(['common', 'angle', modelCommon.angle]);
+        widget.onChanged(['common', 'angle'], modelCommon.angle);
       },
     );
   }
@@ -84,7 +84,7 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.delete),
       onTap: () {
         setState(() => modelCommon.enable = false);
-        widget.onChanged(['common', 'enable', modelCommon.enable]);
+        widget.onChanged(['common', 'enable'], modelCommon.enable);
       },
     );
   }
@@ -134,7 +134,7 @@ class CanvasViewModelWidget extends StatelessWidget {
   final CanvasViewModel viewModel;
   final TransformationController controller;
   final ValueSetter<Model>? onTap;
-  final ValueSetter<List<dynamic>> onChanged;
+  final void Function(List<String> path, dynamic value) onChanged;
   const CanvasViewModelWidget({
     Key? key,
     required this.viewModel,
@@ -145,9 +145,11 @@ class CanvasViewModelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (viewModel.viewerTransform != null) {
-      controller.value = viewModel.viewerTransform!;
-    }
+    if (viewModel.viewerTransform != null) controller.value = viewModel.viewerTransform!;
+    controller.addListener(() {
+      viewModel.viewerTransform = controller.value;
+      onChanged(['viewerTransform'], viewModel.map['viewerTransform']);
+    });
     return InteractiveInfinityContainer(
       viewerTransformationController: controller,
       minScale: 0.3,
@@ -156,14 +158,14 @@ class CanvasViewModelWidget extends StatelessWidget {
         final widget = ModelWidget(
           model: e.value,
           onTap: onTap,
-          onChanged: (p) => onChanged([e.key, ...p]),
+          onChanged: (p, v) => onChanged(['models', e.key, ...p], v),
         );
         return Panel(
           widget: widget,
           position: e.value.common.position,
           onMoved: (position) {
             e.value.common.position = position;
-            onChanged([e.key, 'common', 'position', position]);
+            onChanged(['models', e.key, 'common', 'position'], e.value.common.map['position']);
           },
         );
       }).toList(),

@@ -9,7 +9,7 @@ enum ModelType {
 }
 
 abstract class HashMapData {
-  Map<String, dynamic> map;
+  final Map<String, dynamic> map;
   HashMapData(this.map);
 }
 
@@ -44,7 +44,7 @@ class CommonModelData extends HashMapData {
 
   /// 模型位置
   Offset get position => ((e) => e == null ? null : Offset(e[0], e[1]))(map['position']) ?? const Offset(0, 0);
-  set position(Offset v) => map['position'] = v;
+  set position(Offset v) => map['position'] = [v.dx, v.dy];
 
   /// 模型大小
   Size get size => ((e) => e == null ? null : Size(e[0], e[1]))(map['size']) ?? const Size(100, 100);
@@ -86,7 +86,10 @@ class Model extends HashMapData {
 
 class CanvasViewModel extends HashMapData {
   /// 视口变换
-  Matrix4? get viewerTransform => ((e) => e == null ? null : Matrix4.fromList(e))(map['viewerTransform']);
+  Matrix4? get viewerTransform => ((e) {
+        if (e == null || e is! List) return null;
+        return Matrix4.fromList((e).map((e) => e as double).toList());
+      })(map['viewerTransform']);
   set viewerTransform(Matrix4? v) => map['viewerTransform'] = v?.storage;
   Map<String, Model> get models =>
       (map['models'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Model(value)));
