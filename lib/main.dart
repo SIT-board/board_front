@@ -34,11 +34,13 @@ class _HomeState extends State<Home> {
       id: 1,
       type: ModelType.text,
       data: TextModelData(content: 'HeelloWorld'),
+      common: CommonModelData(),
     ),
     2: Model(
       id: 2,
       type: ModelType.image,
       data: ImageModelData('https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg'),
+      common: CommonModelData(),
     ),
     3: Model(
       id: 3,
@@ -48,6 +50,7 @@ class _HomeState extends State<Home> {
         borderColor: Colors.blue,
         borderWidth: 10,
       ),
+      common: CommonModelData(),
     ),
   };
   @override

@@ -51,9 +51,9 @@ class ModelWidgetBuilder {
   ModelWidgetBuilder(this.model);
   Widget build() {
     final builders = {
-      ModelType.text: (ModelData data) => TextModelWidget(data: model.data as TextModelData),
-      ModelType.rect: (ModelData data) => RectModelWidget(data: model.data as RectModelData),
-      ModelType.image: (ModelData data) => ImageModelWidget(data: model.data as ImageModelData),
+      ModelType.text: (data) => TextModelWidget(data: model.data as TextModelData),
+      ModelType.rect: (data) => RectModelWidget(data: model.data as RectModelData),
+      ModelType.image: (data) => ImageModelWidget(data: model.data as ImageModelData),
     };
     if (!builders.containsKey(model.type)) throw UnimplementedError();
     return builders[model.type]!(model.data);

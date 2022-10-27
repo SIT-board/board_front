@@ -57,12 +57,14 @@ class _FloatingActionIcon extends StatelessWidget {
 class _ModelWidgetState extends State<ModelWidget> {
   bool showEditor = true;
 
+  CommonModelData get modelCommon => widget.model.common;
+
   Widget buildResize() {
     return GestureDetector(
       child: const Icon(Icons.zoom_out_map),
       onPanUpdate: (d) {
-        setState(() => widget.model.size += d.delta);
-        widget.onChanged(['size', widget.model.size]);
+        setState(() => modelCommon.size += d.delta);
+        widget.onChanged(['common', 'size', modelCommon.size]);
       },
     );
   }
@@ -71,8 +73,8 @@ class _ModelWidgetState extends State<ModelWidget> {
     return GestureDetector(
       child: const Icon(Icons.rotate_left),
       onPanUpdate: (d) {
-        setState(() => widget.model.angle += (d.delta.dx + d.delta.dy) / 50);
-        widget.onChanged(['angle', widget.model.angle]);
+        setState(() => modelCommon.angle += (d.delta.dx + d.delta.dy) / 50);
+        widget.onChanged(['common', 'angle', modelCommon.angle]);
       },
     );
   }
@@ -81,8 +83,8 @@ class _ModelWidgetState extends State<ModelWidget> {
     return InkWell(
       child: const Icon(Icons.delete),
       onTap: () {
-        setState(() => widget.model.enable = false);
-        widget.onChanged(['enable', widget.model.enable]);
+        setState(() => modelCommon.enable = false);
+        widget.onChanged(['common', 'enable', modelCommon.enable]);
       },
     );
   }
@@ -91,8 +93,8 @@ class _ModelWidgetState extends State<ModelWidget> {
     // 添加边界顺便约束
     child = Container(
       alignment: Alignment.center,
-      height: widget.model.size.height,
-      width: widget.model.size.width,
+      height: modelCommon.size.height,
+      width: modelCommon.size.width,
       child: child,
     );
 
@@ -101,7 +103,7 @@ class _ModelWidgetState extends State<ModelWidget> {
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        Transform.rotate(angle: widget.model.angle, child: child),
+        Transform.rotate(angle: modelCommon.angle, child: child),
         if (showEditor) Positioned(top: 0, right: 0, child: buildRotate()),
         if (showEditor) Positioned(bottom: 0, right: 0, child: buildResize()),
         if (showEditor) Positioned(left: 0, bottom: 0, child: buildDelete()),
@@ -120,7 +122,7 @@ class _ModelWidgetState extends State<ModelWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.model.enable) return Container();
+    if (!modelCommon.enable) return Container();
     Widget modelWidget = ModelWidgetBuilder(widget.model).build();
     return withController(
       child: modelWidget,
@@ -158,10 +160,10 @@ class CanvasViewModelWidget extends StatelessWidget {
         );
         return Panel(
           widget: widget,
-          position: e.value.position,
+          position: e.value.common.position,
           onMoved: (position) {
-            e.value.position = position;
-            onChanged([e.key, 'position', position]);
+            e.value.common.position = position;
+            onChanged([e.key, 'common', 'position', position]);
           },
         );
       }).toList(),
