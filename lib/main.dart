@@ -5,8 +5,15 @@ import 'package:flutter/rendering.dart';
 
 import 'model.dart';
 import 'model_widget.dart';
+import 'mqtt.dart';
 
-void main() {
+final node = BoardNode(
+  roomId: 'roomId',
+  nodeId: 'nodeId',
+);
+
+void main() async {
+  await node.connect();
   runApp(const MyApp());
 }
 
@@ -76,7 +83,7 @@ class _HomeState extends State<Home> {
         controller: controller,
         viewModel: vm,
         onChanged: (List<String> path, dynamic value) {
-          print(jsonEncode(vm.map));
+          node.broadcast('canvas', jsonEncode([path, value]));
         },
       ),
     );
