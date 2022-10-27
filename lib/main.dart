@@ -30,28 +30,25 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final models = {
-    1: Model(
-      id: 1,
-      type: ModelType.text,
-      data: TextModelData(content: 'HeelloWorld'),
-      common: CommonModelData(),
-    ),
-    2: Model(
-      id: 2,
-      type: ModelType.image,
-      data: ImageModelData('https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg'),
-      common: CommonModelData(),
-    ),
-    3: Model(
-      id: 3,
-      type: ModelType.rect,
-      data: RectModelData(
-        fillColor: Colors.red,
-        borderColor: Colors.blue,
-        borderWidth: 10,
-      ),
-      common: CommonModelData(),
-    ),
+    '1': Model({})
+      ..id = '1'
+      ..type = ModelType.text
+      ..data = (TextModelData({})..content = 'HeelloWorld')
+      ..common = CommonModelData({}),
+    '2': Model({})
+      ..id = '2'
+      ..type = ModelType.image
+      ..data =
+          (ImageModelData({})..url = 'https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg')
+      ..common = CommonModelData({}),
+    '3': Model({})
+      ..id = '3'
+      ..type = ModelType.rect
+      ..data = (RectModelData({})
+        ..fillColor = Colors.red
+        ..borderColor = Colors.blue
+        ..borderWidth = 10)
+      ..common = CommonModelData({}),
   };
   @override
   void initState() {
@@ -69,6 +66,7 @@ class _HomeState extends State<Home> {
           IconButton(
               onPressed: () {
                 controller.value = Matrix4.identity();
+                print(models['1']!.map);
               },
               icon: Icon(Icons.ac_unit))
         ],
@@ -76,7 +74,7 @@ class _HomeState extends State<Home> {
       body: CanvasViewModelWidget(
         // 视口变换控制器
         controller: controller,
-        viewModel: CanvasViewModel(models: models),
+        viewModel: CanvasViewModel({})..models = models,
         onChanged: (List<dynamic> value) {
           print(value);
         },

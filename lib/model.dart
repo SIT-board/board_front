@@ -8,154 +8,90 @@ enum ModelType {
   image,
 }
 
-class ImageModelData {
-  final String url;
-
-  ImageModelData(this.url);
-
-  static ImageModelData fromJson(Map<String, dynamic> json) {
-    return ImageModelData(json['url']);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'url': url};
-  }
+abstract class HashMapData {
+  Map<String, dynamic> map;
+  HashMapData(this.map);
 }
 
-class TextModelData {
-  final String content;
-  final Color? color;
-
-  TextModelData({required this.content, this.color});
-
-  static TextModelData fromJson(Map<String, dynamic> json) {
-    return TextModelData(
-      content: json['content'],
-      color: json['color'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'content': content,
-      'color': color,
-    };
-  }
+class ImageModelData extends HashMapData {
+  String get url => map['url']!;
+  set url(String v) => map['url'] = v;
+  ImageModelData(super.map);
 }
 
-class RectModelData {
-  final Color? fillColor;
-  final Color? borderColor;
-  final double? borderWidth;
-
-  RectModelData({this.fillColor, this.borderColor, this.borderWidth});
-
-  static RectModelData fromJson(Map<String, dynamic> json) {
-    return RectModelData(
-      fillColor: json['fillColor'],
-      borderColor: json['borderColor'],
-      borderWidth: json['borderWidth'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'fillColor': fillColor,
-      'borderColor': borderColor,
-      'borderWidth': borderWidth,
-    };
-  }
+class TextModelData extends HashMapData {
+  String get content => map['content'];
+  set content(String v) => map['content'] = v;
+  Color? get color => ((e) => e == null ? null : Color(e))(map['color']);
+  set color(Color? v) => map['color'] = v?.value;
+  TextModelData(super.map);
 }
 
-class CommonModelData {
+class RectModelData extends HashMapData {
+  Color? get fillColor => ((e) => e == null ? null : Color(e))(map['fillColor']);
+  set fillColor(Color? v) => map['fillColor'] = v?.value;
+  Color? get borderColor => ((e) => e == null ? null : Color(e))(map['borderColor']);
+  set borderColor(Color? v) => map['borderColor'] = v?.value;
+  double? get borderWidth => map['borderWidth'];
+  set borderWidth(double? v) => map['borderWidth'] = v;
+  RectModelData(super.map);
+}
+
+class CommonModelData extends HashMapData {
   /// 模型角度变换
-  double angle = 0;
+  double get angle => map['angle'] ?? 0;
+  set angle(double v) => map['angle'] = v;
 
   /// 模型位置
-  Offset position = const Offset(0, 0);
+  Offset get position => ((e) => e == null ? null : Offset(e[0], e[1]))(map['position']) ?? const Offset(0, 0);
+  set position(Offset v) => map['position'] = v;
 
   /// 模型大小
-  Size size = const Size(100, 100);
+  Size get size => ((e) => e == null ? null : Size(e[0], e[1]))(map['size']) ?? const Size(100, 100);
+  set size(Size v) => map['size'] = [v.width, v.height];
 
   /// 是否显示
-  bool enable = true;
+  bool get enable => map['enable'] ?? true;
+  set enable(bool v) => map['enable'] = v;
 
-  static CommonModelData fromJson(Map<String, dynamic> json) {
-    final data = CommonModelData();
-    data.angle = json['angle'] ?? 0;
-    data.enable = json['enable'] ?? true;
-    final jsonPosition = json['position'];
-    if (jsonPosition != null) data.position = Offset(jsonPosition[0], jsonPosition[1]);
-    final jsonSize = json['size'];
-    if (jsonSize != null) data.size = Size(jsonSize[0], jsonSize[1]);
-    return data;
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'enable': enable,
-      'angle': angle,
-      'position': [position.dx, position.dy],
-      'size': [size.width, size.height],
-    };
-  }
+  CommonModelData(super.map);
 }
 
-class Model {
+class Model extends HashMapData {
   /// 模型id
-  int id;
+  String get id => map['id'];
+  set id(String v) => map['id'] = v;
 
   /// 模型类型
-  ModelType type;
+  ModelType get type => ModelType.values[map['type']];
+  set type(ModelType v) => map['type'] = v.index;
 
   /// 模型数据
-  dynamic data;
+  HashMapData get data {
+    return {
+      ModelType.text: (m) => TextModelData(m),
+      ModelType.image: (m) => ImageModelData(m),
+      ModelType.rect: (m) => RectModelData(m),
+    }[type]!(map['data']);
+  }
+
+  set data(HashMapData v) => map['data'] = v.map;
 
   /// 公共模型数据
-  CommonModelData common;
+  CommonModelData get common => CommonModelData(map['common']);
+  set common(CommonModelData v) => map['common'] = v.map;
 
-  Model({
-    required this.id,
-    required this.type,
-    required this.data,
-    required this.common,
-  });
-
-  static Model fromJson(Map<String, dynamic> json) {
-    final type = Map.fromEntries(ModelType.values.map((e) => MapEntry(e.name, e)))[json['type']]!;
-    final data = {
-      ModelType.image: (m) => ImageModelData.fromJson(m),
-      ModelType.text: (m) => TextModelData.fromJson(m),
-      ModelType.rect: (m) => RectModelData.fromJson(m),
-    }[type]!(json['data']);
-    return Model(
-      id: json['id'],
-      type: type,
-      data: data,
-      common: CommonModelData.fromJson(
-        json['common'],
-      ),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type.name,
-      'data': {
-        ModelType.image: () => (data as ImageModelData).toJson(),
-        ModelType.text: () => (data as TextModelData).toJson(),
-        ModelType.rect: () => (data as RectModelData).toJson(),
-      }[type]!(),
-      'common': common.toJson(),
-    };
-  }
+  Model(super.map);
 }
 
-class CanvasViewModel {
+class CanvasViewModel extends HashMapData {
   /// 视口变换
-  final Matrix4? viewerTransform;
-  final Map<int, Model> models;
+  Matrix4? get viewerTransform => ((e) => e == null ? null : Matrix4.fromList(e))(map['viewerTransform']);
+  set viewerTransform(Matrix4? v) => map['viewerTransform'] = v?.storage;
+  Map<String, Model> get models =>
+      (map['models'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Model(value)));
 
-  CanvasViewModel({this.viewerTransform, required this.models});
+  set models(Map<String, Model> v) => map['models'] = v.map((key, value) => MapEntry(key, value.map));
+
+  CanvasViewModel(super.map);
 }
