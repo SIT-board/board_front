@@ -7,6 +7,7 @@ void main() {
     final node = BoardNode(
       roomId: 'roomId',
       nodeId: 'nodeId',
+      onModelChanged: (Map<dynamic, dynamic> value) {},
     );
     await node.connect();
     node.broadcast('test', 'message');

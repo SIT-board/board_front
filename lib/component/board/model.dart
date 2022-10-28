@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 enum ModelType {
   text,
@@ -84,7 +82,8 @@ class Model extends HashMapData {
   Model(super.map);
 }
 
-class CanvasViewModel extends HashMapData {
+/// 画板的ViewModel
+class BoardViewModel extends HashMapData {
   /// 视口变换
   Matrix4? get viewerTransform => ((e) {
         if (e == null || e is! List) return null;
@@ -96,5 +95,5 @@ class CanvasViewModel extends HashMapData {
 
   set models(Map<String, Model> v) => map['models'] = v.map((key, value) => MapEntry(key, value.map));
 
-  CanvasViewModel(super.map);
+  BoardViewModel(super.map);
 }

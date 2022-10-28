@@ -1,5 +1,4 @@
-import 'package:board_front/model.dart';
-import 'package:board_front/model_widget.dart';
+import 'package:board_front/component/board/board.dart';
 import 'package:board_front/mqtt.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +20,7 @@ class BoardPage extends StatefulWidget {
 class _BoardPageState extends State<BoardPage> {
   final controller = TransformationController();
 
-  var vm = CanvasViewModel({
+  var vm = BoardViewModel({
     "models": {
       "1": {
         "id": "1",
@@ -73,7 +72,7 @@ class _BoardPageState extends State<BoardPage> {
     nodeId: widget.selfId,
     onModelChanged: (vm) {
       setState(() {
-        this.vm = CanvasViewModel(vm.map((key, value) => MapEntry(key as String, value)));
+        this.vm = BoardViewModel(vm.map((key, value) => MapEntry(key as String, value)));
         print(vm);
       });
     },

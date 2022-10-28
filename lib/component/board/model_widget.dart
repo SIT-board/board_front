@@ -21,7 +21,6 @@ class ModelWidget extends StatefulWidget {
 
 /// 角落按钮直径
 const _floatingActionDiameter = 18.0;
-const _floatingActionPadding = 24.0;
 
 /// 悬浮按钮
 class _FloatingActionIcon extends StatelessWidget {
@@ -131,7 +130,7 @@ class _ModelWidgetState extends State<ModelWidget> {
 }
 
 class CanvasViewModelWidget extends StatelessWidget {
-  final CanvasViewModel viewModel;
+  final BoardViewModel viewModel;
   final TransformationController controller;
   final ValueSetter<Model>? onTap;
   final void Function(List<String> path, dynamic value) onChanged;
