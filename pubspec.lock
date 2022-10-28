@@ -81,6 +81,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  intl:
+    dependency: "direct main"
+    description:
+      name: intl
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.17.0"
   lints:
     dependency: transitive
     description:
