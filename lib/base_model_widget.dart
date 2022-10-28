@@ -8,9 +8,18 @@ class TextModelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      data.content,
-      style: TextStyle(color: data.color),
+    final controller = TextEditingController();
+    controller.text = data.content;
+    controller.addListener(() {});
+    return EditableText(
+      controller: controller,
+      focusNode: FocusNode(),
+      selectionColor: Colors.blue,
+      style: TextStyle(
+        color: data.color ?? Colors.black,
+      ),
+      cursorColor: Colors.black,
+      backgroundCursorColor: Colors.transparent,
     );
   }
 }
