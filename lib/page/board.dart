@@ -1,16 +1,14 @@
 import 'package:board_front/component/board/board.dart';
-import 'package:board_front/mqtt.dart';
 import 'package:flutter/material.dart';
 
 class BoardPage extends StatefulWidget {
   final String roomId;
-  final String selfId;
-  final String otherId;
+  final String nodeId;
+
   const BoardPage({
     Key? key,
     required this.roomId,
-    required this.selfId,
-    required this.otherId,
+    required this.nodeId,
   }) : super(key: key);
 
   @override
@@ -67,19 +65,8 @@ class _BoardPageState extends State<BoardPage> {
     ]
   });
 
-  late final node = BoardNode(
-    roomId: widget.roomId,
-    nodeId: widget.selfId,
-    onModelChanged: (vm) {
-      setState(() {
-        this.vm = BoardViewModel(vm.map((key, value) => MapEntry(key as String, value)));
-        print(vm);
-      });
-    },
-  );
   @override
   void initState() {
-    node.connect();
     super.initState();
   }
 
@@ -88,21 +75,13 @@ class _BoardPageState extends State<BoardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('test'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                node.sendToBoard(widget.otherId, vm);
-              },
-              icon: Icon(Icons.ac_unit))
-        ],
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.ac_unit))],
       ),
       body: CanvasViewModelWidget(
         // 视口变换控制器
         controller: controller,
         viewModel: vm,
         onChanged: (List<String> path, dynamic value) {
-          node.sendToBoard(widget.otherId, vm);
-
           // node.broadcast('cmd', jsonEncode([path, value]));
           // node.broadcastBoard(vm);
         },

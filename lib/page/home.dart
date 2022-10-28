@@ -62,8 +62,7 @@ class HomePage extends StatelessWidget {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) {
               return BoardPage(
                 roomId: text[0],
-                selfId: text[1],
-                otherId: text[2],
+                nodeId: text[1],
               );
             }));
           },
