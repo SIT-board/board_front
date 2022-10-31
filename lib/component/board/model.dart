@@ -51,7 +51,7 @@ class CommonModelData extends HashMapData {
   /// 模型尺寸约束
   BoxConstraints get constraints {
     final list = map['constraints'];
-    if (list == null) return const BoxConstraints();
+    if (list == null) return const BoxConstraints(maxWidth: double.maxFinite, maxHeight: double.maxFinite);
     return BoxConstraints(
       minWidth: list[0],
       maxWidth: list[1],
