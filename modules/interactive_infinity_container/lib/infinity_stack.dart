@@ -34,6 +34,14 @@ class InfinityRenderStack extends RenderStack {
   /// 通过复写这里的点击检测代码解除stack越界触摸限制
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    // 原本的RenderBox的点击判定的源码需要进行box边界裁剪
+    // if (_size!.contains(position)) {
+    //   if (hitTestChildren(result, position: position) || hitTestSelf(position)) {
+    //     result.add(BoxHitTestEntry(this, position));
+    //     return true;
+    //   }
+    // }
+    // override一下删除边界裁剪函数
     if (hitTestChildren(result, position: position) || hitTestSelf(position)) {
       result.add(BoxHitTestEntry(this, position));
       return true;
