@@ -19,6 +19,8 @@ void main() {
     final m = testMap();
     m[['a1', 'c2', 2]] = 98;
     expect(m.data['a1']['c2'][2], equals(98));
+    m[['a1', 'c2', '1']] = 666;
+    expect(m.data['a1']['c2'][1], equals(666));
   });
   test('test map get by path', () {
     final m = testMap();
@@ -32,5 +34,25 @@ void main() {
     final m = testList();
     m[[2, 1]] = 999;
     expect(m.data[2][1], equals(999));
+  });
+  test('test contains by path', () {
+    final m = testMap();
+    expect(m.contains(['a1', 'b2']), true);
+    expect(m.contains(['a1', 'c2', 4]), false);
+    expect(m.contains(['a1', 'c2', 1]), true);
+    expect(m.contains(['a1', 'c2', '1']), true);
+  });
+  test('test get pathList', () {
+    final m = testMap();
+    final testCases = [
+      ['a1', 'a2'],
+      ['a1', 'b2'],
+      ['a1', 'c2', 0],
+      ['a1', 'c2', 1],
+      ['a1', 'c2', 2],
+      ['a1', 'c2', 'b1']
+    ].map((e) => e.join('/')).toSet();
+    final paths = m.pathList.map((e) => e.join('/')).toSet();
+    expect(paths.containsAll(testCases), true);
   });
 }
