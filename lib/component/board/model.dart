@@ -46,10 +46,21 @@ class CommonModelData extends HashMapData {
 
   /// 模型大小
   Size get size => ((e) => e == null ? null : Size(e[0], e[1]))(map['size']) ?? const Size(100, 100);
-  set size(Size v) => map['size'] = [
-        v.width >= 0 ? v.width : -v.width,
-        v.height >= 0 ? v.height : -v.height
-      ];
+  set size(Size v) => map['size'] = [v.width, v.height];
+
+  /// 模型尺寸约束
+  BoxConstraints get constraints {
+    final list = map['constraints'];
+    if (list == null) return const BoxConstraints();
+    return BoxConstraints(
+      minWidth: list[0],
+      maxWidth: list[1],
+      minHeight: list[2],
+      maxHeight: list[3],
+    );
+  }
+
+  set constraints(BoxConstraints v) => map['constraints'] = [v.minWidth, v.maxWidth, v.minHeight, v.maxHeight];
 
   /// 是否显示
   bool get enable => map['enable'] ?? true;
@@ -93,11 +104,10 @@ class BoardViewModel extends HashMapData {
         return Matrix4.fromList((e).map((e) => e as double).toList());
       })(map['viewerTransform']);
   set viewerTransform(Matrix4? v) => map['viewerTransform'] = v?.storage;
-  Map<String, Model> get models => (map['models'] as Map<String, dynamic>)
-      .map((key, value) => MapEntry(key, Model(value)));
+  Map<String, Model> get models =>
+      (map['models'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Model(value)));
 
-  set models(Map<String, Model> v) =>
-      map['models'] = v.map((key, value) => MapEntry(key, value.map));
+  set models(Map<String, Model> v) => map['models'] = v.map((key, value) => MapEntry(key, value.map));
 
   BoardViewModel(super.map);
 }
