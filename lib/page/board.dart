@@ -24,7 +24,7 @@ class _BoardPageState extends State<BoardPage> {
         "id": "1",
         "type": 0,
         "data": {"content": "HeelloWorld"},
-        "common": {
+        "common": <String, dynamic>{
           "position": [295.0, 386.0]
         }
       },
@@ -32,7 +32,7 @@ class _BoardPageState extends State<BoardPage> {
         "id": "2",
         "type": 2,
         "data": {"url": "https://api.jikipedia.com/upload/7b732b18afcbe8dfe776937fab2ae01b_scaled.jpg"},
-        "common": {
+        "common": <String, dynamic>{
           "position": [435.0, 153.0]
         }
       },
@@ -40,7 +40,7 @@ class _BoardPageState extends State<BoardPage> {
         "id": "3",
         "type": 1,
         "data": {"fillColor": 4294198070, "borderColor": 4280391411, "borderWidth": 10.0},
-        "common": {
+        "common": <String, dynamic>{
           "position": [152.0, 200.0],
           "constraints": [20.0, 100.0, 50.0, 100.0]
         }
