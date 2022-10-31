@@ -77,7 +77,7 @@ packages:
   interactive_infinity_container:
     dependency: "direct main"
     description:
-      path: "models/interactive_infinity_container"
+      path: "modules/interactive_infinity_container"
       relative: true
     source: path
     version: "0.0.1"
