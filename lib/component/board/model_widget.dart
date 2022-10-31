@@ -62,7 +62,7 @@ class _ModelWidgetState extends State<ModelWidget> {
     return GestureDetector(
       child: const Icon(Icons.zoom_out_map),
       onPanUpdate: (d) {
-        setState(() => modelCommon.size += d.delta);
+        setState(() => modelCommon.size = modelCommon.constraints.constrain(modelCommon.size + d.delta));
         widget.onChanged(['common', 'size'], modelCommon.map['size']);
       },
     );
@@ -92,6 +92,7 @@ class _ModelWidgetState extends State<ModelWidget> {
     // 添加边界顺便约束
     child = Container(
       alignment: Alignment.center,
+      constraints: modelCommon.constraints,
       height: modelCommon.size.height,
       width: modelCommon.size.width,
       child: child,

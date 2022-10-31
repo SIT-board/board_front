@@ -41,7 +41,8 @@ class _BoardPageState extends State<BoardPage> {
         "type": 1,
         "data": {"fillColor": 4294198070, "borderColor": 4280391411, "borderWidth": 10.0},
         "common": {
-          "position": [152.0, 200.0]
+          "position": [152.0, 200.0],
+          "constraints": [20.0, 100.0, 50.0, 100.0]
         }
       }
     },
@@ -84,6 +85,7 @@ class _BoardPageState extends State<BoardPage> {
         onChanged: (List<String> path, dynamic value) {
           // node.broadcast('cmd', jsonEncode([path, value]));
           // node.broadcastBoard(vm);
+          print('$path=$value');
         },
       ),
     );

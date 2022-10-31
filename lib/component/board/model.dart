@@ -48,6 +48,20 @@ class CommonModelData extends HashMapData {
   Size get size => ((e) => e == null ? null : Size(e[0], e[1]))(map['size']) ?? const Size(100, 100);
   set size(Size v) => map['size'] = [v.width, v.height];
 
+  /// 模型尺寸约束
+  BoxConstraints get constraints {
+    final list = map['constraints'];
+    if (list == null) return const BoxConstraints();
+    return BoxConstraints(
+      minWidth: list[0],
+      maxWidth: list[1],
+      minHeight: list[2],
+      maxHeight: list[3],
+    );
+  }
+
+  set constraints(BoxConstraints v) => map['constraints'] = [v.minWidth, v.maxWidth, v.minHeight, v.maxHeight];
+
   /// 是否显示
   bool get enable => map['enable'] ?? true;
   set enable(bool v) => map['enable'] = v;
