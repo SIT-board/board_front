@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:board_front/component/board/board.dart';
 import 'package:flutter/material.dart';
 
@@ -44,6 +46,32 @@ class _BoardPageState extends State<BoardPage> {
           "position": [152.0, 200.0],
           "constraints": [20.0, 100.0, 50.0, 100.0]
         }
+      },
+      "4": {
+        "id": "4",
+        "type": 3,
+        "data": {
+          "pathList": <Map<String, dynamic>>[
+            {
+              'points': [
+                [0.0, 0.0],
+                [100.0, 100.0]
+              ],
+              'color': 4294198070,
+            },
+            {
+              'points': [
+                [0.0, 100.0],
+                [100.0, 0.0],
+              ],
+              'color': 4280391411,
+            }
+          ],
+        },
+        "common": <String, dynamic>{
+          "position": [152.0, 200.0],
+          // "constraints": [20.0, 100.0, 50.0, 100.0]
+        }
       }
     },
     "viewerTransform": [
@@ -76,7 +104,13 @@ class _BoardPageState extends State<BoardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('test'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.ac_unit))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                print(jsonEncode(vm.map));
+              },
+              icon: Icon(Icons.ac_unit))
+        ],
       ),
       body: CanvasViewModelWidget(
         // 视口变换控制器
