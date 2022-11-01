@@ -190,3 +190,19 @@ class BoardNode {
     broadcast('report', '');
   }
 }
+
+class MyBoardNode {
+  final BoardNode node;
+  MyBoardNode(this.node) {
+    node.registerForOnReceive(
+        topic: 'requestBoardModel',
+        callback: (BoardMessage message) {
+          // 其他节点向该节点发起模型数据请求
+        });
+    node.registerForOnReceive(topic: 'boardModelRefresh', callback: (BoardMessage message) {});
+  }
+  // 请求一份BoardModel
+  void requestBoardModel() {
+    node.broadcast('requestBoardModel', '');
+  }
+}

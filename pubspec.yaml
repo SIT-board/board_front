@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  interactive_infinity_container: { path: modules/interactive_infinity_container }
   intl: ^0.17.0
   mqtt_client: ^9.7.2
 
