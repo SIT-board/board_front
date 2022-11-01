@@ -1,4 +1,5 @@
 library board;
 
-export 'model.dart';
-export 'model_widget.dart';
+export 'data.dart';
+export 'model/model.dart';
+export 'widget.dart';

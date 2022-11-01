@@ -8,10 +8,12 @@ class Panel {
   Offset position;
   final Widget widget;
   final ValueSetter<Offset>? onMoved;
+  final VoidCallback? onTap;
   Panel({
     this.position = const Offset(0, 0),
     required this.widget,
     this.onMoved,
+    this.onTap,
   });
 }
 
@@ -37,6 +39,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         setState(() => e.position = e.position + d.delta);
         if (widget.panel.onMoved != null) widget.panel.onMoved!(e.position);
       },
+      onTap: widget.panel.onTap,
       child: result,
     );
     result = Positioned(
