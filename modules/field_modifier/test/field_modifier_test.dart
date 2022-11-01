@@ -25,6 +25,8 @@ void main() {
   test('test map get by path', () {
     final m = testMap();
     expect(m.data['a1']['b2'], equals(true));
+    expect(m['a1.b2'], equals(true));
+    expect(m['a1.c2.2'], equals(3));
   });
   test('test list get by path', () {
     final m = testList();

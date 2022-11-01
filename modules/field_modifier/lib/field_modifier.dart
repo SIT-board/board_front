@@ -9,7 +9,13 @@ class FieldModifier {
   }
 
   dynamic get(List<dynamic> path) => _get(data, path, 0);
-  dynamic operator [](List<dynamic> path) => get(path);
+  dynamic operator [](dynamic path) {
+    if (path is List) {
+      return get(path);
+    } else {
+      return get(path.toString().split('.'));
+    }
+  }
 
   static void _set(dynamic data, List<dynamic> path, dynamic value) {
     final parent = _get(data, path.sublist(0, path.length - 1), 0);
@@ -22,7 +28,13 @@ class FieldModifier {
   }
 
   void set(List<dynamic> path, dynamic value) => _set(data, path, value);
-  void operator []=(List<dynamic> path, dynamic value) => set(path, value);
+  void operator []=(dynamic path, dynamic value) {
+    if (path is List) {
+      set(path, value);
+    } else {
+      set(path.toString().split('.'), value);
+    }
+  }
 
   bool contains(List<dynamic> path) {
     final parent = _get(data, path.sublist(0, path.length - 1), 0);
