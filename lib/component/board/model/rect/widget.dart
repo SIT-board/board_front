@@ -10,10 +10,10 @@ class RectModelWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: data.fillColor,
+        color: data.fillColor.value,
         border: Border.all(
-          color: data.borderColor ?? const Color(0xFF000000),
-          width: data.borderWidth ?? 1.0,
+          color: data.borderColor.value ?? const Color(0xFF000000),
+          width: data.borderWidth.value ?? 1.0,
         ),
       ),
     );

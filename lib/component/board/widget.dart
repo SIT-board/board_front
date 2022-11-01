@@ -2,6 +2,8 @@ import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/interactive_infinity_layout/interactive_infinity_layout.dart';
 import 'package:flutter/material.dart';
 
+import 'model/data.dart';
+
 class ModelWidget extends StatefulWidget {
   final Model model;
   final ValueSetter<Model>? onTap;
@@ -40,7 +42,6 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.zoom_out_map),
       onPanUpdate: (d) {
         setState(() => modelCommon.size = modelCommon.constraints.constrain(modelCommon.size + d.delta));
-        widget.onChanged(['common', 'size'], modelCommon.map['size']);
       },
     );
   }

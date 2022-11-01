@@ -11,12 +11,12 @@ class MyCustomPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final path in data.pathList) {
+    for (final path in data.pathList.value) {
       final paint = Paint()
-        ..color = path.color
+        ..color = path.color.value
         ..strokeCap = StrokeCap.round
         ..strokeWidth = 5.0;
-      final points = path.points;
+      final points = path.points.value;
       for (int i = 0; i < points.length - 1; i++) {
         canvas.drawLine(points[i], points[i + 1], paint);
       }
@@ -43,29 +43,21 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onPanStart: (d) {
-        final pathList = widget.data.pathList;
-        pathList.add(
-          FreeStylePathModelData({
-            'color': Color.fromARGB(
-              255,
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256),
-            ).value,
-          }),
-        );
-        widget.data.pathList = pathList;
+        widget.data.pathList.value.add(FreeStylePathModelData()
+          ..color.value = Color.fromARGB(
+            255,
+            Random().nextInt(256),
+            Random().nextInt(256),
+            Random().nextInt(256),
+          ));
       },
       onPanUpdate: (d) {
         // 绘制越界
         if (!context.size!.contains(d.localPosition)) return;
-        final points = widget.data.pathList.last.points;
-        points.add(d.localPosition);
-        widget.data.pathList.last.points = points;
-        setState(() {});
+        widget.data.pathList.value.last.points.value.add(d.localPosition);
       },
       onPanEnd: (d) {
-        print('Add path: ${widget.data.pathList.last}');
+        print('Add path: ${widget.data.pathList.value.last}');
       },
       child: CustomPaint(
         painter: MyCustomPainter(widget.data),

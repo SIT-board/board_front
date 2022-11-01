@@ -1,7 +1,5 @@
-import 'package:board_front/interface/hash_map_data.dart';
+import 'package:board_front/util/value.dart';
 
-class ImageModelData extends HashMapData {
-  String get url => map['url']!;
-  set url(String v) => map['url'] = v;
-  ImageModelData(super.map);
+class ImageModelData {
+  MyValueNotifier<String> url = MyValueNotifier('');
 }

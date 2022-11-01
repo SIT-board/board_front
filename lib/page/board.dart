@@ -20,7 +20,7 @@ class BoardPage extends StatefulWidget {
 class _BoardPageState extends State<BoardPage> {
   final controller = TransformationController();
 
-  var vm = BoardViewModel({
+  var vm = BoardViewModel()..models={
     "models": {
       "1": {
         "id": "1",
