@@ -7,6 +7,7 @@ enum ModelType {
   rect,
   image,
   freeStyle,
+  line,
 }
 
 class Model extends HashMapData {
@@ -25,6 +26,7 @@ class Model extends HashMapData {
       ModelType.image: (m) => ImageModelData(m),
       ModelType.rect: (m) => RectModelData(m),
       ModelType.freeStyle: (m) => FreeStyleModelData(m),
+      ModelType.line: (m) => LineModelData(m),
     }[type]!(map['data']);
   }
 

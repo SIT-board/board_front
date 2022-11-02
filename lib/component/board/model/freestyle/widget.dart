@@ -31,7 +31,14 @@ class MyCustomPainter extends CustomPainter {
 
 class FreeStyleWidget extends StatefulWidget {
   final FreeStyleModelData data;
-  const FreeStyleWidget({Key? key, required this.data}) : super(key: key);
+  final bool editable;
+  final ValueSetter<FreeStylePathModelData>? onDrawPath;
+  const FreeStyleWidget({
+    Key? key,
+    required this.data,
+    required this.editable,
+    required this.onDrawPath,
+  }) : super(key: key);
 
   @override
   State<FreeStyleWidget> createState() => _FreeStyleWidgetState();
@@ -40,6 +47,14 @@ class FreeStyleWidget extends StatefulWidget {
 class _FreeStyleWidgetState extends State<FreeStyleWidget> {
   @override
   Widget build(BuildContext context) {
+    Widget child = CustomPaint(
+      painter: MyCustomPainter(widget.data),
+      size: Size.infinite,
+    );
+    child = ClipRect(
+      child: child,
+    );
+    if (!widget.editable) return child;
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onPanStart: (d) {
@@ -57,8 +72,8 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
         widget.data.pathList = pathList;
       },
       onPanUpdate: (d) {
-        // 绘制越界
         if (!context.size!.contains(d.localPosition)) return;
+        // 绘制越界
         final points = widget.data.pathList.last.points;
         points.add(d.localPosition);
         widget.data.pathList.last.points = points;
@@ -66,11 +81,9 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
       },
       onPanEnd: (d) {
         print('Add path: ${widget.data.pathList.last}');
+        if (widget.onDrawPath != null) widget.onDrawPath!(widget.data.pathList.last);
       },
-      child: CustomPaint(
-        painter: MyCustomPainter(widget.data),
-        size: Size.infinite,
-      ),
+      child: child,
     );
   }
 }

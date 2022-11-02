@@ -7,12 +7,14 @@ class ModelWidget extends StatefulWidget {
   final ValueSetter<Model>? onTap;
   final void Function(List<String> path, dynamic value) onChanged;
   final VoidCallback? onTopButtonClick;
+  final VoidCallback? onBottomButtonClick;
   const ModelWidget({
     Key? key,
     required this.model,
     this.onTap,
     required this.onChanged,
     this.onTopButtonClick,
+    this.onBottomButtonClick,
   }) : super(key: key);
 
   @override
@@ -28,10 +30,15 @@ class _ModelWidgetState extends State<ModelWidget> {
 
   Widget buildTop() {
     return InkWell(
-      onTap: () {
-        widget.onTopButtonClick?.call();
-      },
+      onTap: () => widget.onTopButtonClick?.call(),
       child: const Icon(Icons.vertical_align_top_outlined),
+    );
+  }
+
+  Widget buildBottom() {
+    return InkWell(
+      onTap: () => widget.onBottomButtonClick?.call(),
+      child: const Icon(Icons.vertical_align_bottom_outlined),
     );
   }
 
@@ -66,18 +73,10 @@ class _ModelWidgetState extends State<ModelWidget> {
   }
 
   Widget withController({required Widget child}) {
-    // 添加边界顺便约束
-    child = Container(
-      alignment: Alignment.center,
-      constraints: modelCommon.constraints,
-      height: modelCommon.size.height,
-      width: modelCommon.size.width,
-      child: child,
-    );
-
     List<Widget> buildControllerWidgetList() => [
           // 上中
           Positioned(top: 0, left: 0, right: 0, child: buildTop()),
+          Positioned(bottom: 0, left: 0, right: 0, child: buildBottom()),
           // 左上
           Positioned(top: 0, left: 0, child: buildDrag()),
           // 右上
@@ -96,32 +95,42 @@ class _ModelWidgetState extends State<ModelWidget> {
       ],
     );
 
-    // 为stack添加边界
-    child = Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 2, color: Colors.blue),
-      ),
-      child: child,
-    );
+    if (modelCommon.editableState) {
+      // 为stack添加边界
+      child = Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: Colors.blue),
+        ),
+        child: child,
+      );
+    }
     return child;
   }
 
   @override
   Widget build(BuildContext context) {
     if (!modelCommon.enable) return Container();
-    Widget modelWidget = ModelWidgetBuilder(widget.model).build();
+    Widget child = ModelWidgetBuilder(widget.model).build();
+    // 添加边界和约束
+    child = Container(
+      alignment: Alignment.center,
+      constraints: modelCommon.constraints,
+      height: modelCommon.size.height,
+      width: modelCommon.size.width,
+      child: child,
+    );
     return withController(
-      child: modelWidget,
+      child: child,
     );
   }
 }
 
-class CanvasViewModelWidget extends StatefulWidget {
+class BoardViewModelWidget extends StatefulWidget {
   final BoardViewModel viewModel;
   final TransformationController controller;
   final ValueSetter<Model>? onTap;
   final void Function(List<String> path, dynamic value) onChanged;
-  const CanvasViewModelWidget({
+  const BoardViewModelWidget({
     Key? key,
     required this.viewModel,
     required this.controller,
@@ -130,17 +139,18 @@ class CanvasViewModelWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CanvasViewModelWidget> createState() => _CanvasViewModelWidgetState();
+  State<BoardViewModelWidget> createState() => _BoardViewModelWidgetState();
 }
 
-class _CanvasViewModelWidgetState extends State<CanvasViewModelWidget> {
+class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget.viewModel.viewerTransform != null) widget.controller.value = widget.viewModel.viewerTransform!;
-    // widget.controller.addListener(() {
-    //   widget.viewModel.viewerTransform = widget.controller.value;
-    //   widget.onChanged(['viewerTransform'], widget.viewModel.map['viewerTransform']);
-    // });
+    widget.controller.addListener(() {
+      widget.viewModel.viewerTransform = widget.controller.value;
+      // widget.onChanged(['viewerTransform'], widget.viewModel.map['viewerTransform']);
+    });
+    // 按照层叠次序排序, index越大的越靠前
     List<Model> models = widget.viewModel.models.entries.map((e) => e.value).toList();
     models.sort((a, b) => a.common.index - b.common.index);
     return InteractiveInfinityLayout(
@@ -148,34 +158,43 @@ class _CanvasViewModelWidgetState extends State<CanvasViewModelWidget> {
       minScale: 0.3,
       maxScale: 100,
       children: models.map((e) {
+        Widget child = ModelWidget(
+          model: e,
+          onTap: widget.onTap,
+          onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
+          onTopButtonClick: () {
+            List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+            indexList.sort();
+            // 层叠关系变更
+            setState(() => e.common.index = indexList.last + 1);
+          },
+          onBottomButtonClick: () {
+            List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+            indexList.sort();
+            // 层叠关系变更
+            setState(() => e.common.index = indexList.first - 1);
+          },
+        );
+        child = GestureDetector(
+          onTap: () {
+            setState(() {
+              models.forEach((e) => e.common.editableState = false);
+              e.common.editableState = true;
+            });
+          },
+          onPanUpdate: (d) {
+            setState(() {
+              models.forEach((e) => e.common.editableState = false);
+              e.common.editableState = true;
+              e.common.position += d.delta;
+            });
+          },
+          child: child,
+        );
         return Positioned(
           left: e.common.position.dx,
           top: e.common.position.dy,
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                models.forEach((e) => e.common.editableState = false);
-                e.common.editableState = true;
-              });
-            },
-            onPanUpdate: (d) {
-              setState(() {
-                models.forEach((e) => e.common.editableState = false);
-                e.common.editableState = true;
-                e.common.position += d.delta;
-              });
-            },
-            child: ModelWidget(
-              model: e,
-              onTap: widget.onTap,
-              onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
-              onTopButtonClick: () {
-                List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
-                indexList.sort();
-                e.common.index = indexList.last + 1;
-              },
-            ),
-          ),
+          child: child,
         );
       }).toList(),
     );

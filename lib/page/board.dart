@@ -47,6 +47,16 @@ class _BoardPageState extends State<BoardPage> {
           "constraints": [20.0, 100.0, 50.0, 100.0]
         }
       },
+      "5": {
+        "id": "5",
+        "type": 4,
+        "data": <String, dynamic>{},
+        "common": <String, dynamic>{
+          "position": [0.0, 0.0],
+          "size": [100.0, 100.0],
+          "constraints": [0.0, double.maxFinite, 60.0, 60.0]
+        }
+      },
       "4": {
         "id": "4",
         "type": 3,
@@ -93,12 +103,6 @@ class _BoardPageState extends State<BoardPage> {
       1.0
     ]
   });
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +116,7 @@ class _BoardPageState extends State<BoardPage> {
               icon: Icon(Icons.ac_unit))
         ],
       ),
-      body: CanvasViewModelWidget(
+      body: BoardViewModelWidget(
         // 视口变换控制器
         controller: controller,
         viewModel: vm,
