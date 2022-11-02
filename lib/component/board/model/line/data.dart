@@ -2,9 +2,13 @@ import 'package:board_front/interface/hash_map_data.dart';
 import 'package:flutter/material.dart';
 
 class LineModelData extends HashMapData {
-  double get thickness => map['thickness'] ?? 3.0;
+  double get thickness => map['thickness'] ?? 1.0;
   set thickness(double v) => map['thickness'] = v;
   Color get color => ((e) => e != null ? Color(e) : Colors.black)(map['color']);
   set color(Color v) => map['color'] = v.value;
+  double get dashLength => map['dashLength'] ?? 4;
+  set dashLength(double v) => map['dashLength'] = v;
+  double get dashGapLength => map['dashGapLength'] ?? 4;
+  set dashGapLength(double v) => map['dashGapLength'] = v;
   LineModelData(super.map);
 }
