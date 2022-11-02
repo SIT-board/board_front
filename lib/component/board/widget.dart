@@ -125,6 +125,8 @@ class _ModelWidgetState extends State<ModelWidget> {
   }
 }
 
+class BoardController {}
+
 class BoardViewModelWidget extends StatefulWidget {
   final BoardViewModel viewModel;
   final TransformationController controller;
@@ -143,6 +145,47 @@ class BoardViewModelWidget extends StatefulWidget {
 }
 
 class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
+  void cancelAllEditableState() {
+    setState(() => getModelDataList().forEach((e) => e.common.editableState = false));
+  }
+
+  Widget buildModelWidget(Model e) {
+    return ModelWidget(
+      model: e,
+      onTap: widget.onTap,
+      onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
+      onTopButtonClick: () {
+        List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+        indexList.sort();
+        // 层叠关系变更
+        setState(() => e.common.index = indexList.last + 1);
+      },
+      onBottomButtonClick: () {
+        List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+        indexList.sort();
+        // 层叠关系变更
+        setState(() => e.common.index = indexList.first - 1);
+      },
+    );
+  }
+
+  List<Model> getModelDataList() => widget.viewModel.models.entries.map((e) => e.value).toList();
+
+  void onModelWidgetTap(Model e) {
+    setState(() {
+      getModelDataList().forEach((e) => e.common.editableState = false);
+      e.common.editableState = true;
+    });
+  }
+
+  void onModelMoved(Model e, Offset target) {
+    setState(() {
+      getModelDataList().forEach((e) => e.common.editableState = false);
+      e.common.editableState = true;
+      e.common.position = target;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.viewModel.viewerTransform != null) widget.controller.value = widget.viewModel.viewerTransform!;
@@ -151,50 +194,22 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
       // widget.onChanged(['viewerTransform'], widget.viewModel.map['viewerTransform']);
     });
     // 按照层叠次序排序, index越大的越靠前
-    List<Model> models = widget.viewModel.models.entries.map((e) => e.value).toList();
+    List<Model> models = getModelDataList();
     models.sort((a, b) => a.common.index - b.common.index);
     return InteractiveInfinityLayout(
       viewerTransformationController: widget.controller,
       minScale: 0.3,
       maxScale: 100,
       children: models.map((e) {
-        Widget child = ModelWidget(
-          model: e,
-          onTap: widget.onTap,
-          onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
-          onTopButtonClick: () {
-            List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
-            indexList.sort();
-            // 层叠关系变更
-            setState(() => e.common.index = indexList.last + 1);
-          },
-          onBottomButtonClick: () {
-            List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
-            indexList.sort();
-            // 层叠关系变更
-            setState(() => e.common.index = indexList.first - 1);
-          },
-        );
-        child = GestureDetector(
-          onTap: () {
-            setState(() {
-              models.forEach((e) => e.common.editableState = false);
-              e.common.editableState = true;
-            });
-          },
-          onPanUpdate: (d) {
-            setState(() {
-              models.forEach((e) => e.common.editableState = false);
-              e.common.editableState = true;
-              e.common.position += d.delta;
-            });
-          },
-          child: child,
-        );
         return Positioned(
           left: e.common.position.dx,
           top: e.common.position.dy,
-          child: child,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque, // 透明区域也捕获点击
+            onTap: () => onModelWidgetTap(e),
+            onPanUpdate: (d) => onModelMoved(e, e.common.position + d.delta),
+            child: buildModelWidget(e),
+          ),
         );
       }).toList(),
     );
