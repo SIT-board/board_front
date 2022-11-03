@@ -51,6 +51,7 @@ class JsonDiffPatcher {
   Map<dynamic, dynamic> source;
   JsonDiffPatcher(this.source);
 
+  /// 实际上source + patch = target
   JsonPatch diff(dynamic target) {
     final sfm = FieldModifier(source);
     final tfm = FieldModifier(target);
