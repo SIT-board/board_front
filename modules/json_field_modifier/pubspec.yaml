@@ -1,6 +1,7 @@
 name: json_field_modifier
 description: 根据path路径递归地修改json object字段
 version: 1.0.0
+publish_to: none
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
