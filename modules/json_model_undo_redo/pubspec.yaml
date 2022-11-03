@@ -1,0 +1,14 @@
+name: json_model_undo_redo
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=2.18.2 <3.0.0'
+
+dependencies:
+  json_diff_patcher: { path: ../json_diff_patcher }
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.16.0
