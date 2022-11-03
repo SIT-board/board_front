@@ -1,4 +1,4 @@
-library event_bus;
+library board_event_bus;
 
 import 'dart:async';
 

@@ -1,4 +1,4 @@
-import 'package:event_bus/event_bus.dart';
+import 'package:board_event_bus/board_event_bus.dart';
 
 enum EventName {
   eventA,
