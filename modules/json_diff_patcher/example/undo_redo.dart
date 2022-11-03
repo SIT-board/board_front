@@ -14,11 +14,20 @@ class UndoRedoManager {
   List<JsonPatch> history = [];
   int currentPtr = -1; // 指向某个补丁对应的快照指针
 
+  /// 恢复到上一次的store
+  void restoreLast() {
+    final patcher = JsonDiffPatcher(model);
+    // patch = lastStore - model;
+    final patch = patcher.diff(lastStore);
+    // model = lastStore + (-patch)
+    patcher.applyPatch(patch);
+  }
+
   /// 快照捕获
   void store() {
     if (canRedo) history.removeRange(currentPtr + 1, history.length);
 
-    // 计算 model - lastStore = patch
+    // 计算 patch = model - lastStore
     final patch = JsonDiffPatcher(lastStore).diff(model);
     history.add(patch);
     lastStore = copy(model);
