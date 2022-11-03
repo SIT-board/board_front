@@ -1,4 +1,4 @@
-import 'package:field_modifier/field_modifier.dart';
+import 'package:json_field_modifier/json_field_modifier.dart';
 
 void main() {
   final map = {

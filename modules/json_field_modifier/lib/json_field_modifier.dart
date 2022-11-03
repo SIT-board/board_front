@@ -1,3 +1,5 @@
+library json_field_modifier;
+
 class FieldModifier {
   final dynamic data;
   FieldModifier(this.data);
@@ -36,6 +38,28 @@ class FieldModifier {
     }
   }
 
+  void _remove(List<dynamic> path) {
+    final parent = _get(data, path.sublist(0, path.length - 1), 0);
+    final lastPath = path.last;
+    if (parent is Map) {
+      parent.remove(lastPath);
+      return;
+    }
+    if (parent is List) {
+      final idx = lastPath is int ? lastPath : int.parse(lastPath.toString());
+      parent.removeAt(idx);
+      return;
+    }
+  }
+
+  void remove(dynamic path) {
+    if (path is List) {
+      _remove(path);
+      return;
+    }
+    _remove(path.toString().split('.'));
+  }
+
   bool contains(List<dynamic> path) {
     final parent = _get(data, path.sublist(0, path.length - 1), 0);
     final lastPath = path.last;
@@ -47,27 +71,36 @@ class FieldModifier {
     return false;
   }
 
-  List<List<dynamic>> get pathList {
+  List<List<dynamic>> getPathList({
+    // 是否包含列表元素的序号，即是否继续深搜List对象
+    bool containListIndex = false,
+  }) {
     List<List<dynamic>> result = [];
+
     List<dynamic> stack = [];
     void visit(dynamic m) {
       if (m is Map) {
         for (final e in m.keys) {
           stack.add(e);
           visit(m[e]);
+          stack.removeLast();
         }
       }
-      if (m is List) {
+      if (containListIndex && m is List) {
         for (final e in m.asMap().entries) {
           stack.add(e.key);
           visit(e.value);
+          stack.removeLast();
         }
       }
 
-      if (stack.isNotEmpty && m is! Map && m is! List) {
-        result.add(stack.toList());
-        stack.removeLast();
-      }
+      // 到达叶子节点
+      // 若containListIndex && m is! Map && m is! List是叶子
+      // 若!containListIndex && m is! Map是叶子
+      // 即(containListIndex && m is! Map && m is! List) || !containListIndex && m is! Map 是叶子
+      // 设为(p&&q&&r)||(!p&&q)
+      final p = containListIndex, q = m is! Map, r = m is! List;
+      if ((p && q && r) || (!p && q)) result.add(stack.toList());
     }
 
     visit(data);

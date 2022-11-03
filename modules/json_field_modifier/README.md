@@ -3,7 +3,7 @@
 可使用path来访问与修改Map/List中的字段
 
 ```dart
-import 'package:field_modifier/field_modifier.dart';
+import 'package:field_modifier/json_field_modifier.dart';
 
 void main() {
   final map = {

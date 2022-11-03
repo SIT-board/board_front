@@ -1,7 +1,6 @@
-name: field_modifier
-description: A sample command-line application.
+name: json_field_modifier
+description: 根据path路径递归地修改json object字段
 version: 1.0.0
-# homepage: https://www.example.com
 
 environment:
   sdk: '>=2.18.2 <3.0.0'

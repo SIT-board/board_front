@@ -1,4 +1,4 @@
-import 'package:field_modifier/field_modifier.dart';
+import 'package:json_field_modifier/json_field_modifier.dart';
 import 'package:test/test.dart';
 
 FieldModifier testMap() => FieldModifier({
@@ -44,7 +44,7 @@ void main() {
     expect(m.contains(['a1', 'c2', 1]), true);
     expect(m.contains(['a1', 'c2', '1']), true);
   });
-  test('test get pathList', () {
+  test('test get pathList include list index', () {
     final m = testMap();
     final testCases = [
       ['a1', 'a2'],
@@ -52,9 +52,38 @@ void main() {
       ['a1', 'c2', 0],
       ['a1', 'c2', 1],
       ['a1', 'c2', 2],
-      ['a1', 'c2', 'b1']
+      ['b1']
     ].map((e) => e.join('/')).toSet();
-    final paths = m.pathList.map((e) => e.join('/')).toSet();
-    expect(paths.containsAll(testCases), true);
+    final paths = m.getPathList(containListIndex: true).map((e) => e.join('/')).toSet();
+    expect(
+      paths.containsAll(testCases),
+      true,
+      reason: "${{'paths': paths, 'testCases': testCases}}",
+    );
+  });
+
+  test('test get pathList exclude list index', () {
+    final m = testMap();
+    final testCasesContains = [
+      ['a1', 'a2'],
+      ['a1', 'b2'],
+      ['b1']
+    ].map((e) => e.join('/')).toSet();
+    final testCaseNotContains = [
+      ['a1', 'c2', 0],
+      ['a1', 'c2', 1],
+      ['a1', 'c2', 2],
+    ].map((e) => e.join('/')).toSet();
+    final paths = m.getPathList(containListIndex: false).map((e) => e.join('/')).toSet();
+    expect(
+      paths.containsAll(testCasesContains),
+      true,
+      reason: "${{'paths': paths, 'testCasesContains': testCasesContains}}",
+    );
+    expect(
+      paths.containsAll(testCaseNotContains),
+      false,
+      reason: "${{'paths': paths, 'testCasesContains': testCasesContains}}",
+    );
   });
 }
