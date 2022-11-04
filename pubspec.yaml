@@ -22,6 +22,7 @@ dependencies:
   quds_popup_menu: ^0.0.1+1
   vector_math: ^2.1.2
   window_manager: ^0.2.7
+  universal_platform: ^1.0.0+1
 
 dev_dependencies:
   flutter_test:
