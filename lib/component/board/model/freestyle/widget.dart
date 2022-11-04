@@ -54,6 +54,10 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
     child = ClipRect(
       child: child,
     );
+    child = Container(
+      child: child,
+      color: widget.data.backgroundColor,
+    );
     if (!widget.editable) return child;
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,

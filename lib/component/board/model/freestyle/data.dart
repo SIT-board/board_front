@@ -13,7 +13,13 @@ class FreeStylePathModelData extends HashMapData {
 }
 
 class FreeStyleModelData extends HashMapData {
-  List<FreeStylePathModelData> get pathList => (map['pathList'] as List).map((e) => FreeStylePathModelData(e)).toList();
+  List<FreeStylePathModelData> get pathList {
+    if (!map.containsKey('pathList')) map['pathList'] = [];
+    return (map['pathList'] as List).map((e) => FreeStylePathModelData(e)).toList();
+  }
+
   set pathList(List<FreeStylePathModelData> v) => map['pathList'] = v.map((e) => e.map).toList();
+  Color get backgroundColor => ((e) => e == null ? Colors.yellow : Color(e))(map['backgroundColor']);
+  set backgroundColor(Color v) => map['backgroundColor'] = v.value;
   FreeStyleModelData(super.map);
 }
