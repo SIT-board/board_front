@@ -128,6 +128,27 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.4"
+  json_diff_patcher:
+    dependency: transitive
+    description:
+      path: "modules/json_diff_patcher"
+      relative: true
+    source: path
+    version: "1.0.0"
+  json_field_modifier:
+    dependency: transitive
+    description:
+      path: "modules/json_field_modifier"
+      relative: true
+    source: path
+    version: "1.0.0"
+  json_model_undo_redo:
+    dependency: "direct main"
+    description:
+      path: "modules/json_model_undo_redo"
+      relative: true
+    source: path
+    version: "1.0.0"
   lints:
     dependency: transitive
     description:
@@ -226,6 +247,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.7+8"
+  screen_retriever:
+    dependency: transitive
+    description:
+      name: screen_retriever
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.4"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -350,6 +378,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  window_manager:
+    dependency: "direct main"
+    description:
+      name: window_manager
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.7"
   xdg_directories:
     dependency: transitive
     description:
