@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:flutter/material.dart';
+import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
 import 'board_page_event.dart';
 import 'menu/menu.dart';
@@ -24,8 +23,8 @@ class BoardPage extends StatefulWidget {
 class _BoardPageState extends State<BoardPage> {
   final eventBus = EventBus<BoardPageEventName>();
   final controller = TransformationController();
-  final vm = BoardViewModel({});
-
+  late final vm = BoardViewModel({});
+  late final undoRedoManager = UndoRedoManager(vm.map);
   @override
   void initState() {
     eventBus.subscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
@@ -39,7 +38,12 @@ class _BoardPageState extends State<BoardPage> {
     super.dispose();
   }
 
-  void onRefreshBoardEvent(arg) => setState(() {});
+  void onRefreshBoardEvent(arg) {
+    print('刷新');
+    print('${vm.map}');
+    undoRedoManager.store();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +52,29 @@ class _BoardPageState extends State<BoardPage> {
         title: Text('test'),
         actions: [
           IconButton(
-              onPressed: () {
-                print(jsonEncode(vm.map));
-              },
-              icon: Icon(Icons.ac_unit))
+            onPressed: () {
+              print("vmMap: ${vm.map}");
+            },
+            icon: Icon(Icons.add),
+          ),
+          IconButton(
+            onPressed: !undoRedoManager.canUndo
+                ? null
+                : () {
+                    undoRedoManager.undo();
+                    setState(() {});
+                  },
+            icon: Icon(Icons.undo),
+          ),
+          IconButton(
+            onPressed: !undoRedoManager.canRedo
+                ? null
+                : () {
+                    undoRedoManager.redo();
+                    setState(() {});
+                  },
+            icon: Icon(Icons.redo),
+          ),
         ],
         leading: IconButton(
             onPressed: () {
@@ -59,7 +82,7 @@ class _BoardPageState extends State<BoardPage> {
             },
             icon: Icon(Icons.arrow_back)),
       ),
-      body: LongPressedMenu(
+      body: BoardMenu(
         eventBus: eventBus,
         boardViewModel: vm,
         child: BoardViewModelWidget(

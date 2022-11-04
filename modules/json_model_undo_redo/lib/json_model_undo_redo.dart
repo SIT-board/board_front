@@ -31,6 +31,8 @@ class UndoRedoManager {
 
     // 计算 patch = model - lastStore
     final patch = JsonDiffPatcher(lastStore).diff(model);
+    if (patch.isEmpty()) return;
+
     history.add(patch);
     lastStore = copy(model);
     currentPtr = history.length - 1;
@@ -49,6 +51,7 @@ class UndoRedoManager {
   void undo() {
     if (!canUndo) return;
     print(history[currentPtr].inverse());
+    print(lastStore);
     JsonDiffPatcher(model).applyPatch(history[currentPtr].inverse());
     currentPtr--;
   }

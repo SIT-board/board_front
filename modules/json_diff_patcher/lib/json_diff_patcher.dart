@@ -39,6 +39,10 @@ class JsonPatch {
     );
   }
 
+  bool isEmpty() {
+    return add.isEmpty && remove.isEmpty && update.isEmpty;
+  }
+
   Map<String, dynamic> toJson() => {'add': add, 'remove': remove, 'update': update};
   @override
   String toString() {
