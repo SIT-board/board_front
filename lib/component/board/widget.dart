@@ -151,8 +151,10 @@ class BoardViewModelWidget extends StatefulWidget {
 }
 
 class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
+  List<Model> get modelDataList => widget.viewModel.models;
+
   void cancelAllEditableState() {
-    setState(() => getModelDataList().forEach((e) => e.common.editableState = false));
+    setState(() => modelDataList.forEach((e) => e.common.editableState = false));
   }
 
   Widget buildModelWidget(Model e) {
@@ -160,13 +162,13 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
       model: e,
       onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
       onTopButtonClick: () {
-        List<int> indexList = widget.viewModel.models.models.entries.map((e) => e.value.common.index).toList();
+        List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
         indexList.sort();
         // 层叠关系变更
         setState(() => e.common.index = indexList.last + 1);
       },
       onBottomButtonClick: () {
-        List<int> indexList = widget.viewModel.models.models.entries.map((e) => e.value.common.index).toList();
+        List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
         indexList.sort();
         // 层叠关系变更
         setState(() => e.common.index = indexList.first - 1);
@@ -174,18 +176,16 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
     );
   }
 
-  List<Model> getModelDataList() => widget.viewModel.models.models.entries.map((e) => e.value).toList();
-
   void onModelWidgetTap(Model e) {
     setState(() {
-      getModelDataList().forEach((e) => e.common.editableState = false);
+      modelDataList.forEach((e) => e.common.editableState = false);
       e.common.editableState = true;
     });
   }
 
   void onModelMoved(Model e, Offset target) {
     setState(() {
-      getModelDataList().forEach((e) => e.common.editableState = false);
+      modelDataList.forEach((e) => e.common.editableState = false);
       e.common.editableState = true;
       e.common.position = target;
     });
@@ -199,7 +199,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
       // widget.onChanged(['viewerTransform'], widget.viewModel.map['viewerTransform']);
     });
     // 按照层叠次序排序, index越大的越靠前
-    List<Model> models = getModelDataList();
+    List<Model> models = modelDataList;
     models.sort((a, b) => a.common.index - b.common.index);
     final layout = InteractiveInfinityLayout(
       viewerTransformationController: widget.controller,
@@ -222,7 +222,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
       child: layout,
       onTap: () {
         setState(() {
-          getModelDataList().forEach((e) => e.common.editableState = false);
+          modelDataList.forEach((e) => e.common.editableState = false);
         });
       },
     );

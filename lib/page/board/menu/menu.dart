@@ -27,7 +27,7 @@ class BoardMenu extends StatelessWidget {
         QudsPopupMenuItem(
           title: Text('清空画布'),
           onPressed: () {
-            boardViewModel.models.clear();
+            boardViewModel.clear();
             eventBus.publish(BoardPageEventName.refreshBoard);
           },
         ),

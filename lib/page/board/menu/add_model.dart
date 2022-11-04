@@ -20,7 +20,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
           title: Text('矩形'),
           onPressed: () {
-            boardViewModel.models.addModel(
+            boardViewModel.addModel(
               Model({})
                 ..id = Random().nextInt(65536).toString()
                 ..common = (CommonModelData({})..position = position)
@@ -32,7 +32,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
           title: Text('直线'),
           onPressed: () {
-            boardViewModel.models.addModel(
+            boardViewModel.addModel(
               Model({})
                 ..id = Random().nextInt(65536).toString()
                 ..common = (CommonModelData({})
@@ -52,7 +52,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
           title: Text('椭圆'),
           onPressed: () {
-            boardViewModel.models.addModel(
+            boardViewModel.addModel(
               Model({})
                 ..id = Random().nextInt(65536).toString()
                 ..common = (CommonModelData({})..position = position)
@@ -64,7 +64,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
           title: Text('文本框'),
           onPressed: () {
-            boardViewModel.models.addModel(
+            boardViewModel.addModel(
               Model({})
                 ..id = Random().nextInt(65536).toString()
                 ..common = (CommonModelData({})..position = position)
@@ -76,7 +76,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
         title: Text('图像'),
         onPressed: () {
-          boardViewModel.models.addModel(
+          boardViewModel.addModel(
             Model({})
               ..id = Random().nextInt(65536).toString()
               ..common = (CommonModelData({})..position = position)
@@ -90,7 +90,7 @@ QudsPopupMenuBase buildAddModelMenu({
       QudsPopupMenuItem(
           title: Text('自由画板'),
           onPressed: () {
-            boardViewModel.models.addModel(
+            boardViewModel.addModel(
               Model({})
                 ..id = Random().nextInt(65536).toString()
                 ..common = (CommonModelData({})..position = position)

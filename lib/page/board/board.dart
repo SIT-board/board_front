@@ -75,6 +75,12 @@ class _BoardPageState extends State<BoardPage> {
                   },
             icon: Icon(Icons.redo),
           ),
+          IconButton(
+            onPressed: () {
+              print(undoRedoManager.history);
+            },
+            icon: Icon(Icons.ac_unit),
+          ),
         ],
         leading: IconButton(
             onPressed: () {
