@@ -22,6 +22,7 @@ class ModelWidgetBuilder {
       ModelType.image: (data) => ImageModelWidget(data: model.data as ImageModelData),
       ModelType.freeStyle: (data) => buildFreeStyleWidget(),
       ModelType.line: (data) => LineModelWidget(data: model.data as LineModelData),
+      ModelType.oval: (data) => OvalModelWidget(data: model.data as OvalModelData),
     };
     if (!builders.containsKey(model.type)) throw UnimplementedError();
     return builders[model.type]!(model.data);

@@ -67,6 +67,19 @@ class LongPressedMenu extends StatelessWidget {
                       );
                       eventBus.publish(BoardPageEventName.refreshBoard);
                     }),
+                QudsPopupMenuItem(
+                    title: Text('椭圆'),
+                    onPressed: () {
+                      boardViewModel.models.addModel(
+                        Model({})
+                          ..id = Random().nextInt(65536).toString()
+                          ..common = (CommonModelData({})
+                            ..position = Matrix4.inverted(viewMatrix).transformOffset(d.localPosition))
+                          ..type = ModelType.oval
+                          ..data = (OvalModelData({})..fillColor = Colors.blue),
+                      );
+                      eventBus.publish(BoardPageEventName.refreshBoard);
+                    }),
                 QudsPopupMenuItem(title: Text('文本框'), onPressed: () {}),
                 QudsPopupMenuItem(title: Text('图像'), onPressed: () {}),
                 QudsPopupMenuItem(title: Text('自由画板'), onPressed: () {}),
