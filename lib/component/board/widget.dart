@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 
 class ModelWidget extends StatefulWidget {
   final Model model;
-  final ValueSetter<Model>? onTap;
   final void Function(List<String> path, dynamic value) onChanged;
   final VoidCallback? onTopButtonClick;
   final VoidCallback? onBottomButtonClick;
   const ModelWidget({
     Key? key,
     required this.model,
-    this.onTap,
     required this.onChanged,
     this.onTopButtonClick,
     this.onBottomButtonClick,
@@ -84,17 +82,6 @@ class _ModelWidgetState extends State<ModelWidget> {
           Positioned(bottom: 0, right: 0, child: buildResize()),
           Positioned(left: 0, bottom: 0, child: buildDelete()),
         ];
-
-    // 添加按钮stack
-    child = Stack(
-      alignment: Alignment.center,
-      clipBehavior: Clip.none,
-      children: [
-        Transform.rotate(angle: modelCommon.angle, child: child),
-        if (modelCommon.editableState) ...buildControllerWidgetList(),
-      ],
-    );
-
     if (modelCommon.editableState) {
       // 为stack添加边界
       child = Container(
@@ -104,6 +91,27 @@ class _ModelWidgetState extends State<ModelWidget> {
         child: child,
       );
     }
+    // 添加按钮stack
+    child = Stack(
+      fit: StackFit.loose,
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        SizedBox(
+          height: modelCommon.size.bottomRight(Offset.zero).distance,
+          width: modelCommon.size.bottomRight(Offset.zero).distance,
+        ),
+        Stack(
+          children: [
+            SizedBox.fromSize(size: modelCommon.size, child: child),
+            if (modelCommon.editableState) ...buildControllerWidgetList(),
+          ],
+        )
+      ],
+    );
+
+    child = Transform.rotate(angle: modelCommon.angle, child: child);
+
     return child;
   }
 
@@ -115,8 +123,8 @@ class _ModelWidgetState extends State<ModelWidget> {
     child = Container(
       alignment: Alignment.center,
       constraints: modelCommon.constraints,
-      height: modelCommon.size.height,
-      width: modelCommon.size.width,
+      // height: modelCommon.size.bottomRight(Offset.zero).distance,
+      // width: modelCommon.size.bottomRight(Offset.zero).distance,
       child: child,
     );
     return withController(
@@ -130,13 +138,11 @@ class BoardController {}
 class BoardViewModelWidget extends StatefulWidget {
   final BoardViewModel viewModel;
   final TransformationController controller;
-  final ValueSetter<Model>? onTap;
   final void Function(List<String> path, dynamic value) onChanged;
   const BoardViewModelWidget({
     Key? key,
     required this.viewModel,
     required this.controller,
-    this.onTap,
     required this.onChanged,
   }) : super(key: key);
 
@@ -152,16 +158,15 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
   Widget buildModelWidget(Model e) {
     return ModelWidget(
       model: e,
-      onTap: widget.onTap,
       onChanged: (p, v) => widget.onChanged(['models', e.id, ...p], v),
       onTopButtonClick: () {
-        List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+        List<int> indexList = widget.viewModel.models.models.entries.map((e) => e.value.common.index).toList();
         indexList.sort();
         // 层叠关系变更
         setState(() => e.common.index = indexList.last + 1);
       },
       onBottomButtonClick: () {
-        List<int> indexList = widget.viewModel.models.entries.map((e) => e.value.common.index).toList();
+        List<int> indexList = widget.viewModel.models.models.entries.map((e) => e.value.common.index).toList();
         indexList.sort();
         // 层叠关系变更
         setState(() => e.common.index = indexList.first - 1);
@@ -169,7 +174,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
     );
   }
 
-  List<Model> getModelDataList() => widget.viewModel.models.entries.map((e) => e.value).toList();
+  List<Model> getModelDataList() => widget.viewModel.models.models.entries.map((e) => e.value).toList();
 
   void onModelWidgetTap(Model e) {
     setState(() {
@@ -196,7 +201,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
     // 按照层叠次序排序, index越大的越靠前
     List<Model> models = getModelDataList();
     models.sort((a, b) => a.common.index - b.common.index);
-    return InteractiveInfinityLayout(
+    final layout = InteractiveInfinityLayout(
       viewerTransformationController: widget.controller,
       minScale: 0.3,
       maxScale: 100,
@@ -205,13 +210,21 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
           left: e.common.position.dx,
           top: e.common.position.dy,
           child: GestureDetector(
-            behavior: HitTestBehavior.opaque, // 透明区域也捕获点击
+            // behavior: HitTestBehavior.opaque, // 透明区域也捕获点击
             onTap: () => onModelWidgetTap(e),
             onPanUpdate: (d) => onModelMoved(e, e.common.position + d.delta),
             child: buildModelWidget(e),
           ),
         );
       }).toList(),
+    );
+    return GestureDetector(
+      child: layout,
+      onTap: () {
+        setState(() {
+          getModelDataList().forEach((e) => e.common.editableState = false);
+        });
+      },
     );
   }
 }

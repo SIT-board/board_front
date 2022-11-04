@@ -21,6 +21,7 @@ class Model extends HashMapData {
 
   /// 模型数据
   HashMapData get data {
+    if (!map.containsKey('data')) map['data'] = <String, dynamic>{};
     return {
       ModelType.text: (m) => TextModelData(m),
       ModelType.image: (m) => ImageModelData(m),

@@ -1,0 +1,4 @@
+enum BoardPageEventName {
+  refreshBoard,
+  viewCameraChange,
+}

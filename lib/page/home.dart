@@ -1,4 +1,4 @@
-import 'package:board_front/page/board.dart';
+import 'package:board_front/page/board/board.dart';
 import 'package:flutter/material.dart';
 
 Future<List<String>?> showInputDialog(BuildContext context) async {

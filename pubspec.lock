@@ -8,6 +8,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.9.0"
+  board_event_bus:
+    dependency: "direct main"
+    description:
+      path: "modules/board_event_bus"
+      relative: true
+    source: path
+    version: "1.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -205,6 +212,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.2.4"
+  quds_popup_menu:
+    dependency: "direct main"
+    description:
+      name: quds_popup_menu
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.1+1"
+  quds_ui_kit:
+    dependency: transitive
+    description:
+      name: quds_ui_kit
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.7+8"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -316,7 +337,7 @@ packages:
     source: hosted
     version: "1.3.1"
   vector_math:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: vector_math
       url: "https://pub.flutter-io.cn"
