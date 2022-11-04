@@ -20,13 +20,14 @@ class ModelMap extends HashMapData {
 /// 画板的ViewModel
 class BoardViewModel extends HashMapData {
   /// 视口变换
-  Matrix4 get viewerTransform => ((e) {
-        if (e == null || e is! List) return Matrix4.identity();
-        return Matrix4.fromList((e).map((e) => e as double).toList());
-      })(map['viewerTransform']);
+  Matrix4 get viewerTransform {
+    map['viewerTransform'] ??= Matrix4.identity().storage;
+    return Matrix4.fromList(map['viewerTransform']);
+  }
+
   set viewerTransform(Matrix4 v) => map['viewerTransform'] = v.storage;
   ModelMap get models {
-    if (!map.containsKey('models')) map['models'] = <String, dynamic>{};
+    map['models'] ??= <String, dynamic>{};
     return ModelMap(map['models']);
   }
 
