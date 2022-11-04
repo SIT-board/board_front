@@ -10,23 +10,25 @@ class ModelMap extends HashMapData {
     map[model.id] = model.map;
   }
 
+  void clear() {
+    map.clear();
+  }
+
   Map<String, Model> get models => map.map((key, value) => MapEntry(key, Model(value)));
 }
 
 /// 画板的ViewModel
 class BoardViewModel extends HashMapData {
   /// 视口变换
-  Matrix4? get viewerTransform => ((e) {
-        if (e == null || e is! List) return null;
+  Matrix4 get viewerTransform => ((e) {
+        if (e == null || e is! List) return Matrix4.identity();
         return Matrix4.fromList((e).map((e) => e as double).toList());
       })(map['viewerTransform']);
-  set viewerTransform(Matrix4? v) => map['viewerTransform'] = v?.storage;
+  set viewerTransform(Matrix4 v) => map['viewerTransform'] = v.storage;
   ModelMap get models {
     if (!map.containsKey('models')) map['models'] = <String, dynamic>{};
     return ModelMap(map['models']);
   }
-
-  set models(ModelMap v) => map['models'] = v.map;
 
   BoardViewModel(super.map);
 }

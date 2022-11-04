@@ -5,7 +5,7 @@ import 'package:board_front/component/board/board.dart';
 import 'package:flutter/material.dart';
 
 import 'board_page_event.dart';
-import 'menu.dart';
+import 'menu/menu.dart';
 
 class BoardPage extends StatefulWidget {
   final String roomId;
