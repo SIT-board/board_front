@@ -80,9 +80,47 @@ class LongPressedMenu extends StatelessWidget {
                       );
                       eventBus.publish(BoardPageEventName.refreshBoard);
                     }),
-                QudsPopupMenuItem(title: Text('文本框'), onPressed: () {}),
-                QudsPopupMenuItem(title: Text('图像'), onPressed: () {}),
-                QudsPopupMenuItem(title: Text('自由画板'), onPressed: () {}),
+                QudsPopupMenuItem(
+                    title: Text('文本框'),
+                    onPressed: () {
+                      boardViewModel.models.addModel(
+                        Model({})
+                          ..id = Random().nextInt(65536).toString()
+                          ..common = (CommonModelData({})
+                            ..position = Matrix4.inverted(viewMatrix).transformOffset(d.localPosition))
+                          ..type = ModelType.text
+                          ..data = (TextModelData({})..content = '新建文本框'),
+                      );
+                      eventBus.publish(BoardPageEventName.refreshBoard);
+                    }),
+                QudsPopupMenuItem(
+                  title: Text('图像'),
+                  onPressed: () {
+                    boardViewModel.models.addModel(
+                      Model({})
+                        ..id = Random().nextInt(65536).toString()
+                        ..common = (CommonModelData({})
+                          ..position = Matrix4.inverted(viewMatrix).transformOffset(d.localPosition))
+                        ..type = ModelType.image
+                        ..data = (ImageModelData({})
+                          ..url = 'https://tse2-mm.cn.bing.net/th/id/OIP-C.7HET4jnvBD-VqPcPQCSO-QHaSw?pid=ImgDet&rs=1'),
+                    );
+                    eventBus.publish(BoardPageEventName.refreshBoard);
+                  },
+                ),
+                QudsPopupMenuItem(
+                    title: Text('自由画板'),
+                    onPressed: () {
+                      boardViewModel.models.addModel(
+                        Model({})
+                          ..id = Random().nextInt(65536).toString()
+                          ..common = (CommonModelData({})
+                            ..position = Matrix4.inverted(viewMatrix).transformOffset(d.localPosition))
+                          ..type = ModelType.freeStyle
+                          ..data = (FreeStyleModelData({})),
+                      );
+                      eventBus.publish(BoardPageEventName.refreshBoard);
+                    }),
               ],
             ),
           ],
