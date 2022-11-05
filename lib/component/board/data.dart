@@ -22,6 +22,11 @@ class BoardViewModel extends HashMapData {
     map['modelMap'].clear();
   }
 
+  void removeModel(String id) {
+    (map['modelMap'] as Map).remove(id);
+    modelIdList = modelIdList.where((e) => e != id).toList();
+  }
+
   List<String> get modelIdList {
     map['modelIdList'] ??= <String>[];
     return (map['modelIdList'] as List).cast<String>();

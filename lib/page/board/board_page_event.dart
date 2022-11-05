@@ -1,4 +1,3 @@
 enum BoardPageEventName {
   refreshBoard,
-  viewCameraChange,
 }

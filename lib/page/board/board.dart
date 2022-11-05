@@ -1,5 +1,7 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
+import 'package:board_front/component/board/board_event.dart';
+import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
@@ -22,6 +24,7 @@ class BoardPage extends StatefulWidget {
 
 class _BoardPageState extends State<BoardPage> {
   final eventBus = EventBus<BoardPageEventName>();
+  final eventBus2 = EventBus<BoardEventName>();
   final controller = TransformationController();
   late final vm = BoardViewModel({});
   late final undoRedoManager = UndoRedoManager(
@@ -31,7 +34,18 @@ class _BoardPageState extends State<BoardPage> {
   @override
   void initState() {
     eventBus.subscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
-    controller.addListener(() => eventBus.publish(BoardPageEventName.viewCameraChange, controller.value));
+    BoardEventName.values.toSet()
+      ..removeAll([
+        BoardEventName.onModelMoving,
+        BoardEventName.onModelResizing,
+        BoardEventName.onModelRotating,
+        BoardEventName.onViewportChanged,
+      ])
+      ..forEach(
+        (e) => eventBus2.subscribe(e, (arg) {
+          undoRedoManager.store();
+        }),
+      );
     super.initState();
   }
 
@@ -43,7 +57,7 @@ class _BoardPageState extends State<BoardPage> {
 
   void onRefreshBoardEvent(arg) {
     final patch = undoRedoManager.store();
-    if(patch.isEmpty()) return;
+    if (patch.isEmpty()) return;
     setState(() {});
     print('画布刷新: $patch');
   }
@@ -88,6 +102,7 @@ class _BoardPageState extends State<BoardPage> {
         leading: IconButton(
             onPressed: () {
               print(vm.map);
+              showBoardColorPicker(context);
             },
             icon: Icon(Icons.arrow_back)),
       ),
@@ -98,11 +113,7 @@ class _BoardPageState extends State<BoardPage> {
           // 视口变换控制器
           controller: controller,
           viewModel: vm,
-          onChanged: (List<String> path, dynamic value) {
-            // node.broadcast('cmd', jsonEncode([path, value]));
-            // node.broadcastBoard(vm);
-            print('$path=$value');
-          },
+          eventBus: eventBus2,
         ),
       ),
     );
