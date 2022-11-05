@@ -32,9 +32,16 @@ class _BoardPageState extends State<BoardPage> {
     vm.map,
     excludePath: {'viewerTransform'},
   );
+  bool edit = false;
   @override
   void initState() {
     eventBus.subscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
+    eventBus2.subscribe(BoardEventName.onModelTap, (arg) {
+      setState(() => edit = true);
+    });
+    eventBus2.subscribe(BoardEventName.onBoardTap, (arg) {
+      setState(() => edit = false);
+    });
     BoardEventName.values.toSet()
       ..removeAll([
         BoardEventName.onModelMoving,
@@ -105,12 +112,32 @@ class _BoardPageState extends State<BoardPage> {
       body: BoardMenu(
         eventBus: eventBus,
         boardViewModel: vm,
-        child: BoardViewModelWidget(
-          // 视口变换控制器
-          controller: controller,
-          viewModel: vm,
-          eventBus: eventBus2,
-        ),
+        child: () {
+          final size = Size(100, 200);
+          final bvmw = BoardViewModelWidget(
+            // 视口变换控制器
+            controller: controller,
+            viewModel: vm,
+            eventBus: eventBus2,
+          );
+          if (size.aspectRatio < 1) {
+            return Column(children: [
+              Expanded(child: bvmw, flex: 3),
+              Expanded(
+                child: Container(color: Colors.red),
+                flex: edit ? 2 : 0,
+              )
+            ]);
+          } else {
+            return Row(children: [
+              Expanded(child: bvmw),
+              Expanded(
+                child: Container(),
+                flex: 2,
+              )
+            ]);
+          }
+        }(),
       ),
     );
   }

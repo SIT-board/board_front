@@ -235,6 +235,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
         setState(() {
           modelDataList.forEach((e) => e.common.editableState = false);
         });
+        widget.eventBus?.publish(BoardEventName.onBoardTap);
       },
     );
   }

@@ -2,6 +2,9 @@ enum BoardEventName {
   /// 当视口发生改变, 参数Matrix4
   onViewportChanged,
 
+  /// 当画板背景被点击
+  onBoardTap,
+
   /// 当某个模型被点击
   onModelTap,
 
