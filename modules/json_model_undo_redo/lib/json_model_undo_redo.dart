@@ -11,7 +11,10 @@ dynamic copy(dynamic json) {
 class UndoRedoManager {
   Map<dynamic, dynamic> lastStore;
   Map<dynamic, dynamic> model;
-  UndoRedoManager(this.model) : lastStore = copy(model);
+
+  /// 需要排除undo redo diff的路径
+  Set<String> excludePath;
+  UndoRedoManager(this.model, {this.excludePath = const {}}) : lastStore = copy(model);
 
   List<JsonPatch> history = [];
   int currentPtr = -1; // 指向某个补丁对应的快照指针
@@ -26,34 +29,42 @@ class UndoRedoManager {
   }
 
   /// 快照捕获
-  void store() {
+  JsonPatch store() {
+    // 不产生分支，直接覆盖后续redo内容
     if (canRedo) history.removeRange(currentPtr + 1, history.length);
 
     // 计算 patch = model - lastStore
     final patch = JsonDiffPatcher(lastStore).diff(model);
-    if (patch.isEmpty()) return;
-
+    if (patch.isEmpty()) return patch;
+    patch.add.removeWhere((key, value) => excludePath.contains(key));
+    patch.remove.removeWhere((key, value) => excludePath.contains(key));
+    patch.update.removeWhere((key, value) => excludePath.contains(key));
     history.add(patch);
     lastStore = copy(model);
     currentPtr = history.length - 1;
+    return patch;
   }
 
   bool get canRedo => currentPtr < history.length - 1;
 
   bool get canUndo => currentPtr >= 0;
 
-  void redo() {
-    if (!canRedo) return;
+  JsonPatch? redo() {
+    if (!canRedo) return null;
     currentPtr++;
-    JsonDiffPatcher(model).applyPatch(history[currentPtr]);
+    final patch = history[currentPtr];
+    JsonDiffPatcher(model).applyPatch(patch);
+    lastStore = copy(model);
+    return patch;
   }
 
-  void undo() {
-    if (!canUndo) return;
-    print(history[currentPtr].inverse());
-    print(lastStore);
-    JsonDiffPatcher(model).applyPatch(history[currentPtr].inverse());
+  JsonPatch? undo() {
+    if (!canUndo) return null;
+    final patch = history[currentPtr].inverse();
+    JsonDiffPatcher(model).applyPatch(patch);
     currentPtr--;
+    lastStore = copy(model);
+    return patch;
   }
 
   @override

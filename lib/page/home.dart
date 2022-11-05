@@ -49,6 +49,11 @@ class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   Widget buildListView(BuildContext context) {
+    Future.delayed(Duration.zero, () {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return BoardPage(roomId: 'roomId123', nodeId: 'nodeId123');
+      }));
+    });
     return ListView(
       children: [
         ListTile(

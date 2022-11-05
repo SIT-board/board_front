@@ -15,14 +15,20 @@ class BoardViewModel extends HashMapData {
 
   void addModel(Model model) {
     map['modelMap'][model.id] = model.map;
-    modelIdList.add(model.id);
+    modelIdList = [...modelIdList, model.id];
   }
 
   void clear() {
     map['modelMap'].clear();
   }
 
-  List<String> get modelIdList => map['modelIdList'] ??= <String>[];
+  List<String> get modelIdList {
+    map['modelIdList'] ??= <String>[];
+    return (map['modelIdList'] as List).cast<String>();
+  }
+
+  set modelIdList(List<String> v) => map['modelIdList'] = v;
+
   List<Model> get models {
     map['modelMap'] ??= <String, dynamic>{};
     final mm = (map['modelMap'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Model(value)));

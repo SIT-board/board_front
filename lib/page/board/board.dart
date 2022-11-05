@@ -24,7 +24,10 @@ class _BoardPageState extends State<BoardPage> {
   final eventBus = EventBus<BoardPageEventName>();
   final controller = TransformationController();
   late final vm = BoardViewModel({});
-  late final undoRedoManager = UndoRedoManager(vm.map);
+  late final undoRedoManager = UndoRedoManager(
+    vm.map,
+    excludePath: {'viewerTransform'},
+  );
   @override
   void initState() {
     eventBus.subscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
@@ -39,10 +42,10 @@ class _BoardPageState extends State<BoardPage> {
   }
 
   void onRefreshBoardEvent(arg) {
-    print('刷新');
-    print('${vm.map}');
-    undoRedoManager.store();
+    final patch = undoRedoManager.store();
+    if(patch.isEmpty()) return;
     setState(() {});
+    print('画布刷新: $patch');
   }
 
   @override
@@ -61,7 +64,7 @@ class _BoardPageState extends State<BoardPage> {
             onPressed: !undoRedoManager.canUndo
                 ? null
                 : () {
-                    undoRedoManager.undo();
+                    print(undoRedoManager.undo());
                     setState(() {});
                   },
             icon: Icon(Icons.undo),
@@ -70,7 +73,7 @@ class _BoardPageState extends State<BoardPage> {
             onPressed: !undoRedoManager.canRedo
                 ? null
                 : () {
-                    undoRedoManager.redo();
+                    print(undoRedoManager.redo());
                     setState(() {});
                   },
             icon: Icon(Icons.redo),

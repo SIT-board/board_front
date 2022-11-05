@@ -73,9 +73,10 @@ class JsonDiffPatcher {
     return JsonPatch(
       add: Map.fromEntries(addPath.map((e) => MapEntry(e, tfm[e]))),
       remove: Map.fromEntries(removePath.map((e) => MapEntry(e, sfm[e]))),
-      update: Map.fromEntries(intersectionPath
-          .map((e) => MapEntry(e, JsonPatchUpdate(sfm[e], tfm[e])))
-          .where((e) => e.value.source != e.value.target)),
+      update: Map.fromEntries(intersectionPath.map((e) => MapEntry(e, JsonPatchUpdate(sfm[e], tfm[e]))).where((e) {
+        final s = jsonEncode(e.value.source), t = jsonEncode(e.value.target);
+        return s != t;
+      })),
     );
   }
 
