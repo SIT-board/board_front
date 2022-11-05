@@ -7,6 +7,7 @@ import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
 import 'board_page_event.dart';
 import 'menu/menu.dart';
+import 'title.dart';
 
 class BoardPage extends StatefulWidget {
   final String roomId;
@@ -66,14 +67,9 @@ class _BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('test'),
+        centerTitle: true,
+        title: BoardTitle(),
         actions: [
-          IconButton(
-            onPressed: () {
-              print("vmMap: ${vm.map}");
-            },
-            icon: Icon(Icons.add),
-          ),
           IconButton(
             onPressed: !undoRedoManager.canUndo
                 ? null
