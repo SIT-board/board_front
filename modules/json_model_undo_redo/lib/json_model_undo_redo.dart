@@ -28,7 +28,7 @@ class UndoRedoManager {
     patcher.applyPatch(patch);
   }
 
-  /// 快照捕获
+  /// 自动快照捕获
   JsonPatch store() {
     // 不产生分支，直接覆盖后续redo内容
     if (canRedo) history.removeRange(currentPtr + 1, history.length);
@@ -43,6 +43,16 @@ class UndoRedoManager {
     lastStore = copy(model);
     currentPtr = history.length - 1;
     return patch;
+  }
+
+  /// 手动快照
+  void storeManual(JsonPatch patch) {
+    // 不产生分支，直接覆盖后续redo内容
+    if (canRedo) history.removeRange(currentPtr + 1, history.length);
+
+    history.add(patch);
+    lastStore = copy(model);
+    currentPtr = history.length - 1;
   }
 
   bool get canRedo => currentPtr < history.length - 1;
