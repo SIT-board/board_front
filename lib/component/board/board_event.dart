@@ -5,8 +5,14 @@ enum BoardEventName {
   /// 当画板背景被点击
   onBoardTap,
 
+  /// 当画板背景被右击
+  onBoardMenu,
+
   /// 当某个模型被点击
   onModelTap,
+
+  /// 当某个模型被长按或右击
+  onModelMenu,
 
   /// 当某个模型被移动中
   onModelMoving,
@@ -34,4 +40,7 @@ enum BoardEventName {
 
   /// 当某个模型被删除
   onModelDeleted,
+
+  /// 刷新视图
+  refreshBoard,
 }

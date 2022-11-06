@@ -1,12 +1,12 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
+import 'package:board_front/component/board/menu/menu.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
 import 'board_page_event.dart';
-import 'menu/menu.dart';
 import 'title.dart';
 
 class BoardPage extends StatefulWidget {
@@ -32,6 +32,7 @@ class _BoardPageState extends State<BoardPage> {
     vm.map,
     excludePath: {'viewerTransform'},
   );
+  late BoardMenu boardMenu;
   bool edit = false;
   @override
   void initState() {
@@ -54,6 +55,11 @@ class _BoardPageState extends State<BoardPage> {
           undoRedoManager.store();
         }),
       );
+    boardMenu = BoardMenu(
+      context: context,
+      boardViewModel: vm,
+      eventBus: eventBus2,
+    );
     super.initState();
   }
 
@@ -109,35 +115,11 @@ class _BoardPageState extends State<BoardPage> {
             },
             icon: Icon(Icons.arrow_back)),
       ),
-      body: BoardMenu(
-        eventBus: eventBus,
-        boardViewModel: vm,
-        child: () {
-          final size = Size(100, 200);
-          final bvmw = BoardViewModelWidget(
-            // 视口变换控制器
-            controller: controller,
-            viewModel: vm,
-            eventBus: eventBus2,
-          );
-          if (size.aspectRatio < 1) {
-            return Column(children: [
-              Expanded(child: bvmw, flex: 3),
-              Expanded(
-                child: Container(color: Colors.red),
-                flex: edit ? 2 : 0,
-              )
-            ]);
-          } else {
-            return Row(children: [
-              Expanded(child: bvmw),
-              Expanded(
-                child: Container(),
-                flex: 2,
-              )
-            ]);
-          }
-        }(),
+      body: BoardViewModelWidget(
+        // 视口变换控制器
+        controller: controller,
+        viewModel: vm,
+        eventBus: eventBus2,
       ),
     );
   }

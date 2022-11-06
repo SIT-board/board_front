@@ -1,6 +1,7 @@
 import 'package:board_front/page/home.dart';
 import 'package:board_front/storage/storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'desktop_init.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'SIT-board',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomePage(),
+      builder: EasyLoading.init(),
     );
   }
 }

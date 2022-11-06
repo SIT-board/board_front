@@ -26,6 +26,7 @@ class EventBus<E> {
 
   /// 添加订阅者
   void subscribe<T>(E eventName, EventCallback<T> callback) {
+    print('订阅事件: $eventName');
     // 如果对应事件的队列不存在，就新建一个新队列
     _eventQueueMap[eventName] ??= <EventCallback>[];
     // 为队列追加元素，由于类型不统一，所以需要单独嵌套做类型转换
@@ -49,6 +50,8 @@ class EventBus<E> {
 
   /// 移除订阅者
   void unsubscribe<T>(E eventName, [EventCallback<T>? f]) {
+    print('取消订阅事件: $eventName');
+
     // 获取队列，若该事件不存在，那直接退出函数
     final list = _eventQueueMap[eventName];
     if (list == null) {

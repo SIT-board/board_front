@@ -1,6 +1,7 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/interactive_infinity_layout/interactive_infinity_layout.dart';
+import 'package:board_front/util/menu.dart';
 import 'package:flutter/material.dart';
 
 import 'board_event.dart';
@@ -201,6 +202,20 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
     widget.eventBus?.publish(BoardEventName.onModelMoving, e);
   }
 
+  onRefresh(arg) => setState(() {});
+
+  @override
+  void initState() {
+    widget.eventBus?.subscribe(BoardEventName.refreshBoard, onRefresh);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.eventBus?.unsubscribe(BoardEventName.refreshBoard, onRefresh);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     widget.controller.value = widget.viewModel.viewerTransform;
@@ -223,12 +238,20 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
             onTap: () => onModelWidgetTap(e),
             onPanUpdate: (d) => onModelMove(e, e.common.position + d.delta),
             onPanEnd: (d) => widget.eventBus?.publish(BoardEventName.onModelMoved, e),
+            onLongPressStart: (d) {
+              // 坐标变换
+              final globalPosition = d.globalPosition;
+              final renderBox = context.findRenderObject()! as RenderBox;
+              final boardLocalPosition = renderBox.globalToLocal(globalPosition);
+              widget.eventBus?.publish(BoardEventName.onModelMenu, [e, boardLocalPosition]);
+            },
             child: buildModelWidget(e),
           ),
         );
       }).toList(),
     );
     return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
       child: layout,
       onTap: () {
         // 背景点击后取消所有模型的选中状态
@@ -237,6 +260,8 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
         });
         widget.eventBus?.publish(BoardEventName.onBoardTap);
       },
-    );
+    ).bindMenuEvent(onTrigger: (event) {
+      widget.eventBus?.publish(BoardEventName.onBoardMenu, event.localPosition);
+    });
   }
 }

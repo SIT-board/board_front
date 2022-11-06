@@ -2,14 +2,13 @@ import 'dart:math';
 
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
+import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/util/transform.dart';
 import 'package:flutter/material.dart';
 import 'package:quds_popup_menu/quds_popup_menu.dart';
 
-import '../board_page_event.dart';
-
 QudsPopupMenuBase buildAddModelMenu({
-  required EventBus<BoardPageEventName> eventBus,
+  required EventBus<BoardEventName> eventBus,
   required BoardViewModel boardViewModel,
   required Offset offset,
 }) {
@@ -27,7 +26,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.rect
                 ..data = (RectModelData({})..fillColor = Colors.blue),
             );
-            eventBus.publish(BoardPageEventName.refreshBoard);
+            eventBus.publish(BoardEventName.refreshBoard);
           }),
       QudsPopupMenuItem(
           title: Text('直线'),
@@ -47,7 +46,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.line
                 ..data = (LineModelData({})),
             );
-            eventBus.publish(BoardPageEventName.refreshBoard);
+            eventBus.publish(BoardEventName.refreshBoard);
           }),
       QudsPopupMenuItem(
           title: Text('椭圆'),
@@ -59,7 +58,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.oval
                 ..data = (OvalModelData({})..fillColor = Colors.blue),
             );
-            eventBus.publish(BoardPageEventName.refreshBoard);
+            eventBus.publish(BoardEventName.refreshBoard);
           }),
       QudsPopupMenuItem(
           title: Text('文本框'),
@@ -71,7 +70,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.text
                 ..data = (TextModelData({})..content = '新建文本框'),
             );
-            eventBus.publish(BoardPageEventName.refreshBoard);
+            eventBus.publish(BoardEventName.refreshBoard);
           }),
       QudsPopupMenuItem(
         title: Text('图像'),
@@ -84,7 +83,7 @@ QudsPopupMenuBase buildAddModelMenu({
               ..data = (ImageModelData({})
                 ..url = 'https://tse2-mm.cn.bing.net/th/id/OIP-C.7HET4jnvBD-VqPcPQCSO-QHaSw?pid=ImgDet&rs=1'),
           );
-          eventBus.publish(BoardPageEventName.refreshBoard);
+          eventBus.publish(BoardEventName.refreshBoard);
         },
       ),
       QudsPopupMenuItem(
@@ -97,7 +96,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.freeStyle
                 ..data = (FreeStyleModelData({})),
             );
-            eventBus.publish(BoardPageEventName.refreshBoard);
+            eventBus.publish(BoardEventName.refreshBoard);
           }),
     ],
   );
