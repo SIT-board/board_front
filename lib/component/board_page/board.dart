@@ -2,7 +2,6 @@ import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/component/board/menu/menu.dart';
-import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
@@ -28,7 +27,7 @@ class _BoardPageState extends State<BoardPage> {
 
   late BoardMenu boardMenu;
   UndoRedoManager get undoRedoManager => widget.undoRedoManager;
-  BoardViewModel get vm => widget.pageSetViewModel.currentPage.board;
+  BoardViewModel get currentPageBoardViewModel => widget.pageSetViewModel.currentPage.board;
   @override
   void initState() {
     eventBus.subscribe(BoardEventName.refreshBoard, onRefreshBoardEvent);
@@ -46,7 +45,7 @@ class _BoardPageState extends State<BoardPage> {
       );
     boardMenu = BoardMenu(
       context: context,
-      boardViewModelGetter: () => vm,
+      boardViewModelGetter: () => currentPageBoardViewModel,
       eventBus: eventBus,
     );
     super.initState();
@@ -59,64 +58,64 @@ class _BoardPageState extends State<BoardPage> {
     print('画布刷新: $patch');
   }
 
+  Widget buildTitle() {
+    return BoardTitle(
+      currentPageId: widget.pageSetViewModel.currentPageId,
+      pageIdList: widget.pageSetViewModel.pageIdList,
+      pageNameMap: Map.fromEntries(
+          widget.pageSetViewModel.pageIdList.map((id) => MapEntry(id, widget.pageSetViewModel.getPageById(id).title))),
+      onChangeTitle: (title) {
+        setState(() => widget.pageSetViewModel.currentPage.title = title);
+        undoRedoManager.store();
+      },
+      onSwitchPage: (int value) {
+        setState(() => widget.pageSetViewModel.currentPageId = value);
+        undoRedoManager.store();
+      },
+      onAddPage: () {
+        setState(() {
+          final newPageId = widget.pageSetViewModel.pageIdList.last + 1;
+          widget.pageSetViewModel.addBoardPage(BoardPageViewModel.createNew(newPageId));
+          widget.pageSetViewModel.currentPageId = newPageId;
+        });
+        undoRedoManager.store();
+      },
+    );
+  }
+
+  List<Widget> buildActions() {
+    return [
+      IconButton(
+        onPressed: !undoRedoManager.canUndo
+            ? null
+            : () {
+                setState(() {});
+              },
+        icon: const Icon(Icons.undo),
+      ),
+      IconButton(
+        onPressed: !undoRedoManager.canRedo
+            ? null
+            : () {
+                setState(() {});
+              },
+        icon: const Icon(Icons.redo),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: BoardTitle(
-          currentPageId: widget.pageSetViewModel.currentPageId,
-          pageIdList: widget.pageSetViewModel.pageIdList,
-          pageNameMap: Map.fromEntries(widget.pageSetViewModel.pageIdList
-              .map((id) => MapEntry(id, widget.pageSetViewModel.getPageById(id).title))),
-          onChangeTitle: (title) {
-            setState(() => widget.pageSetViewModel.currentPage.title = title);
-            undoRedoManager.store();
-          },
-          onSwitchPage: (int value) {
-            setState(() => widget.pageSetViewModel.currentPageId = value);
-            undoRedoManager.store();
-          },
-          onAddPage: () {
-            setState(() {
-              final newPageId = widget.pageSetViewModel.pageIdList.last + 1;
-              widget.pageSetViewModel.addBoardPage(BoardPageViewModel.createNew(newPageId));
-              widget.pageSetViewModel.currentPageId = newPageId;
-            });
-            undoRedoManager.store();
-          },
-        ),
-        actions: [
-          IconButton(
-            onPressed: !undoRedoManager.canUndo
-                ? null
-                : () {
-                    print(undoRedoManager.undo());
-                    setState(() {});
-                  },
-            icon: Icon(Icons.undo),
-          ),
-          IconButton(
-            onPressed: !undoRedoManager.canRedo
-                ? null
-                : () {
-                    print(undoRedoManager.redo());
-                    setState(() {});
-                  },
-            icon: Icon(Icons.redo),
-          ),
-        ],
-        leading: IconButton(
-            onPressed: () {
-              print(vm.map);
-              showBoardColorPicker(context);
-            },
-            icon: Icon(Icons.arrow_back)),
+        title: buildTitle(),
+        actions: buildActions(),
       ),
       body: BoardViewModelWidget(
         // 视口变换控制器
         controller: controller,
-        viewModel: vm,
+        viewModel: currentPageBoardViewModel,
         eventBus: eventBus,
       ),
     );
