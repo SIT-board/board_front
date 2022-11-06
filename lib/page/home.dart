@@ -1,4 +1,5 @@
-import 'package:board_front/page/board/board.dart';
+import 'package:board_front/component/board_page/board.dart';
+import 'package:board_front/component/board_page/data.dart';
 import 'package:flutter/material.dart';
 
 Future<List<String>?> showInputDialog(BuildContext context) async {
@@ -51,27 +52,26 @@ class HomePage extends StatelessWidget {
   Widget buildListView(BuildContext context) {
     Future.delayed(Duration.zero, () {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return BoardPage(roomId: 'roomId123', nodeId: 'nodeId123');
+        return BoardPage(
+          pageSetViewModel: BoardPageSetViewModel.createNew(),
+        );
       }));
     });
     return ListView(
       children: [
-        ListTile(
-          leading: const Icon(Icons.electric_bolt),
-          title: const Text('创建画板'),
-          subtitle: const Text('快速创建一个新的协作画板'),
-          onTap: () async {
-            List<String>? text = await showInputDialog(context);
-            if (text == null) return;
-
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return BoardPage(
-                roomId: text[0],
-                nodeId: text[1],
-              );
-            }));
-          },
-        ),
+        // ListTile(
+        //   leading: const Icon(Icons.electric_bolt),
+        //   title: const Text('创建画板'),
+        //   subtitle: const Text('快速创建一个新的协作画板'),
+        //   onTap: () async {
+        //     List<String>? text = await showInputDialog(context);
+        //     if (text == null) return;
+        //
+        //     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        //       return BoardPage();
+        //     }));
+        //   },
+        // ),
         ListTile(
           leading: const Icon(Icons.add),
           title: const Text('加入画板'),

@@ -6,6 +6,7 @@ import 'package:board_front/component/board/board.dart';
 import 'package:board_front/util/transform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:quds_popup_menu/quds_popup_menu.dart';
 
 import '../board_event.dart';
@@ -13,8 +14,10 @@ import 'add_model.dart';
 
 class BoardMenu {
   final BuildContext context;
-  final BoardViewModel boardViewModel;
+  final ValueGetter<BoardViewModel> boardViewModelGetter;
   final EventBus<BoardEventName> eventBus;
+
+  BoardViewModel get boardViewModel => boardViewModelGetter();
 
   onBoardMenu(arg) {
     showBoardMenu(context, arg as Offset);
@@ -23,13 +26,12 @@ class BoardMenu {
   onModelMenu(arg) {
     final model = arg[0] as Model;
     final pos = arg[1] as Offset;
-    print(pos);
     showModelMenu(context, pos, model);
   }
 
   BoardMenu({
     required this.context,
-    required this.boardViewModel,
+    required this.boardViewModelGetter,
     required this.eventBus,
   }) {
     eventBus.subscribe(BoardEventName.onBoardMenu, onBoardMenu);
@@ -94,6 +96,7 @@ class BoardMenu {
           title: Text('复制对象'),
           onPressed: () {
             Clipboard.setData(ClipboardData(text: model.toJsonString()));
+            EasyLoading.showSuccess('复制成功');
           },
         ),
         buildAddModelMenu(

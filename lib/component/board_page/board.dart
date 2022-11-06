@@ -6,43 +6,32 @@ import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
-import 'board_page_event.dart';
+import 'data.dart';
 import 'title.dart';
 
 class BoardPage extends StatefulWidget {
-  final String roomId;
-  final String nodeId;
-
-  const BoardPage({
+  final BoardPageSetViewModel pageSetViewModel;
+  final UndoRedoManager undoRedoManager;
+  BoardPage({
     Key? key,
-    required this.roomId,
-    required this.nodeId,
-  }) : super(key: key);
+    required this.pageSetViewModel,
+  })  : undoRedoManager = UndoRedoManager(pageSetViewModel.map),
+        super(key: key);
 
   @override
   State<BoardPage> createState() => _BoardPageState();
 }
 
 class _BoardPageState extends State<BoardPage> {
-  final eventBus = EventBus<BoardPageEventName>();
-  final eventBus2 = EventBus<BoardEventName>();
+  final eventBus = EventBus<BoardEventName>();
   final controller = TransformationController();
-  late final vm = BoardViewModel({});
-  late final undoRedoManager = UndoRedoManager(
-    vm.map,
-    excludePath: {'viewerTransform'},
-  );
+
   late BoardMenu boardMenu;
-  bool edit = false;
+  UndoRedoManager get undoRedoManager => widget.undoRedoManager;
+  BoardViewModel get vm => widget.pageSetViewModel.currentPage.board;
   @override
   void initState() {
-    eventBus.subscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
-    eventBus2.subscribe(BoardEventName.onModelTap, (arg) {
-      setState(() => edit = true);
-    });
-    eventBus2.subscribe(BoardEventName.onBoardTap, (arg) {
-      setState(() => edit = false);
-    });
+    eventBus.subscribe(BoardEventName.refreshBoard, onRefreshBoardEvent);
     BoardEventName.values.toSet()
       ..removeAll([
         BoardEventName.onModelMoving,
@@ -51,22 +40,16 @@ class _BoardPageState extends State<BoardPage> {
         BoardEventName.onViewportChanged,
       ])
       ..forEach(
-        (e) => eventBus2.subscribe(e, (arg) {
+        (e) => eventBus.subscribe(e, (arg) {
           undoRedoManager.store();
         }),
       );
     boardMenu = BoardMenu(
       context: context,
-      boardViewModel: vm,
-      eventBus: eventBus2,
+      boardViewModelGetter: () => vm,
+      eventBus: eventBus,
     );
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    eventBus.unsubscribe(BoardPageEventName.refreshBoard, onRefreshBoardEvent);
-    super.dispose();
   }
 
   void onRefreshBoardEvent(arg) {
@@ -81,7 +64,28 @@ class _BoardPageState extends State<BoardPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: BoardTitle(),
+        title: BoardTitle(
+          currentPageId: widget.pageSetViewModel.currentPageId,
+          pageIdList: widget.pageSetViewModel.pageIdList,
+          pageNameMap: Map.fromEntries(widget.pageSetViewModel.pageIdList
+              .map((id) => MapEntry(id, widget.pageSetViewModel.getPageById(id).title))),
+          onChangeTitle: (title) {
+            setState(() => widget.pageSetViewModel.currentPage.title = title);
+            undoRedoManager.store();
+          },
+          onSwitchPage: (int value) {
+            setState(() => widget.pageSetViewModel.currentPageId = value);
+            undoRedoManager.store();
+          },
+          onAddPage: () {
+            setState(() {
+              final newPageId = widget.pageSetViewModel.pageIdList.last + 1;
+              widget.pageSetViewModel.addBoardPage(BoardPageViewModel.createNew(newPageId));
+              widget.pageSetViewModel.currentPageId = newPageId;
+            });
+            undoRedoManager.store();
+          },
+        ),
         actions: [
           IconButton(
             onPressed: !undoRedoManager.canUndo
@@ -101,12 +105,6 @@ class _BoardPageState extends State<BoardPage> {
                   },
             icon: Icon(Icons.redo),
           ),
-          IconButton(
-            onPressed: () {
-              print(undoRedoManager.history);
-            },
-            icon: Icon(Icons.ac_unit),
-          ),
         ],
         leading: IconButton(
             onPressed: () {
@@ -119,7 +117,7 @@ class _BoardPageState extends State<BoardPage> {
         // 视口变换控制器
         controller: controller,
         viewModel: vm,
-        eventBus: eventBus2,
+        eventBus: eventBus,
       ),
     );
   }
