@@ -21,7 +21,7 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536).toString()
+                ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.rect
                 ..data = (RectModelData({})..fillColor = Colors.blue),
@@ -33,7 +33,7 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536).toString()
+                ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})
                   ..position = position
                   ..constraints = const BoxConstraints(
@@ -53,7 +53,7 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536).toString()
+                ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.oval
                 ..data = (OvalModelData({})..fillColor = Colors.blue),
@@ -65,7 +65,7 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536).toString()
+                ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.text
                 ..data = (TextModelData({})..content = '新建文本框'),
@@ -77,7 +77,7 @@ QudsPopupMenuBase buildAddModelMenu({
         onPressed: () {
           boardViewModel.addModel(
             Model({})
-              ..id = Random().nextInt(65536).toString()
+              ..id = Random().nextInt(65536)
               ..common = (CommonModelData({})..position = position)
               ..type = ModelType.image
               ..data = (ImageModelData({})
@@ -91,7 +91,7 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536).toString()
+                ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.freeStyle
                 ..data = (FreeStyleModelData({})),

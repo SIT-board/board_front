@@ -47,7 +47,7 @@ class BoardMenu {
     if (text == null) return null;
     try {
       final model = Model(jsonDecode(text));
-      model.id = Random().nextInt(65535).toString();
+      model.id = Random().nextInt(65535);
       model.common.position = Matrix4.inverted(boardViewModel.viewerTransform).transformOffset(position);
       return QudsPopupMenuItem(
         title: Text('粘贴'),

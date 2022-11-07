@@ -124,10 +124,22 @@ class _ModelWidgetState extends State<ModelWidget> {
     return child;
   }
 
+  /// 模型的局部刷新
+  void onModelRefresh(arg) {
+    if (arg != widget.model.id) return;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    widget.eventBus?.subscribe(BoardEventName.refreshModel, onModelRefresh);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!modelCommon.enable) return Container();
-    Widget child = ModelWidgetBuilder(widget.model).build();
+    Widget child = ModelWidgetBuilder(model: widget.model, eventBus: widget.eventBus).buildModelWidget();
     // 添加边界和约束
     child = Container(
       alignment: Alignment.center,

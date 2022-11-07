@@ -1,11 +1,18 @@
+import 'package:board_event_bus/board_event_bus.dart';
 import 'package:flutter/material.dart';
 
+import '../board_event.dart';
+import 'freestyle/editor.dart';
 import 'model.dart';
 
 /// 构造出模型对应的 Widget
 class ModelWidgetBuilder {
   final Model model;
-  ModelWidgetBuilder(this.model);
+  final EventBus<BoardEventName>? eventBus;
+  ModelWidgetBuilder({
+    required this.model,
+    this.eventBus,
+  });
 
   Widget buildFreeStyleWidget() {
     return FreeStyleWidget(
@@ -15,12 +22,25 @@ class ModelWidgetBuilder {
     );
   }
 
-  Widget build() {
+  Widget buildModelWidget() {
     final builders = {
       ModelType.text: (data) => TextModelWidget(data: model.data as TextModelData),
       ModelType.rect: (data) => RectModelWidget(data: model.data as RectModelData),
       ModelType.image: (data) => ImageModelWidget(data: model.data as ImageModelData),
       ModelType.freeStyle: (data) => buildFreeStyleWidget(),
+      ModelType.line: (data) => LineModelWidget(data: model.data as LineModelData),
+      ModelType.oval: (data) => OvalModelWidget(data: model.data as OvalModelData),
+    };
+    if (!builders.containsKey(model.type)) throw UnimplementedError();
+    return builders[model.type]!(model.data);
+  }
+
+  Widget buildModelEditorWidget() {
+    final builders = {
+      ModelType.text: (data) => TextModelWidget(data: model.data as TextModelData),
+      ModelType.rect: (data) => RectModelWidget(data: model.data as RectModelData),
+      ModelType.image: (data) => ImageModelWidget(data: model.data as ImageModelData),
+      ModelType.freeStyle: (data) => FreeStyleModelEditor(model: model, eventBus: eventBus),
       ModelType.line: (data) => LineModelWidget(data: model.data as LineModelData),
       ModelType.oval: (data) => OvalModelWidget(data: model.data as OvalModelData),
     };

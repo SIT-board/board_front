@@ -34,7 +34,27 @@ class BoardPageSetViewModel extends HashMapData {
   BoardPageViewModel get currentPage => getPageById(currentPageId);
 
   int get currentPageId => map['currentPageId'];
-  set currentPageId(int v) => map['currentPageId'] = v;
+  set currentPageId(int v) {
+    map['currentPageId'] = v;
+    print('切换页面: $v');
+  }
+
+  int? get nextPageId {
+    int idx = pageIdList.firstWhere((e) => e == currentPageId);
+    final ids = pageIdList;
+    print(idx);
+    print(ids);
+    if (!(0 <= (idx + 1) && (idx + 1) < ids.length)) return null;
+    return pageIdList[idx + 1];
+  }
+
+  int? get prePageId {
+    int idx = pageIdList.firstWhere((e) => e == currentPageId);
+    final ids = pageIdList;
+    if (!(0 <= (idx - 1) && (idx - 1) < ids.length)) return null;
+    return pageIdList[idx - 1];
+  }
+
   BoardPageSetViewModel(super.map);
 
   factory BoardPageSetViewModel.createNew() {

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'data.dart';
@@ -13,9 +11,10 @@ class MyCustomPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for (final path in data.pathList) {
       final paint = Paint()
-        ..color = path.color
+        ..color = path.paint.color
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = 5.0;
+        ..strokeWidth = path.paint.strokeWidth
+        ..isAntiAlias = path.paint.isAntiAlias;
       final points = path.points;
       for (int i = 0; i < points.length - 1; i++) {
         canvas.drawLine(points[i], points[i + 1], paint);
@@ -55,25 +54,14 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
       child: child,
     );
     child = Container(
-      child: child,
       color: widget.data.backgroundColor,
+      child: child,
     );
     if (!widget.editable) return child;
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onPanStart: (d) {
-        final pathList = widget.data.pathList;
-        pathList.add(
-          FreeStylePathModelData({
-            'color': Color.fromARGB(
-              255,
-              Random().nextInt(256),
-              Random().nextInt(256),
-              Random().nextInt(256),
-            ).value,
-          }),
-        );
-        widget.data.pathList = pathList;
+        widget.data.addPath(FreeStylePathModelData({})..paint = widget.data.paint.copy());
       },
       onPanUpdate: (d) {
         if (!context.size!.contains(d.localPosition)) return;

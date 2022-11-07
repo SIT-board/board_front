@@ -14,7 +14,7 @@ class BoardViewModel extends HashMapData {
   set viewerTransform(Matrix4 v) => map['viewerTransform'] = v.storage;
 
   void addModel(Model model) {
-    map['modelMap'][model.id] = model.map;
+    map['modelMap'][model.id.toString()] = model.map;
     modelIdList = [...modelIdList, model.id];
   }
 
@@ -22,22 +22,22 @@ class BoardViewModel extends HashMapData {
     map['modelMap'].clear();
   }
 
-  void removeModel(String id) {
+  void removeModel(int id) {
     (map['modelMap'] as Map).remove(id);
     modelIdList = modelIdList.where((e) => e != id).toList();
   }
 
-  List<String> get modelIdList {
-    map['modelIdList'] ??= <String>[];
-    return (map['modelIdList'] as List).cast<String>();
+  List<int> get modelIdList {
+    map['modelIdList'] ??= <int>[];
+    return (map['modelIdList'] as List).cast<int>();
   }
 
-  set modelIdList(List<String> v) => map['modelIdList'] = v;
+  set modelIdList(List<int> v) => map['modelIdList'] = v;
 
   List<Model> get models {
     map['modelMap'] ??= <String, dynamic>{};
     final mm = (map['modelMap'] as Map<String, dynamic>).map((key, value) => MapEntry(key, Model(value)));
-    return modelIdList.map((e) => mm[e]!).toList();
+    return modelIdList.map((e) => mm[e.toString()]!).toList();
   }
 
   BoardViewModel(super.map);

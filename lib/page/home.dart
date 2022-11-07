@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:board_front/component/board_page/board.dart';
 import 'package:board_front/component/board_page/data.dart';
 import 'package:flutter/material.dart';
@@ -50,10 +52,40 @@ class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   Widget buildListView(BuildContext context) {
+    final m1 = BoardPageSetViewModel.createNew();
+    ValueNotifier<BoardPageSetViewModel?> notifier = ValueNotifier(null);
+    //
+    // final nodeSender = BoardNode(roomId: '123', nodeId: '1');
+    // final nodeReceiver = BoardNode(roomId: '123', nodeId: '2');
+
+    // nodeReceiver.registerForOnReceive(
+    //     topic: 'board',
+    //     callback: (msg) {
+    //       notifier.value = BoardPageSetViewModel(jsonDecode(msg.data));
+    //       notifier.notifyListeners();
+    //     });
+
+    // Future.wait([nodeSender.connect(), nodeReceiver.connect()]).then((value) {
+    //   Timer.periodic(Duration(seconds: 1), (timer) {
+    //     nodeSender.sendTo('2', 'board', m1.toJsonString());
+    //     print(m1.toJsonString());
+    //   });
+    // });
     Future.delayed(Duration.zero, () {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return BoardPage(
-          pageSetViewModel: BoardPageSetViewModel.createNew(),
+        return Row(
+          children: [
+            Expanded(child: BoardPage(pageSetViewModel: m1)),
+            // Expanded(
+            //   child: ValueListenableBuilder<BoardPageSetViewModel?>(
+            //     valueListenable: notifier,
+            //     builder: (c, m, w) {
+            //       if (m == null) return Center(child: const CircularProgressIndicator());
+            //       return BoardPage(pageSetViewModel: m);
+            //     },
+            //   ),
+            // ),
+          ],
         );
       }));
     });

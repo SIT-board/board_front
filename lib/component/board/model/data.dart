@@ -13,8 +13,8 @@ enum ModelType {
 
 class Model extends HashMapData {
   /// 模型id
-  String get id => map['id'];
-  set id(String v) => map['id'] = v;
+  int get id => map['id'];
+  set id(int v) => map['id'] = v;
 
   /// 模型类型
   ModelType get type => ModelType.values[map['type']];

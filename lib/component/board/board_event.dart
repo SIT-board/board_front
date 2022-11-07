@@ -43,4 +43,7 @@ enum BoardEventName {
 
   /// 刷新视图
   refreshBoard,
+
+  /// 刷新某模型视图
+  refreshModel,
 }
