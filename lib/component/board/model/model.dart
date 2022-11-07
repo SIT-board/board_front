@@ -12,4 +12,4 @@ export 'rect/data.dart';
 export 'rect/widget.dart';
 export 'text/data.dart';
 export 'text/widget.dart';
-export 'widget.dart';
+export 'widget_builder.dart';
