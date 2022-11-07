@@ -9,10 +9,14 @@ class ImageViewerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.of(context).pop(),
-      child: InteractiveViewer(
-        child: Image(image: provider),
+    return Scaffold(
+      body: SizedBox.expand(
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: InteractiveViewer(
+            child: Image(image: provider),
+          ),
+        ),
       ),
     );
   }
