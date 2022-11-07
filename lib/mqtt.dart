@@ -82,7 +82,8 @@ class BoardNode {
     _client?.updates?.listen((messageList) {
       final recMess = messageList[0];
       final pubMess = recMess.payload as MqttPublishMessage;
-      final String message = MqttPublishPayload.bytesToStringAsString(pubMess.payload.message);
+
+      final String message = utf8.decode(pubMess.payload.message);
       _onReceiveMessage(BoardMessage.fromJson(jsonDecode(message)));
     });
   }
@@ -148,8 +149,7 @@ class BoardNode {
   /// 发送点对点消息
   void sendTo(String otherNodeId, String topic, dynamic jsonMessage) {
     final builder = MqttClientPayloadBuilder();
-
-    builder.addString(
+    builder.addUTF8String(
       jsonEncode(BoardMessage(
         ts: DateTime.now(),
         publisher: nodeId,
@@ -169,7 +169,7 @@ class BoardNode {
   void broadcast(String topic, dynamic jsonMessage) {
     final builder = MqttClientPayloadBuilder();
 
-    builder.addString(
+    builder.addUTF8String(
       jsonEncode(BoardMessage(
         ts: DateTime.now(),
         publisher: nodeId,
