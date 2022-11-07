@@ -139,15 +139,12 @@ class _ModelWidgetState extends State<ModelWidget> {
   @override
   Widget build(BuildContext context) {
     if (!modelCommon.enable) return Container();
-    Widget child = ModelWidgetBuilder(model: widget.model, eventBus: widget.eventBus).buildModelWidget();
     // 添加边界和约束
-    child = Container(
-      alignment: Alignment.center,
-      constraints: modelCommon.constraints,
-      child: child,
-    );
     return withController(
-      child: child,
+      child: Container(
+        constraints: modelCommon.constraints,
+        child: ModelWidgetBuilder(model: widget.model, eventBus: widget.eventBus).buildModelWidget(),
+      ),
     );
   }
 }

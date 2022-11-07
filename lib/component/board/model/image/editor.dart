@@ -53,14 +53,9 @@ class _ImageModelEditorState extends State<ImageModelEditor> {
   ModelAttributeItem buildImageStyle() {
     return ModelAttributeItem(
         title: '填充方式',
-        child: DropdownButton(
+        child: DropdownButton<BoxFit>(
           value: modelData.fit,
-          items: BoxFit.values
-              .map((e) => DropdownMenuItem(
-                    value: e.index,
-                    child: Text(e.name),
-                  ))
-              .toList(),
+          items: BoxFit.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name))).toList(),
           onChanged: (value) {
             if (value == null) return;
             setState(() => modelData.fit = value);

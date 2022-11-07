@@ -10,7 +10,7 @@ class ImageModelWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.network(
       data.url,
-      fit: BoxFit.fill,
+      fit: data.fit,
     );
   }
 }
