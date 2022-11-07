@@ -1,8 +1,10 @@
 export 'common_data.dart';
 export 'data.dart';
 export 'freestyle/data.dart';
+export 'freestyle/editor.dart';
 export 'freestyle/widget.dart';
 export 'image/data.dart';
+export 'image/editor.dart';
 export 'image/widget.dart';
 export 'line/data.dart';
 export 'line/widget.dart';

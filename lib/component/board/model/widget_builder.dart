@@ -39,7 +39,7 @@ class ModelWidgetBuilder {
     final builders = {
       ModelType.text: (data) => TextModelWidget(data: model.data as TextModelData),
       ModelType.rect: (data) => RectModelWidget(data: model.data as RectModelData),
-      ModelType.image: (data) => ImageModelWidget(data: model.data as ImageModelData),
+      ModelType.image: (data) => ImageModelEditor(model: model, eventBus: eventBus),
       ModelType.freeStyle: (data) => FreeStyleModelEditor(model: model, eventBus: eventBus),
       ModelType.line: (data) => LineModelWidget(data: model.data as LineModelData),
       ModelType.oval: (data) => OvalModelWidget(data: model.data as OvalModelData),
