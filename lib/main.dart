@@ -1,11 +1,11 @@
 import 'package:board_front/page/home.dart';
-import 'package:board_front/storage/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'desktop_init.dart';
 import 'global.dart';
+import 'storage/storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
