@@ -43,7 +43,11 @@ class _RectModelEditorState extends State<RectModelEditor> {
   Widget build(BuildContext context) {
     return ModelAttribute(children: [
       ModelAttributeSection(
-        title: '直线属性',
+        title: '矩形属性',
+        items: [buildAlign()],
+      ),
+      ModelAttributeSection(
+        title: '文字属性',
         items: [buildAlign()],
       )
     ]);
