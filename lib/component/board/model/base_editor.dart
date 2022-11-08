@@ -49,7 +49,10 @@ class ModelAttributeSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: Theme.of(context).textTheme.headline5),
-          ...items,
+          ...items.map((e) => Container(
+                padding: EdgeInsets.all(8.0),
+                child: e,
+              )),
           Divider(),
         ],
       ),
