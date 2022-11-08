@@ -15,6 +15,15 @@ class TextModelData extends HashMapData {
   }
 
   set alignment(Alignment v) => map['alignment'] = [v.x, v.y];
+
+  bool get bold => map['bold'] ??= false;
+  set bold(bool v) => map['bold'] = v;
+
+  bool get italic => map['italic'] ??= false;
+  set italic(bool v) => map['italic'] = v;
+
+  bool get underline => map['underline'] ??= false;
+  set underline(bool v) => map['underline'] = v;
 }
 
 class BorderModelData extends HashMapData {

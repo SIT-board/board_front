@@ -5,16 +5,38 @@ import 'package:board_front/component/board/model/base_editor.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 
-class RadioButton extends StatelessWidget {
+import 'common.dart';
+
+class RadioButtonGroup extends StatelessWidget {
   final List<Widget> children;
   final void Function(int index) onChanged;
   final int value;
-
-  const RadioButton({
+  const RadioButtonGroup({
     Key? key,
     required this.children,
     required this.onChanged,
-    this.value = 0,
+    required this.value,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return MultiRadioButtonGroup(
+      onChanged: (int index, bool selectState) => onChanged(index),
+      selectStateList: List.generate(children.length, (index) => index == value),
+      children: children,
+    );
+  }
+}
+
+class MultiRadioButtonGroup extends StatelessWidget {
+  final List<Widget> children;
+  final void Function(int index, bool selectState) onChanged;
+  final List<bool> selectStateList;
+
+  const MultiRadioButtonGroup({
+    Key? key,
+    required this.children,
+    required this.onChanged,
+    required this.selectStateList,
   }) : super(key: key);
 
   @override
@@ -23,12 +45,12 @@ class RadioButton extends StatelessWidget {
       children: children.asMap().entries.map((MapEntry<int, Widget> entry) {
         final e = Expanded(
           child: TextButton(
-            onPressed: () => onChanged(entry.key),
+            onPressed: () => onChanged(entry.key, !selectStateList[entry.key]),
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.black),
               backgroundColor: MaterialStateProperty.resolveWith((states) {
                 //设置按下时的背景颜色
-                if (value == entry.key) return Colors.blue[100];
+                if (selectStateList[entry.key]) return Colors.blue[100];
                 //默认不使用背景颜色
                 return null;
               }),
@@ -121,8 +143,23 @@ class _RectModelEditorState extends State<RectModelEditor> {
         title: '文字属性',
         items: [
           ModelAttributeItem(
+            title: '文字内容',
+            child: TextButton(
+              onPressed: () async {
+                final content = await showModifyTextDialog(
+                  context,
+                  text: modelData.text.content,
+                );
+                if (content == null || content == modelData.text.content) return;
+                modelData.text.content = content;
+                refreshModel();
+              },
+              child: Text('修改'),
+            ),
+          ),
+          ModelAttributeItem(
             title: '水平对齐',
-            child: RadioButton(
+            child: RadioButtonGroup(
               onChanged: (i) {
                 setState(() {
                   modelData.text.alignment = Alignment(
@@ -142,7 +179,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
           ),
           ModelAttributeItem(
             title: '垂直对齐',
-            child: RadioButton(
+            child: RadioButtonGroup(
               onChanged: (i) {
                 setState(() {
                   modelData.text.alignment = Alignment(
@@ -157,6 +194,30 @@ class _RectModelEditorState extends State<RectModelEditor> {
                 Icon(Icons.align_vertical_top),
                 Icon(Icons.align_vertical_center),
                 Icon(Icons.align_vertical_bottom),
+              ],
+            ),
+          ),
+          ModelAttributeItem(
+            title: '文字样式',
+            child: MultiRadioButtonGroup(
+              onChanged: (index, state) {
+                [
+                  () => modelData.text.bold = state,
+                  () => modelData.text.italic = state,
+                  () => modelData.text.underline = state,
+                ][index]();
+                setState(() {});
+                refreshModel();
+              },
+              selectStateList: [
+                modelData.text.bold,
+                modelData.text.italic,
+                modelData.text.underline,
+              ],
+              children: const [
+                Icon(Icons.format_bold),
+                Icon(Icons.format_italic),
+                Icon(Icons.format_underline),
               ],
             ),
           ),

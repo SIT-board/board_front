@@ -1,28 +1,51 @@
 import 'package:flutter/material.dart';
 
+import 'common.dart';
 import 'data.dart';
 
-class RectModelWidget extends StatelessWidget {
+class RectModelWidget extends StatefulWidget {
   final RectModelData data;
+
   const RectModelWidget({Key? key, required this.data}) : super(key: key);
 
   @override
+  State<RectModelWidget> createState() => _RectModelWidgetState();
+}
+
+class _RectModelWidgetState extends State<RectModelWidget> {
+  RectModelData get rect => widget.data;
+  TextModelData get text => rect.text;
+  BorderModelData get border => rect.border;
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: data.color,
-        border: Border.all(
-          color: data.border.color,
-          width: data.border.width,
-        ),
-      ),
+    return GestureDetector(
+      onDoubleTap: () async {
+        final content = await showModifyTextDialog(
+          context,
+          text: text.content,
+        );
+        if (content == null || content == text.content) return;
+        setState(() {
+          text.content = content;
+        });
+      },
       child: Container(
-        alignment: data.text.alignment,
+        decoration: BoxDecoration(
+          color: rect.color,
+          border: Border.all(
+            color: border.color,
+            width: border.width,
+          ),
+        ),
+        alignment: text.alignment,
         child: Text(
-          data.text.content,
+          text.content,
           style: TextStyle(
-            color: data.text.color,
-            fontSize: data.text.fontSize,
+            fontWeight: text.bold ? FontWeight.bold : FontWeight.normal,
+            fontStyle: text.italic ? FontStyle.italic : FontStyle.normal,
+            decoration: text.underline ? TextDecoration.underline : TextDecoration.none,
+            color: text.color,
+            fontSize: text.fontSize,
           ),
         ),
       ),
