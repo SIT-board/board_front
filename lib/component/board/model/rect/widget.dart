@@ -8,7 +8,10 @@ class RectModelWidget extends StatelessWidget {
 
   Widget buildText() => Text(
         data.text.content,
-        style: TextStyle(color: data.text.color),
+        style: TextStyle(
+          color: data.text.color,
+          fontSize: data.text.fontSize,
+        ),
       );
 
   @override

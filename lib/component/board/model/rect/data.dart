@@ -7,6 +7,8 @@ class TextModelData extends HashMapData {
   set content(String v) => map['content'] = v;
   Color get color => Color(map['color'] ??= Colors.black.value);
   set color(Color v) => map['color'] = v.value;
+  double get fontSize => map['fontSize'] ??= 14;
+  set fontSize(double v) => map['fontSize'] = v;
 }
 
 class BorderModelData extends HashMapData {
