@@ -7,6 +7,7 @@ export 'image/data.dart';
 export 'image/editor.dart';
 export 'image/widget.dart';
 export 'line/data.dart';
+export 'line/editor.dart';
 export 'line/widget.dart';
 export 'oval/data.dart';
 export 'oval/widget.dart';
