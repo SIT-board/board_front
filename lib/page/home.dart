@@ -49,10 +49,11 @@ Future<List<String>?> showInputDialog(BuildContext context) async {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final m1 = BoardPageSetViewModel.createNew();
+
+  HomePage({Key? key}) : super(key: key);
 
   Widget buildListView(BuildContext context) {
-    final m1 = BoardPageSetViewModel.createNew();
     ValueNotifier<BoardPageSetViewModel?> notifier = ValueNotifier(null);
     //
     // final nodeSender = BoardNode(roomId: '123', nodeId: '1');

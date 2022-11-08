@@ -6,13 +6,22 @@ class RectModelWidget extends StatelessWidget {
   final RectModelData data;
   const RectModelWidget({Key? key, required this.data}) : super(key: key);
 
+  Widget buildText() => Text(
+        data.text.content,
+        style: TextStyle(color: data.text.color),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: data.fillColor,
-        border: Border.all(color: data.borderColor, width: data.borderWidth),
+        color: data.color,
+        border: Border.all(
+          color: data.border.color,
+          width: data.border.width,
+        ),
       ),
+      child: buildText(),
     );
   }
 }

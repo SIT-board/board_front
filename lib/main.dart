@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SIT-board',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomePage(),
+      home: HomePage(),
       builder: EasyLoading.init(),
     );
   }

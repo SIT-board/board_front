@@ -24,7 +24,7 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..id = Random().nextInt(65536)
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.rect
-                ..data = (RectModelData({})..fillColor = Colors.blue),
+                ..data = (RectModelData({})),
             );
             eventBus.publish(BoardEventName.refreshBoard);
           }),
@@ -45,30 +45,6 @@ QudsPopupMenuBase buildAddModelMenu({
                   ..size = const Size(100, 60))
                 ..type = ModelType.line
                 ..data = (LineModelData({})),
-            );
-            eventBus.publish(BoardEventName.refreshBoard);
-          }),
-      QudsPopupMenuItem(
-          title: Text('椭圆'),
-          onPressed: () {
-            boardViewModel.addModel(
-              Model({})
-                ..id = Random().nextInt(65536)
-                ..common = (CommonModelData({})..position = position)
-                ..type = ModelType.oval
-                ..data = (OvalModelData({})..fillColor = Colors.blue),
-            );
-            eventBus.publish(BoardEventName.refreshBoard);
-          }),
-      QudsPopupMenuItem(
-          title: Text('文本框'),
-          onPressed: () {
-            boardViewModel.addModel(
-              Model({})
-                ..id = Random().nextInt(65536)
-                ..common = (CommonModelData({})..position = position)
-                ..type = ModelType.text
-                ..data = (TextModelData({})..content = '新建文本框'),
             );
             eventBus.publish(BoardEventName.refreshBoard);
           }),

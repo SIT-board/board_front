@@ -3,12 +3,10 @@ import 'package:board_front/interface/hash_map_data.dart';
 import 'model.dart';
 
 enum ModelType {
-  text,
   rect,
   image,
   freeStyle,
   line,
-  oval,
 }
 
 class Model extends HashMapData {
@@ -24,12 +22,10 @@ class Model extends HashMapData {
   HashMapData get data {
     if (!map.containsKey('data')) map['data'] = <String, dynamic>{};
     return {
-      ModelType.text: (m) => TextModelData(m),
       ModelType.image: (m) => ImageModelData(m),
       ModelType.rect: (m) => RectModelData(m),
       ModelType.freeStyle: (m) => FreeStyleModelData(m),
       ModelType.line: (m) => LineModelData(m),
-      ModelType.oval: (m) => OvalModelData(m),
     }[type]!(map['data']);
   }
 
