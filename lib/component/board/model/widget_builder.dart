@@ -35,7 +35,7 @@ class ModelWidgetBuilder {
 
   Widget buildModelEditorWidget() {
     final builders = {
-      ModelType.rect: (data) => RectModelWidget(data: model.data as RectModelData),
+      ModelType.rect: (data) => RectModelEditor(model: model, eventBus: eventBus),
       ModelType.image: (data) => ImageModelEditor(model: model, eventBus: eventBus),
       ModelType.freeStyle: (data) => FreeStyleModelEditor(model: model, eventBus: eventBus),
       ModelType.line: (data) => LineModelEditor(model: model, eventBus: eventBus),

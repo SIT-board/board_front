@@ -10,5 +10,6 @@ export 'line/data.dart';
 export 'line/editor.dart';
 export 'line/widget.dart';
 export 'rect/data.dart';
+export 'rect/editor.dart';
 export 'rect/widget.dart';
 export 'widget_builder.dart';

@@ -4,20 +4,20 @@ import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/component/board/model/base_editor.dart';
 import 'package:flutter/material.dart';
 
-class TextModelEditor extends StatefulWidget {
+class RectModelEditor extends StatefulWidget {
   final Model model;
   final EventBus<BoardEventName>? eventBus;
-  const TextModelEditor({
+  const RectModelEditor({
     Key? key,
     required this.model,
     this.eventBus,
   }) : super(key: key);
 
   @override
-  State<TextModelEditor> createState() => _TextModelEditorState();
+  State<RectModelEditor> createState() => _RectModelEditorState();
 }
 
-class _TextModelEditorState extends State<TextModelEditor> {
+class _RectModelEditorState extends State<RectModelEditor> {
   LineModelData get modelData => widget.model.data as LineModelData;
 
   void refreshModel() {
