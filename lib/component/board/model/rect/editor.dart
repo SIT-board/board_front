@@ -5,57 +5,35 @@ import 'package:board_front/component/board/model/base_editor.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 
-typedef SwitchCallback = void Function(int index);
-
-class MultiButtonSwitch extends StatefulWidget {
+class RadioButton extends StatelessWidget {
   final List<Widget> children;
-  final SwitchCallback onSwitch;
-  final int defaultOptionIndex;
+  final void Function(int index) onChanged;
+  final int value;
 
-  const MultiButtonSwitch({
+  const RadioButton({
     Key? key,
     required this.children,
-    required this.onSwitch,
-    this.defaultOptionIndex = 0,
+    required this.onChanged,
+    this.value = 0,
   }) : super(key: key);
-
-  @override
-  State<MultiButtonSwitch> createState() => _MultiButtonSwitchState();
-}
-
-class _MultiButtonSwitchState extends State<MultiButtonSwitch> {
-  late int currentOptionIndex;
-
-  @override
-  void initState() {
-    currentOptionIndex = widget.defaultOptionIndex;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: widget.children.asMap().entries.map((MapEntry<int, Widget> entry) {
+      children: children.asMap().entries.map((MapEntry<int, Widget> entry) {
         final e = Expanded(
           child: TextButton(
-            onPressed: () {
-              widget.onSwitch(entry.key);
-              setState(() {
-                currentOptionIndex = entry.key;
-              });
-            },
-            child: entry.value,
+            onPressed: () => onChanged(entry.key),
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.black),
               backgroundColor: MaterialStateProperty.resolveWith((states) {
                 //设置按下时的背景颜色
-                if (currentOptionIndex == entry.key) {
-                  return Colors.blue[100];
-                }
+                if (value == entry.key) return Colors.blue[100];
                 //默认不使用背景颜色
                 return null;
               }),
             ),
+            child: entry.value,
           ),
         );
         return Expanded(
@@ -144,16 +122,17 @@ class _RectModelEditorState extends State<RectModelEditor> {
         items: [
           ModelAttributeItem(
             title: '水平对齐',
-            child: MultiButtonSwitch(
-              onSwitch: (i) {
-                modelData.text.alignment = Alignment(
-                  i - 1,
-                  modelData.text.alignment.y,
-                );
-                print(modelData.text.alignment);
+            child: RadioButton(
+              onChanged: (i) {
+                setState(() {
+                  modelData.text.alignment = Alignment(
+                    i - 1,
+                    modelData.text.alignment.y,
+                  );
+                });
                 refreshModel();
               },
-              defaultOptionIndex: modelData.text.alignment.x.toInt() + 1,
+              value: modelData.text.alignment.x.toInt() + 1,
               children: const [
                 Icon(Icons.align_horizontal_left),
                 Icon(Icons.align_horizontal_center),
@@ -163,16 +142,17 @@ class _RectModelEditorState extends State<RectModelEditor> {
           ),
           ModelAttributeItem(
             title: '垂直对齐',
-            child: MultiButtonSwitch(
-              onSwitch: (i) {
-                modelData.text.alignment = Alignment(
-                  modelData.text.alignment.x,
-                  i - 1,
-                );
-                print(modelData.text.alignment);
+            child: RadioButton(
+              onChanged: (i) {
+                setState(() {
+                  modelData.text.alignment = Alignment(
+                    modelData.text.alignment.x,
+                    i - 1,
+                  );
+                });
                 refreshModel();
               },
-              defaultOptionIndex: modelData.text.alignment.y.toInt() + 1,
+              value: modelData.text.alignment.y.toInt() + 1,
               children: const [
                 Icon(Icons.align_vertical_top),
                 Icon(Icons.align_vertical_center),
