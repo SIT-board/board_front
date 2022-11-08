@@ -158,6 +158,27 @@ class _RectModelEditorState extends State<RectModelEditor> {
             ),
           ),
           ModelAttributeItem(
+            title: '字号',
+            child: Slider(
+              value: modelData.text.fontSize,
+              min: 1,
+              max: 72,
+              onChanged: (value) {
+                setState(() {
+                  modelData.text.fontSize = value;
+                });
+                refreshModel();
+              },
+            ),
+          ),
+          ModelAttributeItem(
+            title: '字体',
+            child: TextButton(
+              onPressed: () async {},
+              child: Text('修改'),
+            ),
+          ),
+          ModelAttributeItem(
             title: '水平对齐',
             child: RadioButtonGroup(
               onChanged: (i) {
