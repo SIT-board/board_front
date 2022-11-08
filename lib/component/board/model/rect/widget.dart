@@ -6,11 +6,14 @@ class RectModelWidget extends StatelessWidget {
   final RectModelData data;
   const RectModelWidget({Key? key, required this.data}) : super(key: key);
 
-  Widget buildText() => Text(
-        data.text.content,
-        style: TextStyle(
-          color: data.text.color,
-          fontSize: data.text.fontSize,
+  Widget buildText() => Container(
+        alignment: data.text.alignment,
+        child: Text(
+          data.text.content,
+          style: TextStyle(
+            color: data.text.color,
+            fontSize: data.text.fontSize,
+          ),
         ),
       );
 
