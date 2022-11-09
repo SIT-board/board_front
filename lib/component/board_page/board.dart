@@ -150,19 +150,20 @@ class _BoardPageState extends State<BoardPage> {
             eventBus: eventBus,
           ),
         ),
-        GestureDetector(
-          onPanUpdate: (d) {
-            final size = context.size!;
-            setState(() => s -= d.delta.dy / size.height);
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26),
-              color: Colors.black12,
+        if (showEditor)
+          GestureDetector(
+            onPanUpdate: (d) {
+              final size = context.size!;
+              setState(() => s -= d.delta.dy / size.height);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black26),
+                color: Colors.black12,
+              ),
+              height: 5,
             ),
-            height: 5,
           ),
-        ),
         if (showEditor)
           Expanded(
             flex: (s * 100).toInt(),
@@ -186,19 +187,20 @@ class _BoardPageState extends State<BoardPage> {
             eventBus: eventBus,
           ),
         ),
-        GestureDetector(
-          onPanUpdate: (d) {
-            final size = context.size!;
-            setState(() => s -= d.delta.dx / size.width);
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black26),
-              color: Colors.black12,
+        if (showEditor)
+          GestureDetector(
+            onPanUpdate: (d) {
+              final size = context.size!;
+              setState(() => s -= d.delta.dx / size.width);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black26),
+                color: Colors.black12,
+              ),
+              width: 5,
             ),
-            width: 5,
           ),
-        ),
         if (showEditor)
           Expanded(
             flex: (s * 100).toInt(),
@@ -237,7 +239,14 @@ class _BoardPageState extends State<BoardPage> {
           title: buildTitle(),
           actions: buildActions(),
         ),
-        body: buildPhone(),
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            if (MediaQuery.of(context).size.aspectRatio < 1) {
+              return buildPhone();
+            }
+            return buildDesktop();
+          },
+        ),
       ),
     );
   }
