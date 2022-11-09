@@ -1,50 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:board_front/component/board_page/data.dart';
 import 'package:board_front/util/log.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
-class BoardMessage {
-  final DateTime ts;
-  final String topic;
-  final String publisher;
-  final String sendTo;
-  final dynamic data;
-  BoardMessage({
-    required this.ts,
-    required this.topic,
-    required this.publisher,
-    required this.sendTo,
-    required this.data,
-  });
-  static BoardMessage fromJson(Map<String, dynamic> json) {
-    return BoardMessage(
-      ts: DateTime.fromMillisecondsSinceEpoch(json['ts']),
-      topic: json['topic'],
-      publisher: json['publisher'],
-      sendTo: json['sendTo'],
-      data: json['data'],
-    );
-  }
+import 'message.dart';
 
-  Map<String, dynamic> toJson() {
-    return {
-      'ts': ts.millisecondsSinceEpoch,
-      'topic': topic,
-      'publisher': publisher,
-      'sendTo': sendTo,
-      'data': data,
-    };
-  }
-}
-
-class BoardNode {
+class BoardUserNode {
   /// 房间id
   final String roomId;
 
-  /// 当前节点id
-  final String nodeId;
+  /// 当前用户节点id
+  /// 该id是确定用户的唯一标识
+  final String userNodeId;
+
+  /// 当前用户名, 允许后期再动态修改
+  String username;
 
   /// 服务器地址
   final String mqttServer;
@@ -57,26 +30,30 @@ class BoardNode {
   final Duration onlineListTimeout;
 
   /// 节点接收消息的回调
-  final Map<String, void Function(BoardMessage message)> _onReceiveCallbackMap = {};
+  final Map<String, void Function(BaseMessage message)> _onReceiveCallbackMap = {};
 
   /// 维护一个在线清单列表
-  final Map<String, DateTime> _onlineList = {};
+  final Map<String, DateTime> _onlineUserIdMap = {};
+
+  /// 维护一个用户名列表
+  final Map<String, String> _onlineUsernameMap = {};
 
   /// mqtt客户端
   MqttClient? _client;
 
   /// 用于上报在线状态的定时器
   Timer? _timer;
-  BoardNode({
+  BoardUserNode({
     this.mqttServer = '192.168.2.118',
     required this.roomId,
-    required this.nodeId,
+    required this.userNodeId,
+    String? username,
     this.reportInterval = const Duration(seconds: 1),
     this.onlineListTimeout = const Duration(seconds: 5),
-  });
+  }) : username = username ?? '用户$userNodeId';
 
   void _subscribe() {
-    _client?.subscribe('$roomId/node/$nodeId/#', MqttQos.atLeastOnce);
+    _client?.subscribe('$roomId/node/$userNodeId/#', MqttQos.atLeastOnce);
     _client?.subscribe('$roomId/broadcast/#', MqttQos.atLeastOnce);
 
     _client?.updates?.listen((messageList) {
@@ -84,11 +61,11 @@ class BoardNode {
       final pubMess = recMess.payload as MqttPublishMessage;
 
       final String message = utf8.decode(pubMess.payload.message);
-      _onReceiveMessage(BoardMessage.fromJson(jsonDecode(message)));
+      _onReceiveMessage(BaseMessage.fromJson(jsonDecode(message)));
     });
   }
 
-  void _onReceiveMessage(BoardMessage message) {
+  void _onReceiveMessage(BaseMessage message) {
     final cb = _onReceiveCallbackMap[message.topic];
     if (cb == null) return;
     cb(message);
@@ -96,20 +73,21 @@ class BoardNode {
 
   /// 获取在线列表
   Map<String, DateTime> get onlineList {
-    return Map.fromEntries(_onlineList.entries.where((e) => DateTime.now().difference(e.value) <= onlineListTimeout));
+    return Map.fromEntries(
+        _onlineUserIdMap.entries.where((e) => DateTime.now().difference(e.value) <= onlineListTimeout));
   }
 
   /// 注册消息接收回调
   void registerForOnReceive({
     required String topic,
-    required void Function(BoardMessage message) callback,
+    required void Function(BaseMessage message) callback,
   }) {
     _onReceiveCallbackMap[topic] = callback;
   }
 
   /// 连接mqtt服务器
   Future<void> connect() async {
-    _client = MqttServerClient(mqttServer, nodeId);
+    _client = MqttServerClient(mqttServer, userNodeId);
     final client = _client!;
     client.setProtocolV311();
     try {
@@ -127,17 +105,19 @@ class BoardNode {
     }
     Log.info('Mosquitto client connected');
 
-    Log.info('RoomId: $roomId , NodeId: $nodeId');
+    Log.info('RoomId: $roomId , NodeId: $userNodeId');
     client.onSubscribed = ((s) => Log.info('Topic订阅成功: $s'));
     _subscribe();
 
     // 定时上报在线状态
     _timer = Timer.periodic(reportInterval, (timer) => report());
     registerForOnReceive(
-        topic: 'report',
-        callback: (BoardMessage message) {
-          _onlineList[message.publisher] = message.ts;
-        });
+      topic: 'report',
+      callback: (BaseMessage message) {
+        _onlineUserIdMap[message.publisher] = message.ts;
+        _onlineUsernameMap[message.publisher] = message.data.toString();
+      },
+    );
   }
 
   void disconnect() {
@@ -150,9 +130,9 @@ class BoardNode {
   void sendTo(String otherNodeId, String topic, dynamic jsonMessage) {
     final builder = MqttClientPayloadBuilder();
     builder.addUTF8String(
-      jsonEncode(BoardMessage(
+      jsonEncode(BaseMessage(
         ts: DateTime.now(),
-        publisher: nodeId,
+        publisher: userNodeId,
         sendTo: otherNodeId,
         topic: topic,
         data: jsonMessage,
@@ -170,9 +150,9 @@ class BoardNode {
     final builder = MqttClientPayloadBuilder();
 
     builder.addUTF8String(
-      jsonEncode(BoardMessage(
+      jsonEncode(BaseMessage(
         ts: DateTime.now(),
-        publisher: nodeId,
+        publisher: userNodeId,
         sendTo: '+',
         topic: topic,
         data: jsonMessage,
@@ -187,22 +167,51 @@ class BoardNode {
 
   /// 上报当前节点状态
   void report() {
-    broadcast('report', '');
+    broadcast('report', username);
   }
 }
 
-class MyBoardNode {
-  final BoardNode node;
-  MyBoardNode(this.node) {
+class OwnerBoardNode {
+  final BoardUserNode node;
+  final BoardPageSetViewModel viewModel;
+  OwnerBoardNode({
+    required this.node,
+    required this.viewModel,
+  }) {
+    // owner需要订阅接收模型请求, 非owner则无需订阅该消息
     node.registerForOnReceive(
-        topic: 'requestBoardModel',
-        callback: (BoardMessage message) {
-          // 其他节点向该节点发起模型数据请求
-        });
-    node.registerForOnReceive(topic: 'boardModelRefresh', callback: (BoardMessage message) {});
+      topic: 'boardModelRequest',
+      callback: (BaseMessage message) {
+        // 其他节点向该节点发起模型数据请求
+        sendBoardViewModel(message.publisher);
+      },
+    );
   }
+
+  void sendBoardViewModel(String targetId) {
+    node.sendTo(targetId, 'boardViewModelResponse', viewModel.map);
+  }
+}
+
+class MemberBoardNode {
+  final BoardUserNode node;
+  final BoardPageSetViewModel viewModel;
+
+  MemberBoardNode({
+    required this.node,
+    required this.viewModel,
+  }) {
+    node.registerForOnReceive(
+      topic: 'boardModelResponse',
+      callback: (BaseMessage message) {
+        viewModel.map = message.data;
+        // 通知外部
+      },
+    );
+  }
+
   // 请求一份BoardModel
   void requestBoardModel() {
-    node.broadcast('requestBoardModel', '');
+    node.broadcast('boardViewModelRequest', '');
   }
 }
