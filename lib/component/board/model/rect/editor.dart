@@ -172,10 +172,15 @@ class _RectModelEditorState extends State<RectModelEditor> {
             ),
           ),
           ModelAttributeItem(
-            title: '字体',
-            child: TextButton(
-              onPressed: () async {},
-              child: Text('修改'),
+            title: '文字颜色',
+            child: InkWell(
+              onTap: () async {
+                final pickedColor = await showBoardColorPicker(context);
+                if (pickedColor == null) return;
+                setState(() => modelData.text.color = pickedColor);
+                refreshModel();
+              },
+              child: Container(height: 50, width: 50, color: modelData.text.color),
             ),
           ),
           ModelAttributeItem(
