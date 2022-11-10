@@ -14,6 +14,9 @@ class JsonPatchUpdate {
 
   Map<String, dynamic> toJson() => {'source': source, 'target': target};
 
+  factory JsonPatchUpdate.fromJson(Map<String, dynamic> json) {
+    return JsonPatchUpdate(json['source'], json['target']);
+  }
   @override
   String toString() {
     return jsonEncode(toJson());
@@ -44,6 +47,19 @@ class JsonPatch {
   }
 
   Map<String, dynamic> toJson() => {'add': add, 'remove': remove, 'update': update};
+
+  factory JsonPatch.fromJson(Map<String, dynamic> json) {
+    return JsonPatch(
+      add: json['add'],
+      remove: json['remove'],
+      update: (json['update'] as Map).map((key, value) {
+        return MapEntry(
+          key,
+          JsonPatchUpdate.fromJson((value as Map).cast<String, dynamic>()),
+        );
+      }),
+    );
+  }
   @override
   String toString() {
     return jsonEncode(toJson());

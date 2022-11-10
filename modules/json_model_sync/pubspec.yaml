@@ -1,12 +1,14 @@
 name: json_model_sync
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
+publish_to: none
 
 environment:
   sdk: '>=2.18.4 <3.0.0'
 
 dependencies:
   mqtt_client: ^9.7.2
+  json_diff_patcher: { path: ../json_diff_patcher }
 
 dev_dependencies:
   lints: ^2.0.0
