@@ -7,18 +7,22 @@ class MemberBoardNode {
   final BoardUserNode node;
   final void Function(Map<dynamic, dynamic> model)? onModelRefresh;
   final void Function(JsonPatch patch)? onModelChanged;
-  JsonDiffPatcher? patcher;
-
+  JsonDiffPatcher? _patcher;
+  final List<JsonPatch> _patchBuffer = [];
   MemberBoardNode({
     required this.node,
-    required this.onModelRefresh,
+    this.onModelRefresh,
     this.onModelChanged,
   }) {
     node.registerForOnReceive(
       topic: 'modelResponse',
       callback: (BaseMessage message) {
         final model = message.data;
-        onModelRefresh?.call(model);
+        _patcher = JsonDiffPatcher(model);
+        if (_patchBuffer.isNotEmpty) {
+          _patchBuffer.forEach(_patcher!.applyPatch);
+        }
+        onModelRefresh?.call(model!);
       },
     );
 
@@ -26,7 +30,11 @@ class MemberBoardNode {
       topic: 'syncPatch',
       callback: (BaseMessage message) {
         final patch = JsonPatch.fromJson((message.data as Map).cast<String, dynamic>());
-        patcher?.applyPatch(patch);
+        if (_patcher == null) {
+          _patchBuffer.add(patch);
+        } else {
+          _patcher!.applyPatch(patch);
+        }
         onModelChanged?.call(patch);
       },
     );
