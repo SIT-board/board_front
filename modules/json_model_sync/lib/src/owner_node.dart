@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:json_diff_patcher/json_diff_patcher.dart';
@@ -14,14 +13,11 @@ class OwnerBoardNode {
   final BoardUserNode node;
   final Map<dynamic, dynamic> model;
   final JsonDiffPatcher patcher;
-  final Duration syncPeriod;
-  Timer? _timer;
   Map<dynamic, dynamic> lastStore;
 
   OwnerBoardNode({
     required this.node,
     required this.model,
-    required this.syncPeriod,
   })  : patcher = JsonDiffPatcher(model),
         lastStore = copy(model) {
     // owner需要订阅接收模型请求, 非owner则无需订阅该消息
@@ -32,26 +28,15 @@ class OwnerBoardNode {
         sendBoardViewModel(message.publisher);
       },
     );
-
-    _timer = Timer.periodic(
-      syncPeriod,
-      (timer) {
-        // 监听发生的修改
-        final patch = JsonDiffPatcher(lastStore).diff(model);
-        if (patch.isEmpty()) return;
-        // 发送修改
-        broadcastSyncPatch(patch);
-        lastStore = copy(model);
-      },
-    );
   }
 
-  void dispose() {
-    _timer?.cancel();
-  }
-
-  void broadcastSyncPatch(JsonPatch patch) {
-    node.broadcast('syncPatch', patch.toJson());
+  void broadcastSyncPatch() {
+    // 监听发生的修改
+    final patch = JsonDiffPatcher(lastStore).diff(model);
+    if (patch.isEmpty()) return;
+    // 发送修改
+    node.broadcast('syncPatch', patch);
+    lastStore = copy(model);
   }
 
   void sendBoardViewModel(String targetId) {
