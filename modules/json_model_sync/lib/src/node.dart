@@ -17,9 +17,6 @@ class BoardUserNode {
   /// 当前用户名, 允许后期再动态修改
   String username;
 
-  /// 服务器地址
-  final String mqttServer;
-
   /// 上报时间间隔
   /// 定期上报发布广播消息，通知所有人表示自己在线
   final Duration reportInterval;
@@ -37,24 +34,26 @@ class BoardUserNode {
   final Map<String, String> _onlineUsernameMap = {};
 
   /// mqtt客户端
-  MqttClient? _client;
+  final MqttClient _client;
 
   /// 用于上报在线状态的定时器
   Timer? _timer;
   BoardUserNode({
-    this.mqttServer = '192.168.2.118',
+    String mqttServer = '127.0.0.1',
+    int mqttPort = 1883,
     required this.roomId,
     required this.userNodeId,
     String? username,
     this.reportInterval = const Duration(seconds: 1),
     this.onlineListTimeout = const Duration(seconds: 5),
-  }) : username = username ?? '用户$userNodeId';
+  })  : username = username ?? '用户$userNodeId',
+        _client = MqttServerClient.withPort(mqttServer, userNodeId, mqttPort);
 
   void _subscribe() {
-    _client?.subscribe('$roomId/node/$userNodeId/#', MqttQos.atLeastOnce);
-    _client?.subscribe('$roomId/broadcast/#', MqttQos.atLeastOnce);
+    _client.subscribe('$roomId/node/$userNodeId/#', MqttQos.atLeastOnce);
+    _client.subscribe('$roomId/broadcast/#', MqttQos.atLeastOnce);
 
-    _client?.updates?.listen((messageList) {
+    _client.updates?.listen((messageList) {
       final recMess = messageList[0];
       final pubMess = recMess.payload as MqttPublishMessage;
 
@@ -70,9 +69,11 @@ class BoardUserNode {
   }
 
   /// 获取在线列表
-  Map<String, DateTime> get onlineList {
-    return Map.fromEntries(
-        _onlineUserIdMap.entries.where((e) => DateTime.now().difference(e.value) <= onlineListTimeout));
+  List<String> get onlineList {
+    return _onlineUserIdMap.entries
+        .where((e) => DateTime.now().difference(e.value) <= onlineListTimeout)
+        .map((e) => e.key)
+        .toList();
   }
 
   /// 注册消息接收回调
@@ -85,26 +86,24 @@ class BoardUserNode {
 
   /// 连接mqtt服务器
   Future<void> connect() async {
-    _client = MqttServerClient(mqttServer, userNodeId);
-    final client = _client!;
-    client.setProtocolV311();
+    _client.setProtocolV311();
     try {
-      await client.connect();
+      await _client.connect();
     } on Exception catch (e) {
       print('Mqtt Client connect exception - $e');
-      client.disconnect();
+      _client.disconnect();
       return;
     }
 
-    if (client.connectionStatus!.state != MqttConnectionState.connected) {
-      print('ERROR Mosquitto client connection failed - disconnecting, state is ${client.connectionStatus!.state}');
-      client.disconnect();
+    if (_client.connectionStatus!.state != MqttConnectionState.connected) {
+      print('ERROR Mosquitto client connection failed - disconnecting, state is ${_client.connectionStatus!.state}');
+      _client.disconnect();
       return;
     }
     print('Mosquitto client connected');
 
-    print('RoomId: $roomId , NodeId: $userNodeId');
-    client.onSubscribed = ((s) => print('Topic订阅成功: $s'));
+    print('当前节点信息：RoomId: $roomId , NodeId: $userNodeId');
+    _client.onSubscribed = ((s) => print('Topic订阅成功: $s'));
     _subscribe();
 
     // 定时上报在线状态
@@ -119,7 +118,7 @@ class BoardUserNode {
   }
 
   void disconnect() {
-    _client?.disconnect();
+    _client.disconnect();
     _timer?.cancel();
     _timer = null;
   }
@@ -136,7 +135,7 @@ class BoardUserNode {
         data: jsonMessage,
       ).toJson()),
     );
-    _client?.publishMessage(
+    _client.publishMessage(
       '$roomId/node/$otherNodeId/$topic',
       MqttQos.atLeastOnce,
       builder.payload!,
@@ -156,7 +155,7 @@ class BoardUserNode {
         data: jsonMessage,
       ).toJson()),
     );
-    _client?.publishMessage(
+    _client.publishMessage(
       '$roomId/broadcast/$topic',
       MqttQos.atLeastOnce,
       builder.payload!,
