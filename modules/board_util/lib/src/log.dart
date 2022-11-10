@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 /// 日志工具类
@@ -10,9 +9,7 @@ class Log {
   }
 
   static void _log(String type, dynamic message) {
-    if (kDebugMode) {
-      print('${getCurrentTime()}\t$type\t${_getCaller(3)}  ${message.toString()}');
-    }
+    print('${getCurrentTime()}\t$type\t${_getCaller(3)}  ${message.toString()}');
   }
 
   static String getCurrentTime() {

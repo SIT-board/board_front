@@ -43,13 +43,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.16.0"
-  crypto:
-    dependency: transitive
-    description:
-      name: crypto
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.2"
   dotted_line:
     dependency: "direct main"
     description:
@@ -57,13 +50,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.1.0"
-  event_bus:
-    dependency: transitive
-    description:
-      name: event_bus
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -191,13 +177,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.0"
-  mqtt_client:
-    dependency: "direct main"
-    description:
-      name: mqtt_client
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "9.7.2"
   path:
     dependency: transitive
     description:
@@ -371,13 +350,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.12"
-  typed_data:
-    dependency: transitive
-    description:
-      name: typed_data
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.3.1"
   universal_platform:
     dependency: "direct main"
     description:

@@ -15,7 +15,6 @@ dependencies:
 
   flutter_colorpicker: ^1.0.3
   intl: ^0.17.0
-  mqtt_client: ^9.7.2
   shared_preferences: ^2.0.15
   board_event_bus: { path: modules/board_event_bus }
   json_model_undo_redo: { path: modules/json_model_undo_redo }

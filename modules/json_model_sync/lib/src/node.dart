@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:board_front/component/board_page/data.dart';
-import 'package:board_front/util/log.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
@@ -93,20 +91,20 @@ class BoardUserNode {
     try {
       await client.connect();
     } on Exception catch (e) {
-      Log.error('Mqtt Client connect exception - $e');
+      print('Mqtt Client connect exception - $e');
       client.disconnect();
       return;
     }
 
     if (client.connectionStatus!.state != MqttConnectionState.connected) {
-      Log.error('ERROR Mosquitto client connection failed - disconnecting, state is ${client.connectionStatus!.state}');
+      print('ERROR Mosquitto client connection failed - disconnecting, state is ${client.connectionStatus!.state}');
       client.disconnect();
       return;
     }
-    Log.info('Mosquitto client connected');
+    print('Mosquitto client connected');
 
-    Log.info('RoomId: $roomId , NodeId: $userNodeId');
-    client.onSubscribed = ((s) => Log.info('Topic订阅成功: $s'));
+    print('RoomId: $roomId , NodeId: $userNodeId');
+    client.onSubscribed = ((s) => print('Topic订阅成功: $s'));
     _subscribe();
 
     // 定时上报在线状态
@@ -168,50 +166,5 @@ class BoardUserNode {
   /// 上报当前节点状态
   void report() {
     broadcast('report', username);
-  }
-}
-
-class OwnerBoardNode {
-  final BoardUserNode node;
-  final BoardPageSetViewModel viewModel;
-  OwnerBoardNode({
-    required this.node,
-    required this.viewModel,
-  }) {
-    // owner需要订阅接收模型请求, 非owner则无需订阅该消息
-    node.registerForOnReceive(
-      topic: 'boardModelRequest',
-      callback: (BaseMessage message) {
-        // 其他节点向该节点发起模型数据请求
-        sendBoardViewModel(message.publisher);
-      },
-    );
-  }
-
-  void sendBoardViewModel(String targetId) {
-    node.sendTo(targetId, 'boardViewModelResponse', viewModel.map);
-  }
-}
-
-class MemberBoardNode {
-  final BoardUserNode node;
-  final BoardPageSetViewModel viewModel;
-
-  MemberBoardNode({
-    required this.node,
-    required this.viewModel,
-  }) {
-    node.registerForOnReceive(
-      topic: 'boardModelResponse',
-      callback: (BaseMessage message) {
-        viewModel.map = message.data;
-        // 通知外部
-      },
-    );
-  }
-
-  // 请求一份BoardModel
-  void requestBoardModel() {
-    node.broadcast('boardViewModelRequest', '');
   }
 }
