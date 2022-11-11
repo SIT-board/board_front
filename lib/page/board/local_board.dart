@@ -6,6 +6,7 @@ import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/component/board_page/board_body.dart';
 import 'package:board_front/component/board_page/data.dart';
 import 'package:board_front/component/board_page/title.dart';
+import 'package:board_front/global.dart';
 import 'package:board_front/util/keyboard.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,8 @@ import 'package:intl/intl.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
 class LocalBoardPage extends StatefulWidget {
-  const LocalBoardPage({Key? key}) : super(key: key);
+  final String? initialFilePath;
+  const LocalBoardPage({Key? key, this.initialFilePath}) : super(key: key);
 
   @override
   State<LocalBoardPage> createState() => _LocalBoardPageState();
@@ -24,9 +26,12 @@ class LocalBoardPage extends StatefulWidget {
 class _LocalBoardPageState extends State<LocalBoardPage> {
   final keyBoardFocusNode = FocusNode();
   final eventBus = EventBus<BoardEventName>();
-  final pageSetViewModel = BoardPageSetViewModel.createNew();
+
+  late var pageSetViewModel = BoardPageSetViewModel.createNew();
   late var undoRedoManager = UndoRedoManager(pageSetViewModel.map);
   String? filePath;
+  int lastSaveStorePtr = -1;
+
   void _saveState(arg) => undoRedoManager.store();
   void _refreshBoard(arg) => setState(() {});
   @override
@@ -51,6 +56,8 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
     if (filePath == null) return;
     File(filePath!).writeAsStringSync(pageSetViewModel.toJsonString());
     EasyLoading.showSuccess('保存成功');
+    GlobalObjects.storage.recentlyUsed.addItem(filePath!);
+    lastSaveStorePtr = undoRedoManager.currentPtr;
   }
 
   void gotoNextPage() {
@@ -137,6 +144,7 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
               final content = (jsonDecode(File(path).readAsStringSync()) as Map).cast<String, dynamic>();
               // 解析成功
               filePath = path;
+              GlobalObjects.storage.recentlyUsed.addItem(filePath!);
               pageSetViewModel.map.clear();
               pageSetViewModel.map.addAll(content);
               undoRedoManager = UndoRedoManager(pageSetViewModel.map);
@@ -149,7 +157,7 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
             onTap: () async {
               final otherPath = await FilePicker.platform.saveFile(
                 dialogTitle: '保存白板工程',
-                fileName: '${DateFormat('yyyyMMdd_hhmmss').format(DateTime.now())}.sbp',
+                fileName: '${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.sbp',
               );
               if (otherPath == null) return;
               filePath = otherPath;
@@ -201,6 +209,8 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
       },
       child: WillPopScope(
         onWillPop: () async {
+          // 已经保存过了
+          if (lastSaveStorePtr == undoRedoManager.currentPtr) return true;
           return await showDialog<bool>(
                   context: context,
                   builder: (context) {

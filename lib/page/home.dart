@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:board_front/global.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'board/local_board.dart';
 
@@ -31,13 +33,13 @@ Future<List<String>?> showInputDialog(BuildContext context) async {
                   onPressed: () {
                     Navigator.of(context).pop([controller.text, self.text, other.text]);
                   },
-                  child: Text('加入画板'),
+                  child: const Text('加入画板'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('取消'),
+                  child: const Text('取消'),
                 ),
               ],
             ),
@@ -48,18 +50,24 @@ Future<List<String>?> showInputDialog(BuildContext context) async {
   );
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   Widget buildListView(BuildContext context) {
-    return ListView(
+    return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.draw),
           title: const Text('启动本地画板'),
           subtitle: const Text('创建一个仅自己可见的本地画板'),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocalBoardPage()));
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocalBoardPage()));
+            setState(() {});
           },
         ),
         ListTile(
@@ -76,6 +84,23 @@ class HomePage extends StatelessWidget {
           title: const Text('加入协作画板'),
           subtitle: const Text('加入一个协作画板'),
           onTap: () {},
+        ),
+        const Divider(),
+        const ListTile(title: Text('最近使用')),
+        Expanded(
+          child: ListView(
+            children: GlobalObjects.storage.recentlyUsed.items.map((e) {
+              return ListTile(
+                title: Text(e.name),
+                subtitle: Text('最近使用时间：${DateFormat('yyyy年MM月dd日 HH:mm:ss').format(e.ts)}'),
+                onTap: () async {
+                  await Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => LocalBoardPage(initialFilePath: e.name)));
+                  setState(() {});
+                },
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
