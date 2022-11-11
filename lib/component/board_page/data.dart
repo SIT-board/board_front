@@ -33,6 +33,11 @@ class BoardPageSetViewModel extends HashMapData {
 
   BoardPageViewModel get currentPage => getPageById(currentPageId);
 
+  void deletePage(int pageId) {
+    assert(pageId != currentPageId);
+    pageIdList.remove(pageId);
+  }
+
   int get currentPageId => map['currentPageId'];
   set currentPageId(int v) {
     map['currentPageId'] = v;

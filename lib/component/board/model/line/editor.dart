@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 
 class LineModelEditor extends StatefulWidget {
   final Model model;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const LineModelEditor({
     Key? key,
     required this.model,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -21,9 +21,8 @@ class LineModelEditor extends StatefulWidget {
 class _LineModelEditorState extends State<LineModelEditor> {
   LineModelData get modelData => widget.model.data as LineModelData;
 
-  void refreshModel() {
-    widget.eventBus?.publish(BoardEventName.refreshModel, widget.model.id);
-  }
+  void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +37,9 @@ class _LineModelEditorState extends State<LineModelEditor> {
               min: 1,
               max: 100,
               onChanged: (value) {
-                setState(() {
-                  modelData.thickness = value;
-                });
+                setState(() => modelData.thickness = value);
                 refreshModel();
+                saveState();
               },
             ),
           ),
@@ -54,6 +52,7 @@ class _LineModelEditorState extends State<LineModelEditor> {
                 modelData.color = pickedColor;
                 setState(() {});
                 refreshModel();
+                saveState();
               },
               child: Container(color: modelData.color, width: 50, height: 50),
             ),
@@ -68,6 +67,7 @@ class _LineModelEditorState extends State<LineModelEditor> {
                 setState(() => modelData.dashLength = value);
                 refreshModel();
               },
+              onChangeEnd: (value) => saveState(),
             ),
           ),
           ModelAttributeItem(
@@ -80,6 +80,7 @@ class _LineModelEditorState extends State<LineModelEditor> {
                 setState(() => modelData.dashGapLength = value);
                 refreshModel();
               },
+              onChangeEnd: (value) => saveState(),
             ),
           ),
         ],

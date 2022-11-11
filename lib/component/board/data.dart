@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:board_front/interface/hash_map_data.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +35,14 @@ class BoardViewModel extends HashMapData {
   }
 
   set modelIdList(List<int> v) => map['modelIdList'] = v;
+
+  /// 获取下一个待添加模型的模型id
+  int getNextModelId() {
+    if (modelIdList.isEmpty) return 0;
+    return modelIdList.reduce(max) + 1;
+  }
+
+  Model getModelById(int modelId) => Model((map['modelMap'] as Map<String, dynamic>)[modelId.toString()]);
 
   List<Model> get models {
     map['modelMap'] ??= <String, dynamic>{};

@@ -31,6 +31,7 @@ class BoardTitle extends StatelessWidget {
   final ValueSetter<String> onChangeTitle;
   final ValueSetter<int> onSwitchPage;
   final VoidCallback onAddPage;
+  final ValueSetter<int> onDeletePage;
   const BoardTitle({
     Key? key,
     required this.currentPageId,
@@ -39,6 +40,7 @@ class BoardTitle extends StatelessWidget {
     required this.onChangeTitle,
     required this.onSwitchPage,
     required this.onAddPage,
+    required this.onDeletePage,
   }) : super(key: key);
   String get currentTitle => pageNameMap[currentPageId]!;
 
@@ -69,6 +71,15 @@ class BoardTitle extends StatelessWidget {
                 return QudsPopupMenuItem(
                   title: Text(title),
                   onPressed: () => onSwitchPage(pageId),
+                  trailing: pageId == currentPageId
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            onDeletePage(pageId);
+                          },
+                          icon: Icon(Icons.delete),
+                        ),
                 );
               }).toList(),
             ),

@@ -8,17 +8,11 @@ import 'board_event.dart';
 
 class ModelWidget extends StatefulWidget {
   final Model model;
-  final VoidCallback? onTopButtonClick;
-  final VoidCallback? onBottomButtonClick;
-  final VoidCallback? onDeleteButtonClick;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const ModelWidget({
     Key? key,
     required this.model,
-    this.onTopButtonClick,
-    this.onBottomButtonClick,
-    this.onDeleteButtonClick,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -27,21 +21,28 @@ class ModelWidget extends StatefulWidget {
 
 class _ModelWidgetState extends State<ModelWidget> {
   CommonModelData get modelCommon => widget.model.common;
-
+  int get modelId => widget.model.id;
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
   Widget buildDrag() {
     return const Icon(Icons.drag_indicator);
   }
 
   Widget buildTop() {
     return InkWell(
-      onTap: () => widget.onTopButtonClick?.call(),
+      onTap: () {
+        widget.eventBus.publish(BoardEventName.onModelBringToFront, modelId);
+        saveState();
+      },
       child: const Icon(Icons.vertical_align_top_outlined),
     );
   }
 
   Widget buildBottom() {
     return InkWell(
-      onTap: () => widget.onBottomButtonClick?.call(),
+      onTap: () {
+        widget.eventBus.publish(BoardEventName.onModelBringToBack, modelId);
+        saveState();
+      },
       child: const Icon(Icons.vertical_align_bottom_outlined),
     );
   }
@@ -51,10 +52,11 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.zoom_out_map),
       onPanUpdate: (d) {
         setState(() => modelCommon.size = modelCommon.constraints.constrain(modelCommon.size + d.delta));
-        widget.eventBus?.publish(BoardEventName.onModelResizing, widget.model);
+        widget.eventBus.publish(BoardEventName.onModelResizing, modelId);
       },
       onPanEnd: (d) {
-        widget.eventBus?.publish(BoardEventName.onModelResized, widget.model);
+        widget.eventBus.publish(BoardEventName.onModelResized, modelId);
+        saveState();
       },
     );
   }
@@ -64,10 +66,11 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.rotate_left),
       onPanUpdate: (d) {
         setState(() => modelCommon.angle += (d.delta.dx + d.delta.dy) / 50);
-        widget.eventBus?.publish(BoardEventName.onModelRotating, widget.model);
+        widget.eventBus.publish(BoardEventName.onModelRotating, modelId);
       },
       onPanEnd: (d) {
-        widget.eventBus?.publish(BoardEventName.onModelRotated, widget.model);
+        widget.eventBus.publish(BoardEventName.onModelRotated, modelId);
+        saveState();
       },
     );
   }
@@ -75,7 +78,10 @@ class _ModelWidgetState extends State<ModelWidget> {
   Widget buildDelete() {
     return InkWell(
       child: const Icon(Icons.delete),
-      onTap: () => widget.onDeleteButtonClick?.call(),
+      onTap: () {
+        widget.eventBus.publish(BoardEventName.onModelDeleted, modelId);
+        saveState();
+      },
     );
   }
 
@@ -127,13 +133,20 @@ class _ModelWidgetState extends State<ModelWidget> {
   /// 模型的局部刷新
   void onModelRefresh(arg) {
     if (arg != widget.model.id) return;
+    if (!mounted) return;
     setState(() {});
   }
 
   @override
   void initState() {
-    widget.eventBus?.subscribe(BoardEventName.refreshModel, onModelRefresh);
+    widget.eventBus.subscribe(BoardEventName.refreshModel, onModelRefresh);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.eventBus.unsubscribe(BoardEventName.refreshModel, onModelRefresh);
+    super.dispose();
   }
 
   @override
@@ -151,13 +164,11 @@ class _ModelWidgetState extends State<ModelWidget> {
 
 class BoardViewModelWidget extends StatefulWidget {
   final BoardViewModel viewModel;
-  final TransformationController controller;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const BoardViewModelWidget({
     Key? key,
     required this.viewModel,
-    required this.controller,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -165,78 +176,104 @@ class BoardViewModelWidget extends StatefulWidget {
 }
 
 class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
+  final _controller = TransformationController();
   List<Model> get modelDataList => widget.viewModel.models;
+  Model getModelById(int modelId) => widget.viewModel.getModelById(modelId);
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
-  Widget buildModelWidget(Model e) {
-    return ModelWidget(
-      eventBus: widget.eventBus,
-      model: e,
-      onTopButtonClick: () {
-        List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
-        // 置顶即设置索引为取最大数字+1
-        indexList.sort();
-        // 层叠关系变更
-        setState(() => e.common.index = indexList.last + 1);
-        widget.eventBus?.publish(BoardEventName.onModelBringToFront, e);
-      },
-      onBottomButtonClick: () {
-        List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
-        // 置底即设置索引为取最小数字-1
-        indexList.sort();
-        // 层叠关系变更
-        setState(() => e.common.index = indexList.first - 1);
-        widget.eventBus?.publish(BoardEventName.onModelBringToBack, e);
-      },
-      onDeleteButtonClick: () {
-        setState(() => widget.viewModel.removeModel(e.id));
-        widget.eventBus?.publish(BoardEventName.onModelDeleted, e);
-      },
-    );
+  void _refreshBoard(arg) => setState(() {});
+  void _onModelDeleted(int? modelId) {
+    final e = getModelById(modelId!);
+    setState(() => widget.viewModel.removeModel(e.id));
+    saveState();
   }
 
-  void onModelWidgetTap(Model e) {
+  void _onModelTap(int? modelId) {
+    final e = getModelById(modelId!);
     setState(() {
       modelDataList.forEach((e) => e.common.editableState = false);
       e.common.editableState = true;
     });
-    widget.eventBus?.publish(BoardEventName.onModelTap, e);
   }
 
-  void onModelMove(Model e, Offset target) {
+  void _onModelBringToFront(int? modelId) {
+    final e = getModelById(modelId!);
+    List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
+    // 置顶即设置索引为取最大数字+1
+    indexList.sort();
+    // 层叠关系变更
+    setState(() => e.common.index = indexList.last + 1);
+    saveState();
+  }
+
+  void _onModelBringToBack(int? modelId) {
+    final e = getModelById(modelId!);
+    List<int> indexList = widget.viewModel.models.map((e) => e.common.index).toList();
+    // 置底即设置索引为取最小数字-1
+    indexList.sort();
+    // 层叠关系变更
+    setState(() => e.common.index = indexList.first - 1);
+    saveState();
+  }
+
+  void _onModelMoving(rawArgs) {
+    final List arg = rawArgs as List;
+    final int modelId = arg[0];
+    final Offset target = arg[1];
+    final e = getModelById(modelId);
     setState(() {
       modelDataList.forEach((e) => e.common.editableState = false);
       e.common.editableState = true;
       e.common.position = target;
     });
-    widget.eventBus?.publish(BoardEventName.onModelMoving, e);
   }
 
-  onRefresh(arg) => setState(() {});
+  void _onModelMoved(arg) {
+    // moving has refreshed, only save
+    saveState();
+  }
 
   @override
   void initState() {
-    widget.eventBus?.subscribe(BoardEventName.refreshBoard, onRefresh);
+    widget.eventBus
+      ..subscribe(BoardEventName.refreshBoard, _refreshBoard)
+      ..subscribe<int>(BoardEventName.onModelDeleted, _onModelDeleted)
+      ..subscribe<int>(BoardEventName.onModelTap, _onModelTap)
+      ..subscribe<int>(BoardEventName.onModelBringToFront, _onModelBringToFront)
+      ..subscribe<int>(BoardEventName.onModelBringToBack, _onModelBringToBack)
+      ..subscribe(BoardEventName.onModelMoving, _onModelMoving)
+      ..subscribe(BoardEventName.onModelMoved, _onModelMoved);
+
+    _controller.addListener(() {
+      widget.viewModel.viewerTransform = _controller.value;
+      widget.eventBus.publish(BoardEventName.onViewportChanged, _controller.value);
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    widget.eventBus?.unsubscribe(BoardEventName.refreshBoard, onRefresh);
+    widget.eventBus
+      ..unsubscribe(BoardEventName.refreshBoard, _refreshBoard)
+      ..unsubscribe<int>(BoardEventName.onModelDeleted, _onModelDeleted)
+      ..unsubscribe<int>(BoardEventName.onModelTap, _onModelTap)
+      ..unsubscribe<int>(BoardEventName.onModelBringToFront, _onModelBringToFront)
+      ..unsubscribe<int>(BoardEventName.onModelBringToBack, _onModelBringToBack)
+      ..unsubscribe(BoardEventName.onModelMoving, _onModelMoving)
+      ..unsubscribe(BoardEventName.onModelMoved, _onModelMoved);
+
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.controller.value = widget.viewModel.viewerTransform;
-    widget.controller.addListener(() {
-      widget.viewModel.viewerTransform = widget.controller.value;
-      widget.eventBus?.publish(BoardEventName.onViewportChanged, widget.controller.value);
-    });
+    _controller.value = widget.viewModel.viewerTransform;
     // 按照层叠次序排序, index越大的越靠前
     List<Model> models = modelDataList;
     models.sort((a, b) => a.common.index - b.common.index);
     final layout = InteractiveInfinityLayout(
-      viewerTransformationController: widget.controller,
+      viewerTransformationController: _controller,
       minScale: 0.3,
       maxScale: 100,
       children: models.map((e) {
@@ -244,17 +281,20 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
           left: e.common.position.dx,
           top: e.common.position.dy,
           child: GestureDetector(
-            onTap: () => onModelWidgetTap(e),
-            onPanUpdate: (d) => onModelMove(e, e.common.position + d.delta),
-            onPanEnd: (d) => widget.eventBus?.publish(BoardEventName.onModelMoved, e),
+            onTap: () => widget.eventBus.publish(BoardEventName.onModelTap, e.id),
+            onPanUpdate: (d) => widget.eventBus.publish(BoardEventName.onModelMoving, [
+              e.id,
+              e.common.position + d.delta,
+            ]),
+            onPanEnd: (d) => widget.eventBus.publish(BoardEventName.onModelMoved, e.id),
             onLongPressStart: (d) {
               // 坐标变换
               final globalPosition = d.globalPosition;
               final renderBox = context.findRenderObject()! as RenderBox;
               final boardLocalPosition = renderBox.globalToLocal(globalPosition);
-              widget.eventBus?.publish(BoardEventName.onModelMenu, [e, boardLocalPosition]);
+              widget.eventBus.publish(BoardEventName.onModelMenu, [e.id, boardLocalPosition]);
             },
-            child: buildModelWidget(e),
+            child: ModelWidget(eventBus: widget.eventBus, model: e),
           ),
         );
       }).toList(),
@@ -264,13 +304,11 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
       child: layout,
       onTap: () {
         // 背景点击后取消所有模型的选中状态
-        setState(() {
-          modelDataList.forEach((e) => e.common.editableState = false);
-        });
-        widget.eventBus?.publish(BoardEventName.onBoardTap);
+        setState(() => modelDataList.forEach((e) => e.common.editableState = false));
+        widget.eventBus.publish(BoardEventName.onBoardTap);
       },
     ).bindMenuEvent(onTrigger: (event) {
-      widget.eventBus?.publish(BoardEventName.onBoardMenu, event.localPosition);
+      widget.eventBus.publish(BoardEventName.onBoardMenu, event.localPosition);
     });
   }
 }

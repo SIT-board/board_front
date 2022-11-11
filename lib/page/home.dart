@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:board_front/component/board_page/board.dart';
-import 'package:board_front/component/board_page/data.dart';
 import 'package:flutter/material.dart';
+
+import 'local_board.dart';
 
 Future<List<String>?> showInputDialog(BuildContext context) async {
   final controller = TextEditingController();
@@ -49,65 +49,31 @@ Future<List<String>?> showInputDialog(BuildContext context) async {
 }
 
 class HomePage extends StatelessWidget {
-  final m1 = BoardPageSetViewModel.createNew();
-
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   Widget buildListView(BuildContext context) {
-    ValueNotifier<BoardPageSetViewModel?> notifier = ValueNotifier(null);
-    //
-    // final nodeSender = BoardNode(roomId: '123', nodeId: '1');
-    // final nodeReceiver = BoardNode(roomId: '123', nodeId: '2');
-
-    // nodeReceiver.registerForOnReceive(
-    //     topic: 'board',
-    //     callback: (msg) {
-    //       notifier.value = BoardPageSetViewModel(jsonDecode(msg.data));
-    //       notifier.notifyListeners();
-    //     });
-
-    // Future.wait([nodeSender.connect(), nodeReceiver.connect()]).then((value) {
-    //   Timer.periodic(Duration(seconds: 1), (timer) {
-    //     nodeSender.sendTo('2', 'board', m1.toJsonString());
-    //     print(m1.toJsonString());
-    //   });
-    // });
-    Future.delayed(Duration.zero, () {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return Row(
-          children: [
-            Expanded(child: BoardPage(pageSetViewModel: m1)),
-            // Expanded(
-            //   child: ValueListenableBuilder<BoardPageSetViewModel?>(
-            //     valueListenable: notifier,
-            //     builder: (c, m, w) {
-            //       if (m == null) return Center(child: const CircularProgressIndicator());
-            //       return BoardPage(pageSetViewModel: m);
-            //     },
-            //   ),
-            // ),
-          ],
-        );
-      }));
-    });
     return ListView(
       children: [
-        // ListTile(
-        //   leading: const Icon(Icons.electric_bolt),
-        //   title: const Text('创建画板'),
-        //   subtitle: const Text('快速创建一个新的协作画板'),
-        //   onTap: () async {
-        //     List<String>? text = await showInputDialog(context);
-        //     if (text == null) return;
-        //
-        //     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        //       return BoardPage();
-        //     }));
-        //   },
-        // ),
+        ListTile(
+          leading: const Icon(Icons.draw),
+          title: const Text('启动本地画板'),
+          subtitle: const Text('创建一个仅自己可见的本地画板'),
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocalBoard()));
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.electric_bolt),
+          title: const Text('创建协作画板'),
+          subtitle: const Text('快速创建一个新的协作画板'),
+          onTap: () async {
+            List<String>? text = await showInputDialog(context);
+            if (text == null) return;
+          },
+        ),
         ListTile(
           leading: const Icon(Icons.add),
-          title: const Text('加入画板'),
+          title: const Text('加入协作画板'),
           subtitle: const Text('加入一个协作画板'),
           onTap: () {},
         ),

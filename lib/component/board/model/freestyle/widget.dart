@@ -1,3 +1,5 @@
+import 'package:board_event_bus/board_event_bus.dart';
+import 'package:board_front/component/board/board_event.dart';
 import 'package:flutter/material.dart';
 
 import 'data.dart';
@@ -31,12 +33,13 @@ class MyCustomPainter extends CustomPainter {
 class FreeStyleWidget extends StatefulWidget {
   final FreeStyleModelData data;
   final bool editable;
-  final ValueSetter<FreeStylePathModelData>? onDrawPath;
+  final EventBus<BoardEventName> eventBus;
+
   const FreeStyleWidget({
     Key? key,
     required this.data,
     required this.editable,
-    required this.onDrawPath,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -44,6 +47,7 @@ class FreeStyleWidget extends StatefulWidget {
 }
 
 class _FreeStyleWidgetState extends State<FreeStyleWidget> {
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
   @override
   Widget build(BuildContext context) {
     Widget child = CustomPaint(
@@ -73,7 +77,7 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
       },
       onPanEnd: (d) {
         print('Add path: ${widget.data.pathList.last}');
-        if (widget.onDrawPath != null) widget.onDrawPath!(widget.data.pathList.last);
+        saveState();
       },
       child: child,
     );

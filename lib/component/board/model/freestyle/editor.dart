@@ -9,11 +9,11 @@ import 'data.dart';
 
 class FreeStyleModelEditor extends StatefulWidget {
   final Model model;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const FreeStyleModelEditor({
     Key? key,
     required this.model,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -25,9 +25,8 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
 
   FreeStylePaintStyleModelData get paint => modelData.paint;
 
-  void refreshModel() {
-    widget.eventBus?.publish(BoardEventName.refreshModel, widget.model.id);
-  }
+  void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
   ModelAttributeItem buildBackgroundColor() => ModelAttributeItem(
         title: '背景颜色',
@@ -35,10 +34,9 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
           onTap: () async {
             final pickedColor = await showBoardColorPicker(context);
             if (pickedColor == null) return;
-            setState(() {
-              modelData.backgroundColor = pickedColor;
-            });
+            setState(() => modelData.backgroundColor = pickedColor);
             refreshModel();
+            saveState();
           },
           child: Container(color: modelData.backgroundColor, width: 50, height: 50),
         ),
@@ -55,6 +53,7 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
           if (pickedColor == null) return;
           modelData.paint.color = pickedColor;
           setState(() {});
+          saveState();
         },
         child: Container(color: modelData.paint.color, width: 50, height: 50),
       ));
@@ -66,10 +65,9 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
         min: 1,
         max: 100,
         onChanged: (value) {
-          setState(() {
-            paint.strokeWidth = value;
-          });
+          setState(() => paint.strokeWidth = value);
         },
+        onChangeEnd: (value) => saveState(),
       ));
 
   ModelAttributeItem buildAntiAlias() => ModelAttributeItem(
@@ -77,9 +75,8 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
         child: Checkbox(
           value: paint.isAntiAlias,
           onChanged: (value) {
-            setState(() {
-              paint.isAntiAlias = value!;
-            });
+            setState(() => paint.isAntiAlias = value!);
+            saveState();
           },
         ),
       );

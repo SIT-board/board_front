@@ -71,11 +71,11 @@ class MultiRadioButtonGroup extends StatelessWidget {
 
 class RectModelEditor extends StatefulWidget {
   final Model model;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const RectModelEditor({
     Key? key,
     required this.model,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -85,9 +85,8 @@ class RectModelEditor extends StatefulWidget {
 class _RectModelEditorState extends State<RectModelEditor> {
   RectModelData get modelData => widget.model.data as RectModelData;
 
-  void refreshModel() {
-    widget.eventBus?.publish(BoardEventName.refreshModel, widget.model.id);
-  }
+  void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +100,9 @@ class _RectModelEditorState extends State<RectModelEditor> {
               onTap: () async {
                 final pickedColor = await showBoardColorPicker(context);
                 if (pickedColor == null) return;
-                setState(() {
-                  modelData.color = pickedColor;
-                });
+                setState(() => modelData.color = pickedColor);
                 refreshModel();
+                saveState();
               },
               child: Container(height: 50, width: 50, color: modelData.color),
             ),
@@ -115,10 +113,9 @@ class _RectModelEditorState extends State<RectModelEditor> {
               onTap: () async {
                 final pickedColor = await showBoardColorPicker(context);
                 if (pickedColor == null) return;
-                setState(() {
-                  modelData.border.color = pickedColor;
-                });
+                setState(() => modelData.border.color = pickedColor);
                 refreshModel();
+                saveState();
               },
               child: Container(height: 50, width: 50, color: modelData.border.color),
             ),
@@ -130,11 +127,10 @@ class _RectModelEditorState extends State<RectModelEditor> {
               min: 0,
               max: 10,
               onChanged: (value) {
-                setState(() {
-                  modelData.border.width = value;
-                });
+                setState(() => modelData.border.width = value);
                 refreshModel();
               },
+              onChangeEnd: (value) => saveState(),
             ),
           ),
         ],
@@ -153,6 +149,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                 if (content == null || content == modelData.text.content) return;
                 modelData.text.content = content;
                 refreshModel();
+                saveState();
               },
               child: Text('修改'),
             ),
@@ -169,6 +166,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                 });
                 refreshModel();
               },
+              onChangeEnd: (value) => saveState(),
             ),
           ),
           ModelAttributeItem(
@@ -179,6 +177,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                 if (pickedColor == null) return;
                 setState(() => modelData.text.color = pickedColor);
                 refreshModel();
+                saveState();
               },
               child: Container(height: 50, width: 50, color: modelData.text.color),
             ),
@@ -194,6 +193,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                   );
                 });
                 refreshModel();
+                saveState();
               },
               value: modelData.text.alignment.x.toInt() + 1,
               children: const [
@@ -214,6 +214,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                   );
                 });
                 refreshModel();
+                saveState();
               },
               value: modelData.text.alignment.y.toInt() + 1,
               children: const [
@@ -234,6 +235,7 @@ class _RectModelEditorState extends State<RectModelEditor> {
                 ][index]();
                 setState(() {});
                 refreshModel();
+                saveState();
               },
               selectStateList: [
                 modelData.text.bold,

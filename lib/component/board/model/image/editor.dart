@@ -9,11 +9,11 @@ import 'data.dart';
 
 class ImageModelEditor extends StatefulWidget {
   final Model model;
-  final EventBus<BoardEventName>? eventBus;
+  final EventBus<BoardEventName> eventBus;
   const ImageModelEditor({
     Key? key,
     required this.model,
-    this.eventBus,
+    required this.eventBus,
   }) : super(key: key);
 
   @override
@@ -23,9 +23,8 @@ class ImageModelEditor extends StatefulWidget {
 class _ImageModelEditorState extends State<ImageModelEditor> {
   ImageModelData get modelData => widget.model.data as ImageModelData;
 
-  void refreshModel() {
-    widget.eventBus?.publish(BoardEventName.refreshModel, widget.model.id);
-  }
+  void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
+  void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
   ModelAttributeItem buildImageUrl() {
     return ModelAttributeItem(
@@ -34,7 +33,10 @@ class _ImageModelEditorState extends State<ImageModelEditor> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO 修改图片
+              saveState();
+            },
             child: const Text('修改图片'),
           ),
           TextButton(
@@ -60,6 +62,7 @@ class _ImageModelEditorState extends State<ImageModelEditor> {
             if (value == null) return;
             setState(() => modelData.fit = value);
             refreshModel();
+            saveState();
           },
         ));
   }

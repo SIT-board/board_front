@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
@@ -12,6 +10,12 @@ QudsPopupMenuBase buildAddModelMenu({
   required BoardViewModel boardViewModel,
   required Offset offset,
 }) {
+  void saveState() => eventBus.publish(BoardEventName.saveState);
+  void refresh() {
+    eventBus.publish(BoardEventName.refreshBoard);
+    eventBus.publish(BoardEventName.saveState);
+  }
+
   Offset position = Matrix4.inverted(boardViewModel.viewerTransform).transformOffset(offset);
   return QudsPopupMenuSection(
     titleText: '添加模型',
@@ -21,19 +25,19 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536)
+                ..id = boardViewModel.getNextModelId()
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.rect
                 ..data = (RectModelData({})),
             );
-            eventBus.publish(BoardEventName.refreshBoard);
+            refresh();
           }),
       QudsPopupMenuItem(
           title: Text('直线'),
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536)
+                ..id = boardViewModel.getNextModelId()
                 ..common = (CommonModelData({})
                   ..position = position
                   ..constraints = const BoxConstraints(
@@ -46,20 +50,20 @@ QudsPopupMenuBase buildAddModelMenu({
                 ..type = ModelType.line
                 ..data = (LineModelData({})),
             );
-            eventBus.publish(BoardEventName.refreshBoard);
+            refresh();
           }),
       QudsPopupMenuItem(
         title: Text('图像'),
         onPressed: () {
           boardViewModel.addModel(
             Model({})
-              ..id = Random().nextInt(65536)
+              ..id = boardViewModel.getNextModelId()
               ..common = (CommonModelData({})..position = position)
               ..type = ModelType.image
               ..data = (ImageModelData({})
                 ..url = 'https://tse2-mm.cn.bing.net/th/id/OIP-C.7HET4jnvBD-VqPcPQCSO-QHaSw?pid=ImgDet&rs=1'),
           );
-          eventBus.publish(BoardEventName.refreshBoard);
+          refresh();
         },
       ),
       QudsPopupMenuItem(
@@ -67,12 +71,12 @@ QudsPopupMenuBase buildAddModelMenu({
           onPressed: () {
             boardViewModel.addModel(
               Model({})
-                ..id = Random().nextInt(65536)
+                ..id = boardViewModel.getNextModelId()
                 ..common = (CommonModelData({})..position = position)
                 ..type = ModelType.freeStyle
                 ..data = (FreeStyleModelData({})),
             );
-            eventBus.publish(BoardEventName.refreshBoard);
+            refresh();
           }),
     ],
   );

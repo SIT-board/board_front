@@ -1,75 +1,38 @@
 import 'package:board_event_bus/board_event_bus.dart';
-import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
-import 'package:board_front/component/board/menu/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
+import '../../util/keyboard.dart';
+import 'board_body.dart';
 import 'data.dart';
-import 'keyboard.dart';
 import 'title.dart';
 
 class BoardPage extends StatefulWidget {
   final BoardPageSetViewModel pageSetViewModel;
-  final UndoRedoManager undoRedoManager;
-  BoardPage({
+  const BoardPage({
     Key? key,
     required this.pageSetViewModel,
-  })  : undoRedoManager = UndoRedoManager(pageSetViewModel.map),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   State<BoardPage> createState() => _BoardPageState();
 }
 
 class _BoardPageState extends State<BoardPage> {
-  final eventBus = EventBus<BoardEventName>();
-  final controller = TransformationController();
   final keyBoardFocusNode = FocusNode();
-  late BoardMenu boardMenu;
-  UndoRedoManager get undoRedoManager => widget.undoRedoManager;
-  BoardViewModel get currentPageBoardViewModel => widget.pageSetViewModel.currentPage.board;
-  bool showEditor = false;
-  Model? selectedModel;
-  double s = 0.5;
+  final eventBus = EventBus<BoardEventName>();
+  late final undoRedoManager = UndoRedoManager(widget.pageSetViewModel.map);
+
   @override
   void initState() {
-    eventBus.subscribe(BoardEventName.refreshBoard, onRefreshBoardEvent);
-    eventBus.subscribe(BoardEventName.onModelTap, (arg) {
-      setState(() => showEditor = true);
-      selectedModel = arg as Model;
+    eventBus.subscribe(BoardEventName.saveState, (arg) {
+      undoRedoManager.store();
     });
-    eventBus.subscribe(BoardEventName.onBoardTap, (arg) {
-      setState(() => showEditor = false);
-    });
-
-    BoardEventName.values.toSet()
-      ..removeAll([
-        BoardEventName.onModelMoving,
-        BoardEventName.onModelResizing,
-        BoardEventName.onModelRotating,
-        BoardEventName.onViewportChanged,
-      ])
-      ..forEach(
-        (e) => eventBus.subscribe(e, (arg) {
-          undoRedoManager.store();
-        }),
-      );
-    boardMenu = BoardMenu(
-      context: context,
-      boardViewModelGetter: () => currentPageBoardViewModel,
-      eventBus: eventBus,
-    );
+    eventBus.subscribe(BoardEventName.refreshBoard, (arg) => setState(() {}));
     super.initState();
-  }
-
-  void onRefreshBoardEvent(arg) {
-    final patch = undoRedoManager.store();
-    if (patch.isEmpty()) return;
-    setState(() {});
-    print('画布刷新: $patch');
   }
 
   void gotoNextPage() {
@@ -79,7 +42,6 @@ class _BoardPageState extends State<BoardPage> {
       return;
     }
     setState(() => widget.pageSetViewModel.currentPageId = id);
-    undoRedoManager.store();
   }
 
   void gotoPrePage() {
@@ -89,7 +51,6 @@ class _BoardPageState extends State<BoardPage> {
       return;
     }
     setState(() => widget.pageSetViewModel.currentPageId = id);
-    undoRedoManager.store();
   }
 
   Widget buildTitle() {
@@ -114,105 +75,43 @@ class _BoardPageState extends State<BoardPage> {
         });
         undoRedoManager.store();
       },
+      onDeletePage: (int pageId) {
+        setState(() {
+          widget.pageSetViewModel.deletePage(pageId);
+        });
+        undoRedoManager.store();
+      },
     );
   }
 
   List<Widget> buildActions() {
     return [
       IconButton(
-        onPressed: !undoRedoManager.canUndo
-            ? null
-            : () {
-                setState(() {});
-              },
-        icon: const Icon(Icons.undo),
-      ),
+          onPressed: !undoRedoManager.canUndo
+              ? null
+              : () {
+                  undoRedoManager.undo();
+                  setState(() {});
+                  eventBus.publish(BoardEventName.onBoardTap);
+                },
+          icon: const Icon(Icons.undo)),
       IconButton(
-        onPressed: !undoRedoManager.canRedo
-            ? null
-            : () {
-                setState(() {});
-              },
-        icon: const Icon(Icons.redo),
+          onPressed: !undoRedoManager.canRedo
+              ? null
+              : () {
+                  undoRedoManager.redo();
+                  setState(() {});
+                  eventBus.publish(BoardEventName.onBoardTap);
+                },
+          icon: const Icon(Icons.redo)),
+      IconButton(
+        onPressed: () {
+          print(widget.pageSetViewModel.map);
+        },
+        icon: Icon(Icons.add),
       ),
     ];
   }
-
-  Widget buildPhone() {
-    return Column(
-      children: [
-        Expanded(
-          flex: ((1 - s) * 100).toInt(),
-          child: BoardViewModelWidget(
-            // 视口变换控制器
-            controller: controller,
-            viewModel: currentPageBoardViewModel,
-            eventBus: eventBus,
-          ),
-        ),
-        if (showEditor)
-          GestureDetector(
-            onPanUpdate: (d) {
-              final size = context.size!;
-              setState(() => s -= d.delta.dy / size.height);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black26),
-                color: Colors.black12,
-              ),
-              height: 5,
-            ),
-          ),
-        if (showEditor)
-          Expanded(
-            flex: (s * 100).toInt(),
-            child: SingleChildScrollView(
-              child: ModelWidgetBuilder(model: selectedModel!, eventBus: eventBus).buildModelEditorWidget(),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget buildDesktop() {
-    return Row(
-      children: [
-        Expanded(
-          flex: ((1 - s) * 100).toInt(),
-          child: BoardViewModelWidget(
-            // 视口变换控制器
-            controller: controller,
-            viewModel: currentPageBoardViewModel,
-            eventBus: eventBus,
-          ),
-        ),
-        if (showEditor)
-          GestureDetector(
-            onPanUpdate: (d) {
-              final size = context.size!;
-              setState(() => s -= d.delta.dx / size.width);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black26),
-                color: Colors.black12,
-              ),
-              width: 5,
-            ),
-          ),
-        if (showEditor)
-          Expanded(
-            flex: (s * 100).toInt(),
-            child: SingleChildScrollView(
-              child: ModelWidgetBuilder(model: selectedModel!, eventBus: eventBus).buildModelEditorWidget(),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget body = Container();
 
   @override
   Widget build(BuildContext context) {
@@ -239,13 +138,9 @@ class _BoardPageState extends State<BoardPage> {
           title: buildTitle(),
           actions: buildActions(),
         ),
-        body: OrientationBuilder(
-          builder: (context, orientation) {
-            if (MediaQuery.of(context).size.aspectRatio < 1) {
-              return buildPhone();
-            }
-            return buildDesktop();
-          },
+        body: BoardBodyWidget(
+          eventBus: eventBus,
+          boardViewModel: widget.pageSetViewModel.currentPage.board,
         ),
       ),
     );
