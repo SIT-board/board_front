@@ -66,7 +66,7 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
             },
             child: Container(
               decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
-              height: 5,
+              height: 8,
             ),
           ),
         if (showEditor)
@@ -90,9 +90,12 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
               final size = context.size!;
               setState(() => s -= d.delta.dx / size.width);
             },
-            child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
-              width: 5,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.resizeColumn,
+              child: Container(
+                decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
+                width: 5,
+              ),
             ),
           ),
         if (showEditor)
