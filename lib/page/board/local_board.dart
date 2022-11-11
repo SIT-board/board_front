@@ -43,6 +43,16 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
     super.dispose();
   }
 
+  Future<void> saveAsFile() async {
+    filePath ??= await FilePicker.platform.saveFile(
+      dialogTitle: '保存白板工程',
+      fileName: '${DateFormat('yyyyMMdd_hhmmss').format(DateTime.now())}.sbp',
+    );
+    if (filePath == null) return;
+    File(filePath!).writeAsStringSync(pageSetViewModel.toJsonString());
+    EasyLoading.showSuccess('保存成功');
+  }
+
   void gotoNextPage() {
     int? id = pageSetViewModel.nextPageId;
     if (id == null) {
@@ -133,18 +143,7 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
               setState(() {});
             },
           ),
-          PopupMenuItem(
-            child: Text('保存'),
-            onTap: () async {
-              filePath ??= await FilePicker.platform.saveFile(
-                dialogTitle: '保存白板工程',
-                fileName: '${DateFormat('yyyyMMdd_hhmmss').format(DateTime.now())}.sbp',
-              );
-              if (filePath == null) return;
-              File(filePath!).writeAsStringSync(pageSetViewModel.toJsonString());
-              EasyLoading.showSuccess('保存成功');
-            },
-          ),
+          PopupMenuItem(child: Text('保存'), onTap: saveAsFile),
           PopupMenuItem(
             child: Text('另存为'),
             onTap: () async {
@@ -200,15 +199,43 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
         };
         cb[key]?.call();
       },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: buildTitle(),
-          actions: buildActions(),
-        ),
-        body: BoardBodyWidget(
-          eventBus: eventBus,
-          boardViewModel: pageSetViewModel.currentPage.board,
+      child: WillPopScope(
+        onWillPop: () async {
+          return await showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('保存并退出？', style: Theme.of(context).textTheme.headline5),
+                          ElevatedButton(
+                              onPressed: () async {
+                                await saveAsFile();
+                                if (!mounted) return;
+                                Navigator.of(context).pop(true);
+                              },
+                              child: Text('保存')),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: Text('不保存'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }) ==
+              true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: buildTitle(),
+            actions: buildActions(),
+          ),
+          body: BoardBodyWidget(
+            eventBus: eventBus,
+            boardViewModel: pageSetViewModel.currentPage.board,
+          ),
         ),
       ),
     );
