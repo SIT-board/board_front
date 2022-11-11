@@ -18,11 +18,13 @@ dependencies:
   shared_preferences: ^2.0.15
   board_event_bus: { path: modules/board_event_bus }
   json_model_undo_redo: { path: modules/json_model_undo_redo }
+  platform_widget: { path: modules/platform_widget }
   quds_popup_menu: ^0.0.1+1
   vector_math: ^2.1.2
   window_manager: ^0.2.7
   universal_platform: ^1.0.0+1
   flutter_easyloading: ^3.0.5
+  file_picker: ^5.2.2
 
 dev_dependencies:
   flutter_test:
