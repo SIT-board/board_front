@@ -121,14 +121,6 @@ class _BoardPageState extends State<BoardPage> {
         final cb = {
           LogicalKeyboardKey.pageDown: gotoNextPage,
           LogicalKeyboardKey.pageUp: gotoPrePage,
-          LogicalKeyboardKey.keyC: () {
-            if (!pressedKeySet.contains(LogicalKeyboardKey.control)) return;
-            print('复制对象');
-          },
-          LogicalKeyboardKey.keyV: () {
-            if (!pressedKeySet.contains(LogicalKeyboardKey.control)) return;
-            print('粘贴对象');
-          },
         };
         cb[key]?.call();
       },
