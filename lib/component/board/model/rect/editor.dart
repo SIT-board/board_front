@@ -125,12 +125,38 @@ class _RectModelEditorState extends State<RectModelEditor> {
             child: Slider(
               value: modelData.border.width,
               min: 0,
-              max: 10,
+              max: widget.model.common.size.shortestSide / 2,
               onChanged: (value) {
                 setState(() => modelData.border.width = value);
                 refreshModel();
               },
               onChangeEnd: (value) => saveState(),
+            ),
+          ),
+          ModelAttributeItem(
+            title: '圆角半径',
+            child: Slider(
+              value: modelData.border.radius,
+              min: 0,
+              max: widget.model.common.size.shortestSide / 2,
+              onChanged: (value) {
+                setState(() => modelData.border.radius = value);
+                refreshModel();
+              },
+              onChangeEnd: (value) => saveState(),
+            ),
+          ),
+          ModelAttributeItem(
+            title: '背景形状',
+            child: DropdownButton<BoxShape>(
+              value: modelData.backgroundShape,
+              items: BoxShape.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name))).toList(),
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() => modelData.backgroundShape = value);
+                refreshModel();
+                saveState();
+              },
             ),
           ),
         ],

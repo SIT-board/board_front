@@ -32,11 +32,15 @@ class BorderModelData extends HashMapData {
   set color(Color v) => map['color'] = v.value;
   double get width => map['width'] ?? 0.0;
   set width(double v) => map['width'] = v;
+  double get radius => map['radius'] ?? 0.0;
+  set radius(double v) => map['radius'] = v;
 }
 
 class RectModelData extends HashMapData {
   Color get color => Color(map['color'] ??= Colors.lightBlueAccent.value);
   set color(Color v) => map['color'] = v.value;
+  BoxShape get backgroundShape => BoxShape.values[map['backgroundShape'] ??= BoxShape.rectangle.index];
+  set backgroundShape(BoxShape v) => map['backgroundShape'] = v.index;
   BorderModelData get border => BorderModelData(map['border'] ??= <String, dynamic>{});
   TextModelData get text => TextModelData(map['text'] ??= <String, dynamic>{});
   RectModelData(super.map);

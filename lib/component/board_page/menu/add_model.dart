@@ -33,6 +33,18 @@ QudsPopupMenuBase buildAddModelMenu({
             refresh();
           }),
       QudsPopupMenuItem(
+          title: Text('椭圆'),
+          onPressed: () {
+            boardViewModel.addModel(
+              Model({})
+                ..id = boardViewModel.getNextModelId()
+                ..common = (CommonModelData({})..position = position)
+                ..type = ModelType.oval
+                ..data = (OvalModelData({})),
+            );
+            refresh();
+          }),
+      QudsPopupMenuItem(
           title: Text('直线'),
           onPressed: () {
             boardViewModel.addModel(

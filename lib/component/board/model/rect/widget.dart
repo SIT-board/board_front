@@ -32,10 +32,12 @@ class _RectModelWidgetState extends State<RectModelWidget> {
       child: Container(
         decoration: BoxDecoration(
           color: rect.color,
+          borderRadius: BorderRadius.all(Radius.circular(border.radius)),
           border: Border.all(
             color: border.color,
             width: border.width,
           ),
+          shape: rect.backgroundShape,
         ),
         alignment: text.alignment,
         child: Text(

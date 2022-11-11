@@ -24,6 +24,7 @@ class ModelWidgetBuilder {
             eventBus: eventBus,
           ),
       ModelType.line: (data) => LineModelWidget(data: model.data as LineModelData),
+      ModelType.oval: (data) => OvalModelWidget(data: model.data as OvalModelData),
     };
     if (!builders.containsKey(model.type)) throw UnimplementedError();
     return builders[model.type]!(model.data);
@@ -35,6 +36,7 @@ class ModelWidgetBuilder {
       ModelType.image: (data) => ImageModelEditor(model: model, eventBus: eventBus),
       ModelType.freeStyle: (data) => FreeStyleModelEditor(model: model, eventBus: eventBus),
       ModelType.line: (data) => LineModelEditor(model: model, eventBus: eventBus),
+      ModelType.oval: (data) => OvalModelEditor(model: model, eventBus: eventBus),
     };
     if (!builders.containsKey(model.type)) throw UnimplementedError();
     return builders[model.type]!(model.data);
