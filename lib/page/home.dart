@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'board/local_board.dart';
+import 'board/owner_board.dart';
 
 Future<List<String>?> showInputDialog(BuildContext context) async {
   final controller = TextEditingController();
@@ -75,8 +76,8 @@ class _HomePageState extends State<HomePage> {
           title: const Text('创建协作画板'),
           subtitle: const Text('快速创建一个新的协作画板'),
           onTap: () async {
-            List<String>? text = await showInputDialog(context);
-            if (text == null) return;
+            await Navigator.of(context).push(MaterialPageRoute(builder: (context) => const OwnerBoardPage()));
+            setState(() {});
           },
         ),
         ListTile(

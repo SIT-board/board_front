@@ -76,6 +76,10 @@ class BoardUserNode {
         .toList();
   }
 
+  String getUsernameByUserId(String userId) {
+    return _onlineUsernameMap[userId] ?? '未知用户';
+  }
+
   /// 注册消息接收回调
   void registerForOnReceive({
     required String topic,

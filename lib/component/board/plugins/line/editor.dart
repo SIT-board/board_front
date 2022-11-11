@@ -1,9 +1,11 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
-import 'package:board_front/component/board/model/base_editor.dart';
+import 'package:board_front/component/board/plugins/base_editor.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
+
+import 'data.dart';
 
 class LineModelEditor extends StatefulWidget {
   final Model model;
@@ -19,7 +21,7 @@ class LineModelEditor extends StatefulWidget {
 }
 
 class _LineModelEditorState extends State<LineModelEditor> {
-  LineModelData get modelData => widget.model.data as LineModelData;
+  LineModelData get modelData => LineModelData(widget.model.data);
 
   void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);

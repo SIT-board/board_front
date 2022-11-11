@@ -1,11 +1,12 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
-import 'package:board_front/component/board/model/base_editor.dart';
+import 'package:board_front/component/board/plugins/base_editor.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
+import 'data.dart';
 
 class RadioButtonGroup extends StatelessWidget {
   final List<Widget> children;
@@ -83,7 +84,7 @@ class RectModelEditor extends StatefulWidget {
 }
 
 class _RectModelEditorState extends State<RectModelEditor> {
-  RectModelData get modelData => widget.model.data as RectModelData;
+  RectModelData get modelData => RectModelData(widget.model.data);
 
   void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);

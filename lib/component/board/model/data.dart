@@ -2,36 +2,19 @@ import 'package:board_front/interface/hash_map_data.dart';
 
 import 'model.dart';
 
-enum ModelType {
-  rect,
-  image,
-  freeStyle,
-  line,
-  oval,
-}
-
 class Model extends HashMapData {
   /// 模型id
   int get id => map['id'];
   set id(int v) => map['id'] = v;
 
   /// 模型类型
-  ModelType get type => ModelType.values[map['type']];
-  set type(ModelType v) => map['type'] = v.index;
+  String get type => map['type'];
+  set type(String v) => map['type'] = v;
 
   /// 模型数据
-  HashMapData get data {
-    if (!map.containsKey('data')) map['data'] = <String, dynamic>{};
-    return {
-      ModelType.image: (m) => ImageModelData(m),
-      ModelType.rect: (m) => RectModelData(m),
-      ModelType.freeStyle: (m) => FreeStyleModelData(m),
-      ModelType.line: (m) => LineModelData(m),
-      ModelType.oval: (m) => OvalModelData(m),
-    }[type]!(map['data']);
-  }
+  Map<String, dynamic> get data => map['data'] ??= <String, dynamic>{};
 
-  set data(HashMapData v) => map['data'] = v.map;
+  set data(Map<String, dynamic> v) => map['data'] = v;
 
   /// 公共模型数据
   CommonModelData get common => CommonModelData(map['common']);

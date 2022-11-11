@@ -3,8 +3,8 @@ import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../model/model.dart';
 import '../base_editor.dart';
-import '../data.dart';
 import 'data.dart';
 
 class FreeStyleModelEditor extends StatefulWidget {
@@ -21,7 +21,7 @@ class FreeStyleModelEditor extends StatefulWidget {
 }
 
 class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
-  FreeStyleModelData get modelData => widget.model.data as FreeStyleModelData;
+  FreeStyleModelData get modelData => FreeStyleModelData(widget.model.data);
 
   FreeStylePaintStyleModelData get paint => modelData.paint;
 

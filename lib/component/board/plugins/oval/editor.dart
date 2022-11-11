@@ -4,8 +4,9 @@ import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/util/color_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../model/model.dart';
 import '../base_editor.dart';
-import '../data.dart';
+import 'data.dart';
 
 class OvalModelEditor extends StatefulWidget {
   final Model model;
@@ -21,7 +22,7 @@ class OvalModelEditor extends StatefulWidget {
 }
 
 class _OvalModelEditorState extends State<OvalModelEditor> {
-  OvalModelData get modelData => widget.model.data as OvalModelData;
+  OvalModelData get modelData => OvalModelData(widget.model.data);
 
   void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);

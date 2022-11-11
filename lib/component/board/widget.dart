@@ -5,6 +5,7 @@ import 'package:board_front/util/menu.dart';
 import 'package:flutter/material.dart';
 
 import 'board_event.dart';
+import 'plugins/plugins.dart';
 
 class ModelWidget extends StatefulWidget {
   final Model model;
@@ -156,7 +157,10 @@ class _ModelWidgetState extends State<ModelWidget> {
     return withController(
       child: Container(
         constraints: modelCommon.constraints,
-        child: ModelWidgetBuilder(model: widget.model, eventBus: widget.eventBus).buildModelWidget(),
+        child: defaultModelPlugins.getPluginByModelType(widget.model.type).buildModelView(
+              widget.model,
+              widget.eventBus,
+            ),
       ),
     );
   }

@@ -3,8 +3,8 @@ import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/component/image_viewer/image_viewer.dart';
 import 'package:flutter/material.dart';
 
+import '../../model/model.dart';
 import '../base_editor.dart';
-import '../data.dart';
 import 'data.dart';
 
 class ImageModelEditor extends StatefulWidget {
@@ -21,7 +21,7 @@ class ImageModelEditor extends StatefulWidget {
 }
 
 class _ImageModelEditorState extends State<ImageModelEditor> {
-  ImageModelData get modelData => widget.model.data as ImageModelData;
+  ImageModelData get modelData => ImageModelData(widget.model.data);
 
   void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);

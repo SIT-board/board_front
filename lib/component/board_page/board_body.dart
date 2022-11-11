@@ -1,6 +1,7 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
+import 'package:board_front/component/board/plugins/plugins.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_widget/platform_widget.dart';
 
@@ -97,7 +98,10 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
           Expanded(
             flex: (s * 100).toInt(),
             child: SingleChildScrollView(
-              child: ModelWidgetBuilder(model: selectedModel!, eventBus: eventBus).buildModelEditorWidget(),
+              child: defaultModelPlugins.getPluginByModelType(selectedModel!.type).buildModelEditor(
+                    selectedModel!,
+                    eventBus,
+                  ),
             ),
           ),
       ],
@@ -126,7 +130,10 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
           Expanded(
             flex: (s * 100).toInt(),
             child: SingleChildScrollView(
-              child: ModelWidgetBuilder(model: selectedModel!, eventBus: eventBus).buildModelEditorWidget(),
+              child: defaultModelPlugins.getPluginByModelType(selectedModel!.type).buildModelEditor(
+                    selectedModel!,
+                    eventBus,
+                  ),
             ),
           ),
       ],
