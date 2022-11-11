@@ -64,25 +64,23 @@ class BoardTitle extends StatelessWidget {
             ),
             QudsPopupMenuDivider(),
             QudsPopupMenuItem(title: const Text('添加新页'), onPressed: onAddPage),
-            QudsPopupMenuSection(
-              titleText: '切换页面',
-              subItems: pageIdList.map((pageId) {
-                final title = pageNameMap[pageId]!;
-                return QudsPopupMenuItem(
-                  title: Text(title),
-                  onPressed: () => onSwitchPage(pageId),
-                  trailing: pageId == currentPageId
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            onDeletePage(pageId);
-                          },
-                          icon: Icon(Icons.delete),
-                        ),
-                );
-              }).toList(),
-            ),
+            QudsPopupMenuDivider(),
+            ...pageIdList.map((pageId) {
+              final title = pageNameMap[pageId]!;
+              return QudsPopupMenuItem(
+                title: Text(title),
+                onPressed: () => onSwitchPage(pageId),
+                trailing: pageId == currentPageId
+                    ? null
+                    : IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          onDeletePage(pageId);
+                        },
+                        icon: Icon(Icons.delete),
+                      ),
+              );
+            })
           ],
         );
       },

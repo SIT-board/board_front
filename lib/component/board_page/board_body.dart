@@ -27,23 +27,47 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
   double s = 0.5;
 
   EventBus<BoardEventName> get eventBus => widget.eventBus;
-  late final boardMenu;
+  late final boardMenu = BoardMenu(
+    context: context,
+    boardViewModelGetter: () => currentPageBoardViewModel,
+    eventBus: eventBus,
+  );
+
+  void _onBoardMenu(arg) {
+    boardMenu.showBoardMenu(context, arg as Offset);
+  }
+
+  void _onModelMenu(arg) {
+    final model = arg[0] as Model;
+    final pos = arg[1] as Offset;
+    boardMenu.showModelMenu(context, pos, model);
+  }
+
+  void _onModelTap(arg) {
+    setState(() => showEditor = true);
+    selectedModel = currentPageBoardViewModel.getModelById(arg as int);
+  }
+
+  void _onBoardTap(arg) {
+    setState(() => showEditor = false);
+  }
 
   @override
   void initState() {
-    eventBus.subscribe(BoardEventName.onModelTap, (arg) {
-      setState(() => showEditor = true);
-      selectedModel = currentPageBoardViewModel.getModelById(arg as int);
-    });
-    eventBus.subscribe(BoardEventName.onBoardTap, (arg) {
-      setState(() => showEditor = false);
-    });
-    boardMenu = BoardMenu(
-      context: context,
-      boardViewModelGetter: () => currentPageBoardViewModel,
-      eventBus: eventBus,
-    );
+    eventBus.subscribe(BoardEventName.onModelTap, _onModelTap);
+    eventBus.subscribe(BoardEventName.onBoardTap, _onBoardTap);
+    eventBus.subscribe(BoardEventName.onBoardMenu, _onBoardMenu);
+    eventBus.subscribe(BoardEventName.onModelMenu, _onModelMenu);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    eventBus.unsubscribe(BoardEventName.onModelTap, _onModelTap);
+    eventBus.unsubscribe(BoardEventName.onBoardTap, _onBoardTap);
+    eventBus.unsubscribe(BoardEventName.onBoardMenu, _onBoardMenu);
+    eventBus.unsubscribe(BoardEventName.onModelMenu, _onModelMenu);
+    super.dispose();
   }
 
   Widget buildBoardView() {

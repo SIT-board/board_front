@@ -19,29 +19,11 @@ class BoardMenu {
 
   BoardViewModel get boardViewModel => boardViewModelGetter();
 
-  onBoardMenu(arg) {
-    showBoardMenu(context, arg as Offset);
-  }
-
-  onModelMenu(arg) {
-    final model = arg[0] as Model;
-    final pos = arg[1] as Offset;
-    showModelMenu(context, pos, model);
-  }
-
   BoardMenu({
     required this.context,
     required this.boardViewModelGetter,
     required this.eventBus,
-  }) {
-    eventBus.subscribe(BoardEventName.onBoardMenu, onBoardMenu);
-    eventBus.subscribe(BoardEventName.onModelMenu, onModelMenu);
-  }
-
-  void dispose() {
-    eventBus.unsubscribe(BoardEventName.onBoardMenu, onBoardMenu);
-    eventBus.unsubscribe(BoardEventName.onModelMenu, onModelMenu);
-  }
+  });
 
   QudsPopupMenuItem? buildBoardPasteMenuItem(String? text, Offset position) {
     if (text == null) return null;
@@ -50,7 +32,7 @@ class BoardMenu {
       model.id = Random().nextInt(65535);
       model.common.position = Matrix4.inverted(boardViewModel.viewerTransform).transformOffset(position);
       return QudsPopupMenuItem(
-        title: Text('粘贴'),
+        title: const Text('粘贴'),
         onPressed: () {
           boardViewModel.addModel(model);
           eventBus.publish(BoardEventName.refreshBoard);
@@ -93,7 +75,7 @@ class BoardMenu {
       endOffset: position,
       items: [
         QudsPopupMenuItem(
-          title: Text('复制对象'),
+          title: const Text('复制对象'),
           onPressed: () {
             Clipboard.setData(ClipboardData(text: model.toJsonString()));
             EasyLoading.showSuccess('复制成功');
