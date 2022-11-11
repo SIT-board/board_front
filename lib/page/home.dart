@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'local_board.dart';
+import 'board/local_board.dart';
 
 Future<List<String>?> showInputDialog(BuildContext context) async {
   final controller = TextEditingController();
@@ -59,7 +59,7 @@ class HomePage extends StatelessWidget {
           title: const Text('启动本地画板'),
           subtitle: const Text('创建一个仅自己可见的本地画板'),
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocalBoard()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocalBoardPage()));
           },
         ),
         ListTile(
