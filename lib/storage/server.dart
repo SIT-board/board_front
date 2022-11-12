@@ -9,7 +9,7 @@ class ServerStorageKeys {
 }
 
 class ServerStorage {
-  static const String defaultMqttHost = '';
+  static const String defaultMqttHost = '127.0.0.1';
   static const int defaultMqttPort = 1883;
   static const String defaultImageServer = '';
   static const String defaultAttachmentServer = '';
@@ -20,8 +20,9 @@ class ServerStorage {
   String get mqttHost => prefs.getString(ServerStorageKeys.mqttHost) ?? defaultMqttHost;
   set mqttHost(String v) => prefs.setString(ServerStorageKeys.mqttHost, v);
 
-  int get mqttPort => prefs.getInt(ServerStorageKeys.mqttPort) ?? defaultMqttPort;
-  set mqttPort(int v) => prefs.setInt(ServerStorageKeys.mqttPort, v);
+  int get mqttPort =>
+      int.tryParse(prefs.getString(ServerStorageKeys.mqttPort) ?? defaultMqttPort.toString()) ?? defaultMqttPort;
+  set mqttPort(int v) => prefs.setString(ServerStorageKeys.mqttPort, v.toString());
 
   String get image => prefs.getString(ServerStorageKeys.image) ?? defaultImageServer;
   set image(String v) => prefs.setString(ServerStorageKeys.image, v);

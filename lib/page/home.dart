@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'board/local_board.dart';
 import 'board/member_board.dart';
 import 'board/owner_board.dart';
+import 'setting/index.dart';
 
 Future<String?> showRoomIdInputDialog(BuildContext context) async {
   return await showDialog<String>(
@@ -114,6 +115,14 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('共享协作画板'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SettingPage()));
+            },
+            icon: const Icon(Icons.settings),
+          ),
+        ],
       ),
       body: buildListView(context),
     );

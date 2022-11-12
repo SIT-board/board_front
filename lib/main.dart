@@ -1,6 +1,7 @@
 import 'package:board_front/page/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'desktop_init.dart';
@@ -13,6 +14,7 @@ void main() async {
   GlobalObjects.sharedPreferences = await SharedPreferences.getInstance();
   GlobalObjects.storage = BoardStorage(GlobalObjects.sharedPreferences);
   await DesktopInit.init();
+  await Settings.init();
   runApp(const MyApp());
 }
 
