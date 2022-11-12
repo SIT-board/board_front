@@ -30,6 +30,7 @@ dependencies:
   flutter_widget_from_html_core: ^0.9.0
   flutter_markdown: ^0.6.13
   flutter_settings_screens: ^0.3.3-null-safety+2
+  dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:
