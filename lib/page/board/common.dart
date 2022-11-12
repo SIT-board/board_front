@@ -4,6 +4,47 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:json_model_sync/json_model_sync.dart';
 
+Future<String?> showTextInputDialog({
+  required BuildContext context,
+  required String title,
+  required String initialText,
+}) async {
+  return await showDialog<String>(
+    context: context,
+    builder: (ctx) {
+      final controller = TextEditingController();
+      controller.text = initialText;
+      return Dialog(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.headlineSmall),
+            TextField(controller: controller),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(controller.text);
+                  },
+                  child: const Text('确认'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('取消'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 Future<void> showJoinDialog(BuildContext context, BoardUserNode node) async {
   final screenHeight = MediaQuery.of(context).size.height;
   final n = node;
@@ -32,6 +73,19 @@ Future<void> showJoinDialog(BuildContext context, BoardUserNode node) async {
                   child: ListView(
                     children: n.onlineList.map((e) {
                       return ListTile(
+                        onTap: e == n.userNodeId
+                            ? () async {
+                                final username = await showTextInputDialog(
+                                  context: context,
+                                  title: '修改参会用户名',
+                                  initialText: n.username,
+                                );
+                                if (username == null) return;
+                                n.username = username;
+                                EasyLoading.showSuccess('用户名修改成功');
+                                Navigator.of(context).pop();
+                              }
+                            : null,
                         title: Text(n.getUsernameByUserId(e)),
                         trailing: e == n.userNodeId ? const Text('自己') : null,
                       );
