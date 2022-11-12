@@ -1,25 +1,21 @@
-import 'dart:convert';
-
 import 'package:json_diff_patcher/json_diff_patcher.dart';
 
 import 'message.dart';
 import 'node.dart';
 
-dynamic copy(dynamic json) {
-  return jsonDecode(jsonEncode(json));
-}
-
 class OwnerBoardNode {
   final BoardUserNode node;
   final Map<dynamic, dynamic> model;
-  final JsonDiffPatcher patcher;
-  Map<dynamic, dynamic> lastStore;
+  final JsonDiffPatcher _patcher;
+  Map<dynamic, dynamic> _lastStore;
+  final void Function(JsonPatch patch)? onModelChanged;
 
   OwnerBoardNode({
     required this.node,
     required this.model,
-  })  : patcher = JsonDiffPatcher(model),
-        lastStore = copy(model) {
+    this.onModelChanged,
+  })  : _patcher = JsonDiffPatcher(model),
+        _lastStore = copy(model) {
     // owner需要订阅接收模型请求, 非owner则无需订阅该消息
     node.registerForOnReceive(
       topic: 'modelRequest',
@@ -28,15 +24,25 @@ class OwnerBoardNode {
         sendBoardViewModel(message.publisher);
       },
     );
+    node.registerForOnReceive(
+      topic: 'syncPatch',
+      callback: (BaseMessage message) {
+        if (node.userNodeId == message.publisher) return; // 去除自反性
+        final patch = JsonPatch.fromJson((message.data as Map).cast<String, dynamic>());
+        _patcher.applyPatch(patch);
+        _lastStore = copy(model);
+        onModelChanged?.call(patch);
+      },
+    );
   }
 
   void broadcastSyncPatch() {
     // 监听发生的修改
-    final patch = JsonDiffPatcher(lastStore).diff(model);
+    final patch = JsonDiffPatcher(_lastStore).diff(model);
     if (patch.isEmpty()) return;
     // 发送修改
     node.broadcast('syncPatch', patch);
-    lastStore = copy(model);
+    _lastStore = copy(model);
   }
 
   void sendBoardViewModel(String targetId) {

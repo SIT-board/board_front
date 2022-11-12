@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 /// 通信的基本消息实体
+dynamic copy(dynamic json) {
+  return jsonDecode(jsonEncode(json));
+}
 
 class BaseMessage {
   final DateTime ts;

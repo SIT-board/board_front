@@ -34,13 +34,15 @@ void main() {
     (model['m4'] as Map)['m5'] = 456;
     ownerNode.broadcastSyncPatch();
 
+    final memberModel = {};
     final memberNode = MemberBoardNode(
       node: memberRawNode,
+      model: memberModel,
       onModelChanged: (patch) {
         print('model被修改：$patch');
       },
-      onModelRefresh: (model) {
-        print('model被刷新: $model');
+      onModelRefresh: () {
+        print('model被刷新: $memberModel');
       },
     );
     memberNode.requestBoardModel();

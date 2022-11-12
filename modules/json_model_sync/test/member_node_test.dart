@@ -13,12 +13,14 @@ void main() {
     );
     await node1.connect();
 
+    final model = {};
     final memberNode = MemberBoardNode(
       node: node1,
+      model: model,
       onModelChanged: (patch) {
         print('model被修改：$patch');
       },
-      onModelRefresh: (model) {
+      onModelRefresh: () {
         print('model被刷新: $model');
       },
     );
