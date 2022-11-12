@@ -9,7 +9,7 @@ class ServerStorageKeys {
 }
 
 class ServerStorage {
-  static const String defaultMqttHost = '127.0.0.1';
+  static const String defaultMqttHost = 'board.jimyag.com';
   static const int defaultMqttPort = 1883;
   static const String defaultImageServer = '';
   static const String defaultAttachmentServer = '';
