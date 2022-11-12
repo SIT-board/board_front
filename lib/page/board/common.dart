@@ -59,7 +59,7 @@ Future<void> showProjectInfoDialog(BuildContext context, BoardPageSetViewModel p
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text('关闭')),
+                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('关闭')),
                 ],
               ),
             ],

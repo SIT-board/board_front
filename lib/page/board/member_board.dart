@@ -58,7 +58,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
       memberBoardNode.requestBoardModel();
 
       // 等待五秒
-      await Future.delayed(Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 5));
 
       // 还是没收到模型数据
       if (!hasModel) {
@@ -67,7 +67,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         Navigator.of(context).pop();
       }
       // 收到了模型数据，可以开始监听了
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         memberBoardNode.broadcastSyncPatch();
       });
     });
@@ -147,7 +147,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
   List<Widget> buildActions() {
     return [
-      IconButton(onPressed: () {}, icon: Icon(Icons.people)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.people)),
       IconButton(
           onPressed: !undoRedoManager.canUndo
               ? null
@@ -168,7 +168,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
           icon: const Icon(Icons.redo)),
       PopupMenuButton(itemBuilder: (context) {
         return [
-          PopupMenuItem(child: Text('保存'), onTap: saveAsFile),
+          PopupMenuItem(onTap: saveAsFile, child: const Text('保存')),
           PopupMenuItem(
             child: const Text('另存为'),
             onTap: () async {
@@ -183,7 +183,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
             },
           ),
           PopupMenuItem(
-              child: Text('项目信息'),
+              child: const Text('项目信息'),
               onTap: () {
                 WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
               })
@@ -220,10 +220,10 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
                                 if (!mounted) return;
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text('保存')),
+                              child: const Text('保存')),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: Text('不保存'),
+                            child: const Text('不保存'),
                           ),
                         ],
                       ),

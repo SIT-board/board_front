@@ -51,7 +51,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
   @override
   void initState() {
     ownerBoardNode.node.connect().then((value) {
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         ownerBoardNode.broadcastSyncPatch();
       });
     });
@@ -157,7 +157,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
       PopupMenuButton(itemBuilder: (context) {
         return [
           PopupMenuItem(
-            child: Text('打开本地文件'),
+            child: const Text('打开本地文件'),
             onTap: () async {
               final result = await FilePicker.platform.pickFiles(
                 dialogTitle: '打开一个白板工程文件',
@@ -176,9 +176,9 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
               setState(() {});
             },
           ),
-          PopupMenuItem(child: Text('保存'), onTap: saveAsFile),
+          PopupMenuItem(child: const Text('保存'), onTap: saveAsFile),
           PopupMenuItem(
-            child: Text('另存为'),
+            child: const Text('另存为'),
             onTap: () async {
               final otherPath = await FilePicker.platform.saveFile(
                 dialogTitle: '保存白板工程',
@@ -191,7 +191,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
             },
           ),
           PopupMenuItem(
-              child: Text('项目信息'),
+              child: const Text('项目信息'),
               onTap: () {
                 WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                   showDialog(
@@ -207,7 +207,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text('关闭')),
+                                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('关闭')),
                                 ],
                               ),
                             ],
@@ -250,10 +250,10 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
                                 if (!mounted) return;
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text('保存')),
+                              child: const Text('保存')),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: Text('不保存'),
+                            child: const Text('不保存'),
                           ),
                         ],
                       ),
