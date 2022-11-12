@@ -5,16 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'board/local_board.dart';
+import 'board/member_board.dart';
 import 'board/owner_board.dart';
 
-Future<List<String>?> showInputDialog(BuildContext context) async {
-  final controller = TextEditingController();
-  final self = TextEditingController();
-  final other = TextEditingController();
-  controller.text = '123';
-  return await showDialog(
+Future<String?> showRoomIdInputDialog(BuildContext context) async {
+  return await showDialog<String>(
     context: context,
     builder: (ctx) {
+      final controller = TextEditingController();
+      controller.text = '123456';
       return Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -25,14 +24,12 @@ Future<List<String>?> showInputDialog(BuildContext context) async {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             TextField(controller: controller),
-            TextField(controller: self),
-            TextField(controller: other),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop([controller.text, self.text, other.text]);
+                    Navigator.of(context).pop(controller.text);
                   },
                   child: const Text('加入画板'),
                 ),
@@ -84,7 +81,12 @@ class _HomePageState extends State<HomePage> {
           leading: const Icon(Icons.add),
           title: const Text('加入协作画板'),
           subtitle: const Text('加入一个协作画板'),
-          onTap: () {},
+          onTap: () async {
+            String? roomId = await showRoomIdInputDialog(context);
+            if (roomId == null) return;
+            if (!mounted) return;
+            await Navigator.of(context).push(MaterialPageRoute(builder: (context) => MemberBoardPage(roomId: roomId)));
+          },
         ),
         const Divider(),
         const ListTile(title: Text('最近使用')),

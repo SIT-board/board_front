@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:board_event_bus/board_event_bus.dart';
@@ -18,31 +17,35 @@ import 'package:json_model_sync/json_model_sync.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 import 'package:uuid/uuid.dart';
 
-import 'common.dart';
-
-class OwnerBoardPage extends StatefulWidget {
-  const OwnerBoardPage({Key? key}) : super(key: key);
+class MemberBoardPage extends StatefulWidget {
+  final String roomId;
+  const MemberBoardPage({Key? key, required this.roomId}) : super(key: key);
 
   @override
-  State<OwnerBoardPage> createState() => _OwnerBoardPageState();
+  State<MemberBoardPage> createState() => _MemberBoardPageState();
 }
 
-class _OwnerBoardPageState extends State<OwnerBoardPage> {
+class _MemberBoardPageState extends State<MemberBoardPage> {
   final keyBoardFocusNode = FocusNode();
   final eventBus = EventBus<BoardEventName>();
 
-  late var pageSetViewModel = BoardPageSetViewModel.createNew();
-  late var undoRedoManager = UndoRedoManager(pageSetViewModel.map);
+  final BoardPageSetViewModel pageSetViewModel = BoardPageSetViewModel.createNew();
+  late final UndoRedoManager undoRedoManager;
+  bool hasModel = false;
+
   String? filePath;
-  int lastSaveStorePtr = -1;
   Timer? _timer;
-  late final ownerBoardNode = OwnerBoardNode(
+
+  late final memberBoardNode = MemberBoardNode(
     node: BoardUserNode(
-      // roomId: const Uuid().v4(),
-      roomId: '123456',
+      roomId: widget.roomId,
       userNodeId: const Uuid().v4(),
     ),
     model: pageSetViewModel.map,
+    onModelRefresh: () {
+      undoRedoManager = UndoRedoManager(pageSetViewModel.map);
+      setState(() => hasModel = true);
+    },
     onModelChanged: (patch) => setState(() {}),
   );
 
@@ -50,9 +53,22 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
   void _refreshBoard(arg) => setState(() {});
   @override
   void initState() {
-    ownerBoardNode.node.connect().then((value) {
+    memberBoardNode.node.connect().then((value) async {
+      // 发起白板数据请求
+      memberBoardNode.requestBoardModel();
+
+      // 等待五秒
+      await Future.delayed(Duration(seconds: 5));
+
+      // 还是没收到模型数据
+      if (!hasModel) {
+        EasyLoading.showError('房间号有误');
+        if (!mounted) return;
+        Navigator.of(context).pop();
+      }
+      // 收到了模型数据，可以开始监听了
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        ownerBoardNode.broadcastSyncPatch();
+        memberBoardNode.broadcastSyncPatch();
       });
     });
     eventBus.subscribe(BoardEventName.saveState, _saveState);
@@ -65,7 +81,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
     eventBus.unsubscribe(BoardEventName.saveState, _saveState);
     eventBus.unsubscribe(BoardEventName.refreshBoard, _refreshBoard);
     _timer?.cancel();
-    ownerBoardNode.node.disconnect();
+    memberBoardNode.node.disconnect();
     super.dispose();
   }
 
@@ -78,7 +94,6 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
     File(filePath!).writeAsStringSync(pageSetViewModel.toJsonString());
     EasyLoading.showSuccess('保存成功');
     GlobalObjects.storage.recentlyUsed.addItem(filePath!);
-    lastSaveStorePtr = undoRedoManager.currentPtr;
   }
 
   void gotoNextPage() {
@@ -132,10 +147,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
 
   List<Widget> buildActions() {
     return [
-      IconButton(
-        onPressed: () => showJoinDialog(context, ownerBoardNode.node),
-        icon: const Icon(Icons.people),
-      ),
+      IconButton(onPressed: () {}, icon: Icon(Icons.people)),
       IconButton(
           onPressed: !undoRedoManager.canUndo
               ? null
@@ -156,29 +168,9 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
           icon: const Icon(Icons.redo)),
       PopupMenuButton(itemBuilder: (context) {
         return [
-          PopupMenuItem(
-            child: Text('打开本地文件'),
-            onTap: () async {
-              final result = await FilePicker.platform.pickFiles(
-                dialogTitle: '打开一个白板工程文件',
-                type: FileType.custom,
-                allowedExtensions: ['sbp'],
-              );
-              String? path = result?.files.single.path;
-              if (path == null) return;
-              final content = (jsonDecode(File(path).readAsStringSync()) as Map).cast<String, dynamic>();
-              // 解析成功
-              filePath = path;
-              GlobalObjects.storage.recentlyUsed.addItem(filePath!);
-              pageSetViewModel.map.clear();
-              pageSetViewModel.map.addAll(content);
-              undoRedoManager = UndoRedoManager(pageSetViewModel.map);
-              setState(() {});
-            },
-          ),
           PopupMenuItem(child: Text('保存'), onTap: saveAsFile),
           PopupMenuItem(
-            child: Text('另存为'),
+            child: const Text('另存为'),
             onTap: () async {
               final otherPath = await FilePicker.platform.saveFile(
                 dialogTitle: '保存白板工程',
@@ -193,28 +185,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
           PopupMenuItem(
               child: Text('项目信息'),
               onTap: () {
-                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('项目信息', style: Theme.of(context).textTheme.headline5),
-                              Text('页数：${pageSetViewModel.pageIdList.length}'),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text('关闭')),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      });
-                });
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
               })
         ];
       }),
@@ -235,7 +206,6 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
       child: WillPopScope(
         onWillPop: () async {
           // 已经保存过了
-          if (lastSaveStorePtr == undoRedoManager.currentPtr) return true;
           return await showDialog<bool>(
                   context: context,
                   builder: (context) {
