@@ -53,6 +53,11 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         _hasModel = true;
         _ownerUserId = message.publisher;
       });
+
+      // 收到了模型数据，可以开始监听了
+      _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        memberBoardNode.broadcastSyncPatch();
+      });
     },
     onModelChanged: (patch) => setState(() {}),
   );
@@ -74,10 +79,6 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         if (!mounted) return;
         Navigator.of(context).pop();
       }
-      // 收到了模型数据，可以开始监听了
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        memberBoardNode.broadcastSyncPatch();
-      });
     });
     eventBus.subscribe(BoardEventName.saveState, _saveState);
     eventBus.subscribe(BoardEventName.refreshBoard, _refreshBoard);
@@ -150,6 +151,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         });
         undoRedoManager.store();
       },
+      onTap: () => eventBus.publish(BoardEventName.onBoardTap),
     );
   }
 
@@ -226,44 +228,15 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         };
         cb[key]?.call();
       },
-      child: WillPopScope(
-        onWillPop: () async {
-          // 已经保存过了
-          return await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return Dialog(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('保存并退出？', style: Theme.of(context).textTheme.headline5),
-                          ElevatedButton(
-                              onPressed: () async {
-                                await saveAsFile();
-                                if (!mounted) return;
-                                Navigator.of(context).pop(true);
-                              },
-                              child: const Text('保存')),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('不保存'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }) ==
-              true;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: buildTitle(),
-            actions: buildActions(),
-          ),
-          body: BoardBodyWidget(
-            eventBus: eventBus,
-            boardViewModel: pageSetViewModel.currentPage.board,
-          ),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: buildTitle(),
+          actions: buildActions(),
+        ),
+        body: BoardBodyWidget(
+          eventBus: eventBus,
+          boardViewModel: pageSetViewModel.currentPage.board,
         ),
       ),
     );

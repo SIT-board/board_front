@@ -60,7 +60,7 @@ class MemberBoardNode {
 
   void broadcastSyncPatch() {
     // 监听发生的修改
-    final patch = JsonDiffPatcher(_lastStore).diff(_patcher);
+    final patch = JsonDiffPatcher(_lastStore).diff(model);
     if (patch.isEmpty()) return;
     // 发送修改
     node.broadcast('syncPatch', patch);

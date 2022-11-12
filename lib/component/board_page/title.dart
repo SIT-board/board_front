@@ -32,6 +32,7 @@ class BoardTitle extends StatelessWidget {
   final ValueSetter<int> onSwitchPage;
   final VoidCallback onAddPage;
   final ValueSetter<int> onDeletePage;
+  final VoidCallback? onTap;
   const BoardTitle({
     Key? key,
     required this.currentPageId,
@@ -41,12 +42,14 @@ class BoardTitle extends StatelessWidget {
     required this.onSwitchPage,
     required this.onAddPage,
     required this.onDeletePage,
+    this.onTap,
   }) : super(key: key);
   String get currentTitle => pageNameMap[currentPageId]!;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: onTap,
       onTapUp: (d) {
         final position = d.globalPosition;
         showQudsPopupMenu(
