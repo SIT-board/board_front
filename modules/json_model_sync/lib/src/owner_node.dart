@@ -16,6 +16,7 @@ class OwnerBoardNode {
     this.onModelChanged,
   })  : _patcher = JsonDiffPatcher(model),
         _lastStore = copy(model) {
+    node.username = '主持人${node.userNodeId}';
     // owner需要订阅接收模型请求, 非owner则无需订阅该消息
     node.registerForOnReceive(
       topic: 'modelRequest',

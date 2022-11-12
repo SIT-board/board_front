@@ -53,7 +53,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
   @override
   void initState() {
     ownerBoardNode.node.connect().then((value) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
         ownerBoardNode.broadcastSyncPatch();
       });
     });
