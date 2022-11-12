@@ -63,6 +63,32 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
           });
         });
       });
+      // 每3秒钟轮询一次在线列表检查主持人是否存在
+      // 如果不存在，那么退出会议
+      Timer.periodic(const Duration(seconds: 2), (timer) {
+        if (!memberBoardNode.node.onlineList.contains(_ownerUserId)) {
+          timer.cancel();
+          showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('会议已结束'),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('退出会议'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ).then((value) {
+            Navigator.of(context).pop();
+          });
+        }
+      });
     },
     onModelChangeBefore: (patch) {
       // 非只读模式需要删除一些视角信息
@@ -176,7 +202,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
         icon: const Icon(Icons.people),
       ),
       IconButton(
-          onPressed: !undoRedoManager.canUndo
+          onPressed: !undoRedoManager.canUndo || pageSetViewModel.memberReadOnly
               ? null
               : () {
                   undoRedoManager.undo();
@@ -185,7 +211,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
                 },
           icon: const Icon(Icons.undo)),
       IconButton(
-          onPressed: !undoRedoManager.canRedo
+          onPressed: !undoRedoManager.canRedo || pageSetViewModel.memberReadOnly
               ? null
               : () {
                   undoRedoManager.redo();
