@@ -86,4 +86,13 @@ void main() {
       reason: "${{'paths': paths, 'testCasesContains': testCasesContains}}",
     );
   });
+
+  test('test set not exists path value', () {
+    final m = FieldModifier({});
+    m['m1.m2'] = 1;
+    m['m1.m3'] = 2;
+    m['m12.m23.m5.m2'] = 2;
+    expect(m['m1.m2'], 1);
+    print(m.data);
+  });
 }

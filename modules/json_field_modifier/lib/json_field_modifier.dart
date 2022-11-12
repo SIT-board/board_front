@@ -3,11 +3,20 @@ library json_field_modifier;
 class FieldModifier {
   final dynamic data;
   FieldModifier(this.data);
-  static dynamic _get(dynamic data, List<dynamic> path, int deep) {
+  static dynamic _get(
+    dynamic data,
+    List<dynamic> path,
+    int deep, [
+    bool autoCreateParent = false, // 是否自动创建父结点
+  ]) {
     if (deep >= path.length) return data;
     final key = path[deep];
-    final value = (data is List && key is! int) ? data[int.parse(key.toString())] : data[key];
-    return _get(value, path, deep + 1);
+    var value = (data is List && key is! int) ? data[int.parse(key.toString())] : data[key];
+    if (autoCreateParent && value == null && deep < path.length) {
+      value = <dynamic, dynamic>{};
+      data[key] = value;
+    }
+    return _get(value, path, deep + 1, autoCreateParent);
   }
 
   dynamic get(List<dynamic> path) => _get(data, path, 0);
@@ -20,7 +29,7 @@ class FieldModifier {
   }
 
   static void _set(dynamic data, List<dynamic> path, dynamic value) {
-    final parent = _get(data, path.sublist(0, path.length - 1), 0);
+    final parent = _get(data, path.sublist(0, path.length - 1), 0, true);
     final key = path.last;
     if (parent is List && key is! int) {
       parent[int.parse(key.toString())] = value;
