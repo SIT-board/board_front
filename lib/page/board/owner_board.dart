@@ -38,6 +38,8 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
   Timer? _timer;
   late final ownerBoardNode = OwnerBoardNode(
     node: BoardUserNode(
+      mqttServer: GlobalObjects.storage.server.mqttHost,
+      mqttPort: GlobalObjects.storage.server.mqttPort,
       // roomId: const Uuid().v4(),
       roomId: '123456',
       userNodeId: const Uuid().v4(),

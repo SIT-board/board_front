@@ -38,6 +38,8 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
   late final memberBoardNode = MemberBoardNode(
     node: BoardUserNode(
+      mqttServer: GlobalObjects.storage.server.mqttHost,
+      mqttPort: GlobalObjects.storage.server.mqttPort,
       roomId: widget.roomId,
       userNodeId: const Uuid().v4(),
     ),
