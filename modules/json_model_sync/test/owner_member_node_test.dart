@@ -41,7 +41,7 @@ void main() {
       onModelChanged: (patch) {
         print('model被修改：$patch');
       },
-      onModelRefresh: () {
+      onModelRefresh: (message) {
         print('model被刷新: $memberModel');
       },
     );
