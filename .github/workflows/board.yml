@@ -98,30 +98,30 @@ jobs:
       - name: 🏗️ Build iOS
         run: flutter build ios --no-codesign
 
-  build-MacOS:
-    runs-on: macos-latest
-    steps:
-      - uses: nelonoel/branch-name@v1.0.1
-      - uses: benjlevesque/short-sha@v1.2
-        id: short-sha
-        with: { length: 7 }
-      - uses: actions/checkout@v3
+  # build-MacOS:
+  #  runs-on: macos-latest
+  #  steps:
+  #    - uses: nelonoel/branch-name@v1.0.1
+  #    - uses: benjlevesque/short-sha@v1.2
+  #      id: short-sha
+  #      with: { length: 7 }
+  #    - uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
-        with: { channel: stable, cache: true }
+  #    - uses: subosito/flutter-action@v2
+  #      with: { channel: stable, cache: true }
 
-      # Building
-      - name: Build macOS
-        run: |
-          flutter config --enable-macos-desktop
-          flutter pub get
-          flutter build macos --release
+  #    # Building
+  #    - name: Build macOS
+  #      run: |
+  #        flutter config --enable-macos-desktop
+  #        flutter pub get
+  #        flutter build macos --release
 
-      - name: Upload web File
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.BRANCH_NAME }}-${{ env.SHA }}-macos.zip
-          path: build/macos/Build/Products/Release
+  #    - name: Upload web File
+  #      uses: actions/upload-artifact@v3
+  #      with:
+  #        name: ${{ env.BRANCH_NAME }}-${{ env.SHA }}-macos.zip
+  #        path: build/macos/Build/Products/Release
 
   build-Web:
     runs-on: ubuntu-latest
