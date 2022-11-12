@@ -13,7 +13,7 @@ class FieldModifier {
     final key = path[deep];
     var value = (data is List && key is! int) ? data[int.parse(key.toString())] : data[key];
     if (autoCreateParent && value == null && deep < path.length) {
-      value = <dynamic, dynamic>{};
+      value = <String, dynamic>{};
       data[key] = value;
     }
     return _get(value, path, deep + 1, autoCreateParent);
