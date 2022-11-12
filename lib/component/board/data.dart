@@ -22,6 +22,7 @@ class BoardViewModel extends HashMapData {
 
   void clear() {
     map['modelMap'].clear();
+    modelIdList = [];
   }
 
   void removeModel(int id) {
