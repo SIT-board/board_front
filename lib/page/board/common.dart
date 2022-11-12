@@ -45,7 +45,7 @@ Future<String?> showTextInputDialog({
   );
 }
 
-Future<void> showJoinDialog(BuildContext context, BoardUserNode node) async {
+Future<void> showJoinDialog(BuildContext context, BoardUserNode node, String ownerId) async {
   final screenHeight = MediaQuery.of(context).size.height;
   final n = node;
   return showDialog<void>(
@@ -72,22 +72,35 @@ Future<void> showJoinDialog(BuildContext context, BoardUserNode node) async {
                 Expanded(
                   child: ListView(
                     children: n.onlineList.map((e) {
+                      if (e == n.userNodeId) {
+                        return ListTile(
+                          leading: const Icon(Icons.person, color: Colors.blue),
+                          onTap: () async {
+                            final username = await showTextInputDialog(
+                              context: context,
+                              title: '修改参会用户名',
+                              initialText: n.username,
+                            );
+                            if (username == null) return;
+                            n.username = username;
+                            EasyLoading.showSuccess('用户名修改成功');
+                            Navigator.of(context).pop();
+                          },
+                          title: Text(n.getUsernameByUserId(e)),
+                          trailing: const Text('自己'),
+                        );
+                      }
+                      if (e == ownerId) {
+                        return ListTile(
+                          leading: const Icon(Icons.person, color: Colors.orange),
+                          title: Text(n.getUsernameByUserId(e)),
+                          trailing: const Text('主持人'),
+                        );
+                      }
                       return ListTile(
-                        onTap: e == n.userNodeId
-                            ? () async {
-                                final username = await showTextInputDialog(
-                                  context: context,
-                                  title: '修改参会用户名',
-                                  initialText: n.username,
-                                );
-                                if (username == null) return;
-                                n.username = username;
-                                EasyLoading.showSuccess('用户名修改成功');
-                                Navigator.of(context).pop();
-                              }
-                            : null,
+                        leading: const Icon(Icons.person),
                         title: Text(n.getUsernameByUserId(e)),
-                        trailing: e == n.userNodeId ? const Text('自己') : null,
+                        trailing: const Text('成员'),
                       );
                     }).toList(),
                   ),

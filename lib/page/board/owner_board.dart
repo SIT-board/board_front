@@ -135,7 +135,7 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
   List<Widget> buildActions() {
     return [
       IconButton(
-        onPressed: () => showJoinDialog(context, ownerBoardNode.node),
+        onPressed: () => showJoinDialog(context, ownerBoardNode.node, ownerBoardNode.node.userNodeId),
         icon: const Icon(Icons.people),
       ),
       IconButton(

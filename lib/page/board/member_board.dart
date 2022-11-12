@@ -17,6 +17,8 @@ import 'package:json_model_sync/json_model_sync.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 import 'package:uuid/uuid.dart';
 
+import 'common.dart';
+
 class MemberBoardPage extends StatefulWidget {
   final String roomId;
   const MemberBoardPage({Key? key, required this.roomId}) : super(key: key);
@@ -31,11 +33,12 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
   final BoardPageSetViewModel pageSetViewModel = BoardPageSetViewModel.createNew();
   late final UndoRedoManager undoRedoManager;
-  bool hasModel = false;
+  bool _hasModel = false;
 
   String? filePath;
   Timer? _timer;
 
+  late final String _ownerUserId;
   late final memberBoardNode = MemberBoardNode(
     node: BoardUserNode(
       mqttServer: GlobalObjects.storage.server.mqttHost,
@@ -44,9 +47,12 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
       userNodeId: const Uuid().v4(),
     ),
     model: pageSetViewModel.map,
-    onModelRefresh: () {
+    onModelRefresh: (message) {
       undoRedoManager = UndoRedoManager(pageSetViewModel.map);
-      setState(() => hasModel = true);
+      setState(() {
+        _hasModel = true;
+        _ownerUserId = message.publisher;
+      });
     },
     onModelChanged: (patch) => setState(() {}),
   );
@@ -63,7 +69,7 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
       await Future.delayed(const Duration(seconds: 5));
 
       // 还是没收到模型数据
-      if (!hasModel) {
+      if (!_hasModel) {
         EasyLoading.showError('房间号有误');
         if (!mounted) return;
         Navigator.of(context).pop();
@@ -149,7 +155,10 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
   List<Widget> buildActions() {
     return [
-      IconButton(onPressed: () {}, icon: const Icon(Icons.people)),
+      IconButton(
+        onPressed: () => showJoinDialog(context, memberBoardNode.node, _ownerUserId),
+        icon: const Icon(Icons.people),
+      ),
       IconButton(
           onPressed: !undoRedoManager.canUndo
               ? null
@@ -196,6 +205,18 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_hasModel) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            CircularProgressIndicator(),
+            SizedBox(height: 10),
+            Text('正在进入房间...'),
+          ],
+        ),
+      );
+    }
     return BoardKeyMapping(
       focusNode: keyBoardFocusNode,
       onKeyDown: (key, pressedKeySet) {

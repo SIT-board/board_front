@@ -6,7 +6,7 @@ import 'node.dart';
 class MemberBoardNode {
   final BoardUserNode node;
   final Map<dynamic, dynamic> model;
-  final void Function()? onModelRefresh;
+  final void Function(BaseMessage)? onModelRefresh;
   final void Function(JsonPatch patch)? onModelChanged;
   JsonDiffPatcher? _patcher;
   final List<JsonPatch> _patchBuffer = [];
@@ -33,7 +33,7 @@ class MemberBoardNode {
         _lastStore = copy(model);
 
         // 通知事件
-        onModelRefresh?.call();
+        onModelRefresh?.call(message);
       },
     );
 
