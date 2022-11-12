@@ -39,8 +39,9 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
   }
 
   void _onModelMenu(arg) {
-    final model = arg[0] as Model;
+    final modelId = arg[0] as int;
     final pos = arg[1] as Offset;
+    final model = currentPageBoardViewModel.getModelById(modelId);
     boardMenu.showModelMenu(context, pos, model);
   }
 
