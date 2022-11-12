@@ -8,6 +8,9 @@ class MemberBoardNode {
   final Map<dynamic, dynamic> model;
   final void Function(BaseMessage)? onModelRefresh;
   final void Function(JsonPatch patch)? onModelChanged;
+
+  /// 在model改变之前的拦截器
+  final void Function(JsonPatch patch)? onModelChangeBefore;
   JsonDiffPatcher? _patcher;
   final List<JsonPatch> _patchBuffer = [];
   Map<dynamic, dynamic> _lastStore;
@@ -17,6 +20,7 @@ class MemberBoardNode {
     this.model = const {},
     this.onModelRefresh,
     this.onModelChanged,
+    this.onModelChangeBefore,
   }) : _lastStore = copy(model) {
     node.registerForOnReceive(
       topic: 'modelResponse',
@@ -48,6 +52,7 @@ class MemberBoardNode {
         if (_patcher == null) {
           _patchBuffer.add(patch);
         } else {
+          onModelChangeBefore?.call(patch);
           _patcher!.applyPatch(patch);
 
           // 快照一份
@@ -58,10 +63,13 @@ class MemberBoardNode {
     );
   }
 
-  void broadcastSyncPatch() {
+  void broadcastSyncPatch({
+    void Function(JsonPatch patch)? beforeSend,
+  }) {
     // 监听发生的修改
     final patch = JsonDiffPatcher(_lastStore).diff(model);
     if (patch.isEmpty()) return;
+    beforeSend?.call(patch);
     // 发送修改
     node.broadcast('syncPatch', patch);
     _lastStore = copy(model);

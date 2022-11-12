@@ -56,8 +56,22 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
 
       // 收到了模型数据，可以开始监听了
       _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        memberBoardNode.broadcastSyncPatch();
+        memberBoardNode.broadcastSyncPatch(beforeSend: (patch) {
+          // 无论什么时候都不把member的视角数据广播出去
+          patch.removeWhere((type, key, value) {
+            return key.contains('viewerTransform') || key.contains('currentPageId');
+          });
+        });
       });
+    },
+    onModelChangeBefore: (patch) {
+      // 非只读模式需要删除一些视角信息
+      if (!pageSetViewModel.memberReadOnly) {
+        // 删除owner的视角数据
+        patch.removeWhere((type, key, value) {
+          return key.contains('viewerTransform') || key.contains('currentPageId');
+        });
+      }
     },
     onModelChanged: (patch) => setState(() {}),
   );
@@ -234,9 +248,12 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
           title: buildTitle(),
           actions: buildActions(),
         ),
-        body: BoardBodyWidget(
-          eventBus: eventBus,
-          boardViewModel: pageSetViewModel.currentPage.board,
+        body: AbsorbPointer(
+          absorbing: pageSetViewModel.memberReadOnly,
+          child: BoardBodyWidget(
+            eventBus: eventBus,
+            boardViewModel: pageSetViewModel.currentPage.board,
+          ),
         ),
       ),
     );

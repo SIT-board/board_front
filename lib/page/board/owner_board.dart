@@ -132,6 +132,42 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
     );
   }
 
+  Future<void> showBoardModeDialog() async {
+    final n = ValueNotifier<bool>(pageSetViewModel.memberReadOnly);
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('白板模式设置', style: Theme.of(context).textTheme.headline5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('成员只读：'),
+                    ValueListenableBuilder(
+                      valueListenable: n,
+                      builder: (context, thisValue, child) {
+                        return Switch(
+                            value: thisValue,
+                            onChanged: (thatValue) {
+                              n.value = thatValue;
+                            });
+                      },
+                    ),
+                  ],
+                ),
+                ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text('关闭')),
+              ],
+            ),
+          );
+        });
+    pageSetViewModel.memberReadOnly = n.value;
+    n.dispose();
+  }
+
   List<Widget> buildActions() {
     return [
       IconButton(
@@ -158,6 +194,10 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
           icon: const Icon(Icons.redo)),
       PopupMenuButton(itemBuilder: (context) {
         return [
+          PopupMenuItem(
+            onTap: () => WidgetsBinding.instance.addPostFrameCallback((timeStamp) => showBoardModeDialog()),
+            child: Text('白板模式设置'),
+          ),
           PopupMenuItem(
             child: const Text('打开本地文件'),
             onTap: () async {

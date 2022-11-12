@@ -46,6 +46,12 @@ class JsonPatch {
     return add.isEmpty && remove.isEmpty && update.isEmpty;
   }
 
+  void removeWhere(bool Function(String type, String key, dynamic value) tester) {
+    add.removeWhere((key, value) => tester('add', key, value));
+    remove.removeWhere((key, value) => tester('remove', key, value));
+    update.removeWhere((key, value) => tester('update', key, value));
+  }
+
   Map<String, dynamic> toJson() => {'add': add, 'remove': remove, 'update': update};
 
   factory JsonPatch.fromJson(Map<String, dynamic> json) {

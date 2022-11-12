@@ -19,6 +19,9 @@ class BoardPageViewModel extends HashMapData {
 
 /// 所有页面
 class BoardPageSetViewModel extends HashMapData {
+  bool get memberReadOnly => map['memberReadOnly'] ??= true;
+  set memberReadOnly(bool v) => map['memberReadOnly'] = v;
+
   List<int> get pageIdList => ((map['pageIdList'] ??= <int>[]) as List).cast<int>();
 
   BoardPageViewModel getPageById(int pageId) {
@@ -47,8 +50,6 @@ class BoardPageSetViewModel extends HashMapData {
   int? get nextPageId {
     int idx = pageIdList.firstWhere((e) => e == currentPageId);
     final ids = pageIdList;
-    print(idx);
-    print(ids);
     if (!(0 <= (idx + 1) && (idx + 1) < ids.length)) return null;
     return pageIdList[idx + 1];
   }
