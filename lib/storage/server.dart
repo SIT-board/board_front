@@ -4,18 +4,20 @@ class ServerStorageKeys {
   static const _namespace = '/server';
   static const mqttHost = '$_namespace/mqtt/host';
   static const mqttPort = '$_namespace/mqtt/port';
-  static const image = '$_namespace/image';
-  static const attachment = '$_namespace/attachment';
+  static const fileUpload = '$_namespace/fileUpload';
 }
 
 class ServerStorage {
   static const String defaultMqttHost = 'board.jimyag.com';
   static const int defaultMqttPort = 1883;
-  static const String defaultImageServer = '';
-  static const String defaultAttachmentServer = '';
+  static const String defaultFileUploadService = 'http://localhost:8080/file/upload';
 
   final SharedPreferences prefs;
   ServerStorage(this.prefs);
+
+  void clear() {
+    prefs.getKeys().where((e) => e.startsWith(ServerStorageKeys._namespace)).forEach(prefs.remove);
+  }
 
   String get mqttHost => prefs.getString(ServerStorageKeys.mqttHost) ?? defaultMqttHost;
   set mqttHost(String v) => prefs.setString(ServerStorageKeys.mqttHost, v);
@@ -24,9 +26,6 @@ class ServerStorage {
       int.tryParse(prefs.getString(ServerStorageKeys.mqttPort) ?? defaultMqttPort.toString()) ?? defaultMqttPort;
   set mqttPort(int v) => prefs.setString(ServerStorageKeys.mqttPort, v.toString());
 
-  String get image => prefs.getString(ServerStorageKeys.image) ?? defaultImageServer;
-  set image(String v) => prefs.setString(ServerStorageKeys.image, v);
-
-  String get attachment => prefs.getString(ServerStorageKeys.attachment) ?? defaultAttachmentServer;
-  set attachment(String v) => prefs.setString(ServerStorageKeys.attachment, v);
+  String get fileUpload => prefs.getString(ServerStorageKeys.fileUpload) ?? defaultFileUploadService;
+  set fileUpload(String v) => prefs.setString(ServerStorageKeys.fileUpload, v);
 }

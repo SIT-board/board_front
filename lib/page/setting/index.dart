@@ -5,15 +5,13 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key}) : super(key: key);
-
   ServerStorage get server => GlobalObjects.storage.server;
-  @override
-  Widget build(BuildContext context) {
-    return SettingsScreen(
-      title: '白板设置',
+
+  Widget buildBody(BuildContext context) {
+    return ListView(
       children: [
         SettingsGroup(
-          title: '服务器设置',
+          title: 'MQTT服务器设置',
           children: [
             TextInputSettingsTile(
               title: 'MQTT服务器地址',
@@ -37,7 +35,60 @@ class SettingPage extends StatelessWidget {
             ),
           ],
         ),
+        SettingsGroup(
+          title: '其他服务',
+          children: [
+            TextInputSettingsTile(
+              title: '文件上传服务',
+              settingKey: ServerStorageKeys.fileUpload,
+              initialValue: server.fileUpload,
+            ),
+          ],
+        ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('白板设置'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('还原默认设置？', style: Theme.of(context).textTheme.headline5),
+                          ElevatedButton(
+                            onPressed: () {
+                              server.clear();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('还原'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('取消'),
+                          ),
+                        ],
+                      ),
+                    );
+                  });
+            },
+            icon: const Icon(Icons.undo),
+          ),
+        ],
+      ),
+      body: buildBody(context),
     );
   }
 }

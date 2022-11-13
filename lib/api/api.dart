@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'attachment.dart';
 
 class Api {
-  Dio dio;
-  Api(this.dio);
+  late Dio dio = Dio();
+  Api();
 
   ImageService get image => ImageService(dio);
   AttachmentService get attachment => AttachmentService(dio);

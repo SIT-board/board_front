@@ -1,5 +1,4 @@
 import 'package:board_front/page/home.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -15,9 +14,7 @@ void main() async {
   // 初始化 SharedPreferences 存储
   GlobalObjects.sharedPreferences = await SharedPreferences.getInstance();
   GlobalObjects.storage = BoardStorage(GlobalObjects.sharedPreferences);
-  final dio = Dio();
-  dio.options.baseUrl = 'http://localhost:8080';
-  GlobalObjects.api = Api(dio);
+  GlobalObjects.api = Api();
   await DesktopInit.init();
   await Settings.init();
   runApp(const MyApp());
