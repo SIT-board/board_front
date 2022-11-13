@@ -10,7 +10,7 @@
 
 ## 在线运行
 
-[Live Demo](https://sit-board.github.io/
+[Live Demo](https://sit-board.github.io)
 
 注意：受限于时间精力，故未针对Web端做平台相关的适配，部分需要本地文件相关的功能在Web端无法使用。
 
