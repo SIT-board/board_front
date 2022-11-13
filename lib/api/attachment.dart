@@ -5,10 +5,10 @@ class AttachmentService {
   AttachmentService(this.dio);
 
   /// 上传附件
-  Future<String> upload(MultipartFile imageFile) async {
+  Future<String> upload(MultipartFile file) async {
     final response = await dio.post(
-      '/attachment/upload',
-      data: FormData.fromMap({'attachment': imageFile}),
+      '/file/upload',
+      data: FormData.fromMap({'file': file}),
     );
     return response.data;
   }

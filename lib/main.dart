@@ -15,7 +15,9 @@ void main() async {
   // 初始化 SharedPreferences 存储
   GlobalObjects.sharedPreferences = await SharedPreferences.getInstance();
   GlobalObjects.storage = BoardStorage(GlobalObjects.sharedPreferences);
-  GlobalObjects.api = Api(Dio());
+  final dio = Dio();
+  dio.options.baseUrl = 'http://localhost:8080';
+  GlobalObjects.api = Api(dio);
   await DesktopInit.init();
   await Settings.init();
   runApp(const MyApp());

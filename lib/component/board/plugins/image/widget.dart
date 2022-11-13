@@ -8,7 +8,7 @@ class ImageModelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NetworkImage(data.url).obtainKey(ImageConfiguration());
+    if (data.url.isEmpty) return const Center(child: Text('未设置图片'));
     return Image.network(
       data.url,
       fit: data.fit,

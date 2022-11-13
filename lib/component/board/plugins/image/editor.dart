@@ -1,5 +1,6 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board_event.dart';
+import 'package:board_front/component/board/plugins/image/image_upload.dart';
 import 'package:board_front/component/image_viewer/image_viewer.dart';
 import 'package:flutter/material.dart';
 
@@ -33,9 +34,14 @@ class _ImageModelEditorState extends State<ImageModelEditor> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           TextButton(
-            onPressed: () {
-              // TODO 修改图片
+            onPressed: () async {
+              final String? url = await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return const ImageUploadPage();
+              }));
+              if (url == null) return;
+              modelData.url = url;
               saveState();
+              refreshModel();
             },
             child: const Text('修改图片'),
           ),

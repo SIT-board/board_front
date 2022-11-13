@@ -31,8 +31,7 @@ class ImageModelPlugin extends BoardModelPluginInterface {
       ..id = modelId
       ..common = (CommonModelData({})..position = position)
       ..type = modelTypeName
-      ..data = (ImageModelData({})
-        ..url = 'https://tse2-mm.cn.bing.net/th/id/OIP-C.7HET4jnvBD-VqPcPQCSO-QHaSw?pid=ImgDet&rs=1').map;
+      ..data = (ImageModelData({})..url = '').map;
   }
 
   @override
