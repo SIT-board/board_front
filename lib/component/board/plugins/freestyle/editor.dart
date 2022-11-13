@@ -28,6 +28,22 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
   void refreshModel() => widget.eventBus.publish(BoardEventName.refreshModel, widget.model.id);
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
+  void _refreshEditor(arg) {
+    if (arg == widget.model.id) setState(() {});
+  }
+
+  @override
+  void initState() {
+    widget.eventBus.subscribe(BoardEventName.refreshEditor, _refreshEditor);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.eventBus.unsubscribe(BoardEventName.refreshEditor, _refreshEditor);
+    super.dispose();
+  }
+
   ModelAttributeItem buildBackgroundColor() => ModelAttributeItem(
         title: '背景颜色',
         child: InkWell(

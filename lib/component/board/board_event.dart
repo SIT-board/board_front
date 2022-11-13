@@ -50,6 +50,9 @@ enum BoardEventName {
   /// 刷新某模型视图, modelId
   refreshModel,
 
+  // 刷新某个编辑器视图, modelId
+  refreshEditor,
+
   /// 当需要保存状态时
   saveState,
 }

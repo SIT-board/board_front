@@ -18,6 +18,7 @@ class FreeStyleModelPlugin implements BoardModelPluginInterface {
       data: FreeStyleModelData(model.data),
       editable: model.common.editableState,
       eventBus: eventBus,
+      modelId: model.id,
     );
   }
 

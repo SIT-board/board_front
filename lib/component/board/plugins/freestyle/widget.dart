@@ -35,12 +35,14 @@ class FreeStyleWidget extends StatefulWidget {
   final FreeStyleModelData data;
   final bool editable;
   final EventBus<BoardEventName> eventBus;
+  final int modelId;
 
   const FreeStyleWidget({
     Key? key,
     required this.data,
     required this.editable,
     required this.eventBus,
+    required this.modelId,
   }) : super(key: key);
 
   @override
@@ -84,7 +86,7 @@ class _FreeStyleWidgetState extends State<FreeStyleWidget> {
         setState(() {});
       },
       onPanEnd: (d) {
-        print('Add path: $currentPathId');
+        widget.eventBus.publish(BoardEventName.refreshEditor, widget.modelId);
         saveState();
       },
       child: child,
