@@ -26,6 +26,7 @@ class HtmlModelEditor extends StatelessWidget {
       refreshModel();
     });
     return TextField(
+      minLines: 100,
       maxLines: null,
       controller: controller,
     );
