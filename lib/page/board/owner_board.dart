@@ -40,8 +40,8 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
     node: BoardUserNode(
       mqttServer: GlobalObjects.storage.server.mqttHost,
       mqttPort: GlobalObjects.storage.server.mqttPort,
-      // roomId: const Uuid().v4(),
-      roomId: '123456',
+      roomId: const Uuid().v4(),
+      // roomId: '123456',
       userNodeId: const Uuid().v4(),
     ),
     model: pageSetViewModel.map,
