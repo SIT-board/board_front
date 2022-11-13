@@ -1,16 +1,37 @@
-# board_front
+# SIT-board客户端
 
-A new Flutter project.
+## 编译部署
 
-## Getting Started
+得益于Flutter跨平台运行的优势，SIT-board轻松实现了全平台运行，各个平台的编译流程细节可，参考文档 [编译部署.md](docs/编译部署.md)。
 
-This project is a starting point for a Flutter application.
+## 使用说明
 
-A few resources to get you started if this is your first Flutter project:
+程序的具体使用说明可参考文档 [使用说明.md](docs/使用说明.md)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 模块划分
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 算法模块
+
+算法模块主要实现了以下几个：
+
+1. json_field_modifier
+2. json_diff_patcher
+3. json_model_undo_redo
+4. json_model_sync
+
+具体详细说明可参考文档 [核心算法实现.md](docs/核心算法实现.md)
+
+### 本地存储模块
+
+程序运行时数据的存储，参考文档 [本地存储模块.md](docs/本地存储模块.md)
+
+### 白板模块
+
+白板作为程序内部的一个独立模块，其视图模型和持久化拥有自己的数据结构，
+参考文档 [白板数据的存储.md](docs/白板数据的存储结构.md)
+
+白板实现了插件化方案, 参考文档 [白板元素插件系统.md](docs/白板元素插件系统.md)
+
+### 分布式同步与通信模块
+
+该程序基于MQTT分布式通信实现白板数据的同步，同步的方案构思可参考文档 [同步方案.md](docs/同步方案.md)
