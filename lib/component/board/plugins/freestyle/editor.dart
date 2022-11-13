@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../model/model.dart';
 import '../base_editor.dart';
 import 'data.dart';
+import 'line_watcher.dart';
 
 class FreeStyleModelEditor extends StatefulWidget {
   final Model model;
@@ -29,6 +30,7 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
   void saveState() => widget.eventBus.publish(BoardEventName.saveState);
 
   void _refreshEditor(arg) {
+    if (!mounted) return;
     if (arg == widget.model.id) setState(() {});
   }
 
@@ -58,8 +60,34 @@ class _FreeStyleModelEditorState extends State<FreeStyleModelEditor> {
         ),
       );
 
-  ModelAttributeItem buildCurrentPathShow() =>
-      ModelAttributeItem(title: '当前绘制线条数: ${modelData.pathListSize}', child: Container());
+  ModelAttributeItem buildCurrentPathShow() => ModelAttributeItem(
+        title: '当前绘制线条数: ${modelData.pathListSize}',
+        child: TextButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: LineWatcherColumn(
+                        pathList: modelData.pathIdList.map((e) => modelData.getPathById(e)).toList(),
+                        onDeletePath: (i) {
+                          final ids = modelData.pathIdList.toList();
+                          ids.removeWhere((e) => e == i);
+                          modelData.pathIdList = ids;
+                          refreshModel();
+                          setState(() {});
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  );
+                });
+          },
+          child: Text('查看线条'),
+        ),
+      );
 
   ModelAttributeItem buildPaintColor() => ModelAttributeItem(
       title: '画笔颜色',
