@@ -63,9 +63,9 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
           });
         });
       });
-      // 每3秒钟轮询一次在线列表检查主持人是否存在
+      // 每10秒钟轮询一次在线列表检查主持人是否存在
       // 如果不存在，那么退出会议
-      Timer.periodic(const Duration(seconds: 2), (timer) {
+      Timer.periodic(const Duration(seconds: 10), (timer) {
         if (!memberBoardNode.node.onlineList.contains(_ownerUserId)) {
           timer.cancel();
           showDialog(

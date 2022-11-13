@@ -45,7 +45,7 @@ class BoardUserNode {
     required this.userNodeId,
     String? username,
     this.reportInterval = const Duration(seconds: 1),
-    this.onlineListTimeout = const Duration(seconds: 3),
+    this.onlineListTimeout = const Duration(seconds: 10),
   })  : username = username ?? '用户$userNodeId',
         _client = MqttServerClient.withPort(mqttServer, userNodeId, mqttPort);
 
