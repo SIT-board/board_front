@@ -144,4 +144,11 @@ jobs:
           name: ${{ env.BRANCH_NAME }}-${{ env.SHA }}-web.zip
           path: build/web
 
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          external_repository: SIT-board/SIT-board.github.io
+          publish_branch: master
+          publish_dir: build/web
 
