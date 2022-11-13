@@ -10,7 +10,7 @@ class ServerStorageKeys {
 class ServerStorage {
   static const String defaultMqttHost = 'board.jimyag.com';
   static const int defaultMqttPort = 1883;
-  static const String defaultFileUploadService = 'http://localhost:8080/file/upload';
+  static const String defaultFileUploadService = 'http://board.jimyag.cn:8080/file/upload';
 
   final SharedPreferences prefs;
   ServerStorage(this.prefs);

@@ -85,7 +85,8 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
           String filePath = file.path!;
           print('上传图片：$filePath');
           EasyLoading.showProgress(0, status: '正在上传');
-          String url = await attachment.upload(await MultipartFile.fromFile(filePath));
+          final uploadResponse = await attachment.upload(await MultipartFile.fromFile(filePath));
+          final url = uploadResponse.url;
           EasyLoading.dismiss();
           storage.addItem(
             name: filePath,

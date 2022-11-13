@@ -48,7 +48,8 @@ class _AttachmentModelEditorState extends State<AttachmentModelEditor> {
               String fileName = file.name;
               print('上传附件：$filePath');
               EasyLoading.showProgress(0, status: '正在上传');
-              String url = await GlobalObjects.api.attachment.upload(await MultipartFile.fromFile(filePath));
+              final uploadResponse = await GlobalObjects.api.attachment.upload(await MultipartFile.fromFile(filePath));
+              String url = uploadResponse.url;
               EasyLoading.dismiss();
               modelData.url = url;
               modelData.name = fileName;
