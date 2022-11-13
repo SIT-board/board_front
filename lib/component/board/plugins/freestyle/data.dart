@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:board_front/interface/hash_map_data.dart';
 import 'package:flutter/material.dart';
 
 class FreeStylePathModelData extends HashMapData {
   FreeStylePathModelData(super.map);
+
+  int get id => map['id'];
+  set id(int v) => map['id'] = v;
 
   List<Offset> get points =>
       ((e) => e == null ? <Offset>[] : (e as List).map((e) => Offset(e[0], e[1])).toList())(map['points']);
@@ -39,19 +43,28 @@ class FreeStylePaintStyleModelData extends HashMapData {
 }
 
 class FreeStyleModelData extends HashMapData {
-  List<FreeStylePathModelData> get pathList {
-    return ((map['pathList'] ??= []) as List).map((e) => FreeStylePathModelData(e)).toList();
+  List<int> get pathIdList => ((map['pathIdList'] ??= <int>[]) as List).cast<int>();
+
+  set pathIdList(List<int> v) => map['pathIdList'] = v;
+
+  int getNextModelId() {
+    if (pathIdList.isEmpty) return 0;
+    return pathIdList.reduce(max) + 1;
   }
 
-  int get pathListSize => ((map['pathList'] ??= []) as List).length;
+  FreeStylePathModelData getPathById(int pathId) {
+    return FreeStylePathModelData((map['pathMap'] as Map<String, dynamic>)[pathId.toString()]);
+  }
+
+  int get pathListSize => pathIdList.length;
 
   void addPath(FreeStylePathModelData p) {
-    if (!map.containsKey('pathList')) map['pathList'] = [];
-    (map['pathList'] as List).add(p.map);
+    ((map['pathMap'] ??= <String, dynamic>{}) as Map)[p.id.toString()] = p.map;
+    pathIdList = [...pathIdList, p.id];
   }
 
   /// 背景颜色
-  Color get backgroundColor => ((e) => e == null ? Colors.yellow : Color(e))(map['backgroundColor']);
+  Color get backgroundColor => Color(map['backgroundColor'] ??= Colors.yellow.value);
   set backgroundColor(Color v) => map['backgroundColor'] = v.value;
 
   /// 当前画笔样式
