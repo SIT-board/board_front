@@ -1,8 +1,10 @@
+import 'package:board_front/page/board/simple_board.dart';
 import 'package:board_front/page/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'api/api.dart';
 import 'desktop_init.dart';
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SIT-board',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomePage(),
+      home: UniversalPlatform.isWeb ? const SimpleBoardPage() : const HomePage(),
       builder: EasyLoading.init(),
     );
   }

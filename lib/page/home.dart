@@ -14,7 +14,6 @@ Future<String?> showRoomIdInputDialog(BuildContext context) async {
     context: context,
     builder: (ctx) {
       final controller = TextEditingController();
-      controller.text = '123456';
       return Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
