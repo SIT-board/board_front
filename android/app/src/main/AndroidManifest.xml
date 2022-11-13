@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.board_front">
    <application
-        android:label="board_front"
+        android:label="SIT-board"
         android:name="${applicationName}"
-        android:icon="@mipmap/SIT-Board">
+        android:icon="@mipmap/sit_board">
         <activity
             android:name=".MainActivity"
             android:exported="true"
