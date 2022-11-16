@@ -7,6 +7,7 @@ import 'image/plugin_impl.dart';
 import 'line/plugin_impl.dart';
 import 'markdown/plugin_impl.dart';
 import 'oval/plugin_impl.dart';
+import 'plantuml/plugin_impl.dart';
 import 'rect/plugin_impl.dart';
 import 'svg/plugin_impl.dart';
 
@@ -26,6 +27,7 @@ final defaultModelPlugins = BoardModelPluginManager(
     LineModelPlugin(),
     OvalModelPlugin(),
     SvgModelPlugin(),
+    PlantUMLModelPlugin(),
     ImageModelPlugin(),
     AttachmentModelPlugin(),
     FreeStyleModelPlugin(),
