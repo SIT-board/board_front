@@ -5,13 +5,14 @@ class ServerStorageKeys {
   static const mqttHost = '$_namespace/mqtt/host';
   static const mqttPort = '$_namespace/mqtt/port';
   static const fileUpload = '$_namespace/fileUpload';
+  static const plantuml = '$_namespace/plantuml';
 }
 
 class ServerStorage {
   static const String defaultMqttHost = 'board.jimyag.com';
   static const int defaultMqttPort = 1883;
   static const String defaultFileUploadService = 'http://board.jimyag.cn:8080/file/upload';
-
+  static const String defaultPlantUmlService = 'http://board.jimyag.cn:8081';
   final SharedPreferences prefs;
   ServerStorage(this.prefs);
 
@@ -28,4 +29,7 @@ class ServerStorage {
 
   String get fileUpload => prefs.getString(ServerStorageKeys.fileUpload) ?? defaultFileUploadService;
   set fileUpload(String v) => prefs.setString(ServerStorageKeys.fileUpload, v);
+
+  String get plantuml => prefs.getString(ServerStorageKeys.plantuml) ?? defaultPlantUmlService;
+  set plantuml(String v) => prefs.setString(ServerStorageKeys.plantuml, v);
 }

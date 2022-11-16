@@ -43,6 +43,11 @@ class SettingPage extends StatelessWidget {
               settingKey: ServerStorageKeys.fileUpload,
               initialValue: server.fileUpload,
             ),
+            TextInputSettingsTile(
+              title: 'PlantUML渲染服务',
+              settingKey: ServerStorageKeys.plantuml,
+              initialValue: server.plantuml,
+            ),
           ],
         ),
       ],
