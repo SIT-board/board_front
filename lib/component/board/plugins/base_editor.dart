@@ -61,7 +61,7 @@ class ModelAttributeSection extends StatelessWidget {
 }
 
 class ModelAttribute extends StatelessWidget {
-  final List<ModelAttributeSection> children;
+  final List<Widget> children;
   const ModelAttribute({
     Key? key,
     required this.children,
