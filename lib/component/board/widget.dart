@@ -298,7 +298,10 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
               final boardLocalPosition = renderBox.globalToLocal(globalPosition);
               widget.eventBus.publish(BoardEventName.onModelMenu, [e.id, boardLocalPosition]);
             },
-            child: ModelWidget(eventBus: widget.eventBus, model: e),
+            child: ModelWidget(
+              eventBus: widget.eventBus,
+              model: e,
+            ),
           ),
         );
       }).toList(),
