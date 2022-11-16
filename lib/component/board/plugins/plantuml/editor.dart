@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board_event.dart';
-import 'package:board_front/util/color_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -45,37 +44,6 @@ class _PlantUMLModelEditorState extends State<PlantUMLModelEditor> {
     );
   }
 
-  Widget buildColor() {
-    void pickColor() async {
-      final pickedColor = await showBoardColorPicker(context);
-      if (pickedColor == null) return;
-      modelData.color = pickedColor;
-      setState(() {});
-      refreshModel();
-      saveState();
-    }
-
-    if (modelData.color == null) return TextButton(onPressed: pickColor, child: const Text('未选择颜色'));
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        InkWell(
-          onTap: pickColor,
-          child: Container(color: modelData.color, width: 50, height: 50),
-        ),
-        TextButton(
-          onPressed: () {
-            modelData.color = null;
-            setState(() {});
-            refreshModel();
-            saveState();
-          },
-          child: const Text('取消覆盖'),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ModelAttribute(
@@ -88,7 +56,7 @@ class _PlantUMLModelEditorState extends State<PlantUMLModelEditor> {
               child: TextButton(
                 onPressed: () async {
                   final pfs = await FilePicker.platform.pickFiles(
-                    dialogTitle: '上传附件',
+                    dialogTitle: '导入PlantUML文件',
                     type: FileType.any,
                   );
                   if (pfs == null || pfs.files.isEmpty) return;
@@ -102,23 +70,6 @@ class _PlantUMLModelEditorState extends State<PlantUMLModelEditor> {
                 },
                 child: const Text('导入PlantUML文件'),
               ),
-            ),
-            ModelAttributeItem(
-              title: '填充方式',
-              child: DropdownButton<BoxFit>(
-                value: modelData.fit,
-                items: BoxFit.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name))).toList(),
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() => modelData.fit = value);
-                  refreshModel();
-                  saveState();
-                },
-              ),
-            ),
-            ModelAttributeItem(
-              title: '颜色覆盖',
-              child: buildColor(),
             ),
           ],
         ),

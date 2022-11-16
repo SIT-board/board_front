@@ -43,11 +43,6 @@ class _PlantUMLModelWidgetState extends State<PlantUMLModelWidget> {
   Widget build(BuildContext context) {
     if (errorMsg != null) return Text('$errorMsg');
     if (svgContent.isEmpty) return const Center(child: Text('未设置PlantUML'));
-
-    return SvgPicture.string(
-      svgContent,
-      fit: widget.data.fit,
-      color: widget.data.color,
-    );
+    return SvgPicture.string(svgContent);
   }
 }
