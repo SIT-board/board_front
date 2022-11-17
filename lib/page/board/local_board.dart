@@ -36,6 +36,9 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
   void _refreshBoard(arg) => setState(() {});
   @override
   void initState() {
+    if (widget.initialFilePath != null) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => loadFile(widget.initialFilePath!));
+    }
     eventBus.subscribe(BoardEventName.saveState, _saveState);
     eventBus.subscribe(BoardEventName.refreshBoard, _refreshBoard);
     super.initState();
@@ -109,6 +112,21 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
     );
   }
 
+  void loadFile(String path) {
+    try {
+      final content = (jsonDecode(File(path).readAsStringSync()) as Map).cast<String, dynamic>();
+      // 解析成功
+      filePath = path;
+      GlobalObjects.storage.recentlyUsed.addItem(filePath!);
+      pageSetViewModel.map.clear();
+      pageSetViewModel.map.addAll(content);
+      undoRedoManager = UndoRedoManager(pageSetViewModel.map);
+      setState(() {});
+    } catch (e) {
+      EasyLoading.showError(e.toString());
+    }
+  }
+
   List<Widget> buildActions() {
     return [
       IconButton(
@@ -139,16 +157,9 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
                 type: FileType.custom,
                 allowedExtensions: ['sbp'],
               );
-              String? path = result?.files.single.path;
+              final path = result?.paths.single;
               if (path == null) return;
-              final content = (jsonDecode(File(path).readAsStringSync()) as Map).cast<String, dynamic>();
-              // 解析成功
-              filePath = path;
-              GlobalObjects.storage.recentlyUsed.addItem(filePath!);
-              pageSetViewModel.map.clear();
-              pageSetViewModel.map.addAll(content);
-              undoRedoManager = UndoRedoManager(pageSetViewModel.map);
-              setState(() {});
+              loadFile(path);
             },
           ),
           PopupMenuItem(onTap: saveAsFile, child: const Text('保存')),
