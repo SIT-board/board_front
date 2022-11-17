@@ -5,6 +5,8 @@ import 'package:pumli/pumli.dart';
 
 import 'data.dart';
 
+Map<String, SvgPicture> _cache = {};
+
 class PlantUMLModelWidget extends StatefulWidget {
   final PlantUMLModelData data;
   const PlantUMLModelWidget({Key? key, required this.data}) : super(key: key);
@@ -14,16 +16,18 @@ class PlantUMLModelWidget extends StatefulWidget {
 }
 
 class _PlantUMLModelWidgetState extends State<PlantUMLModelWidget> {
-  late String plantUmlServiceUrl = GlobalObjects.storage.server.plantuml;
-
   @override
   Widget build(BuildContext context) {
     if (widget.data.data.isEmpty) return const Center(child: Text('未设置PlantUML'));
+    final cached = _cache[widget.data.data];
+    if (cached != null) return cached;
+
     return FutureBuilder<String>(
-      future: PumliREST(serviceURL: plantUmlServiceUrl).getSVG(widget.data.data),
+      future: PumliREST(serviceURL: GlobalObjects.storage.server.plantuml).getSVG(widget.data.data),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return SvgPicture.string(snapshot.data ?? '');
+          if (_cache.length > 10) _cache = Map.fromEntries(_cache.entries.skip(_cache.length - 10));
+          return _cache[widget.data.data] = SvgPicture.string(snapshot.data ?? '');
         }
         if (snapshot.hasError) return Text('${snapshot.error}');
         return const Center(child: CircularProgressIndicator());
