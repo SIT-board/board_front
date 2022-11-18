@@ -81,6 +81,7 @@ class _ModelWidgetState extends State<ModelWidget> {
       child: const Icon(Icons.delete),
       onTap: () {
         widget.eventBus.publish(BoardEventName.onModelDeleted, modelId);
+        widget.eventBus.publish(BoardEventName.onBoardTap);
         saveState();
       },
     );
