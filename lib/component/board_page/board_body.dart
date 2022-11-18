@@ -79,24 +79,45 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
     );
   }
 
-  Widget buildPhone() {
-    return Column(
+  Widget buildBody(Orientation orientation) {
+    Widget buildHorizontalDivider() => GestureDetector(
+          onPanUpdate: (d) {
+            final size = context.size!;
+            setState(() => s -= d.delta.dy / size.height);
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeRow,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
+              height: 8,
+            ),
+          ),
+        );
+    Widget buildVerticalDivider() => GestureDetector(
+          onPanUpdate: (d) {
+            final size = context.size!;
+            setState(() => s -= d.delta.dx / size.width);
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeColumn,
+            child: Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
+              width: 5,
+            ),
+          ),
+        );
+    return Flex(
+      direction: {
+        Orientation.landscape: Axis.horizontal,
+        Orientation.portrait: Axis.vertical,
+      }[orientation]!,
       children: [
         Expanded(flex: ((1 - s) * 100).toInt(), child: buildBoardView()),
         if (showEditor)
-          GestureDetector(
-            onPanUpdate: (d) {
-              final size = context.size!;
-              setState(() => s -= d.delta.dy / size.height);
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.resizeRow,
-              child: Container(
-                decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
-                height: 8,
-              ),
-            ),
-          ),
+          {
+            Orientation.landscape: buildVerticalDivider,
+            Orientation.portrait: buildHorizontalDivider,
+          }[orientation]!(),
         if (showEditor)
           Expanded(
             flex: (s * 100).toInt(),
@@ -110,52 +131,13 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
       ],
     );
   }
-
-  Widget buildDesktop() {
-    return Row(
-      children: [
-        Expanded(flex: ((1 - s) * 100).toInt(), child: buildBoardView()),
-        if (showEditor)
-          GestureDetector(
-            onPanUpdate: (d) {
-              final size = context.size!;
-              setState(() => s -= d.delta.dx / size.width);
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.resizeColumn,
-              child: Container(
-                decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
-                width: 5,
-              ),
-            ),
-          ),
-        if (showEditor)
-          Expanded(
-            flex: (s * 100).toInt(),
-            child: SingleChildScrollView(
-              child: defaultModelPlugins.getPluginByModelType(selectedModel!.type).buildModelEditor(
-                    selectedModel!,
-                    eventBus,
-                  ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget buildBodyByOrientation(Orientation orientation) {
-    if (orientation == Orientation.landscape) {
-      return buildDesktop();
-    } else {
-      return buildPhone();
-    }
-  }
-
-  late final Orientation _initialOrientation =
-      MediaQuery.of(context).size.aspectRatio < 1 ? Orientation.portrait : Orientation.landscape;
 
   @override
   Widget build(BuildContext context) {
-    return buildBodyByOrientation(_initialOrientation);
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        return buildBody(orientation);
+      },
+    );
   }
 }
