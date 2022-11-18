@@ -3,7 +3,6 @@ import 'package:board_front/component/board/board.dart';
 import 'package:board_front/component/board/board_event.dart';
 import 'package:board_front/component/board/plugins/plugins.dart';
 import 'package:flutter/material.dart';
-import 'package:platform_widget/platform_widget.dart';
 
 import 'menu/menu.dart';
 
@@ -90,9 +89,12 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
               final size = context.size!;
               setState(() => s -= d.delta.dy / size.height);
             },
-            child: Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
-              height: 8,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.resizeRow,
+              child: Container(
+                decoration: BoxDecoration(border: Border.all(color: Colors.black26), color: Colors.black12),
+                height: 8,
+              ),
             ),
           ),
         if (showEditor)
@@ -141,11 +143,19 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
     );
   }
 
+  Widget buildBodyByOrientation(Orientation orientation) {
+    if (orientation == Orientation.landscape) {
+      return buildDesktop();
+    } else {
+      return buildPhone();
+    }
+  }
+
+  late final Orientation _initialOrientation =
+      MediaQuery.of(context).size.aspectRatio < 1 ? Orientation.portrait : Orientation.landscape;
+
   @override
   Widget build(BuildContext context) {
-    return MyPlatformWidget(
-      desktopOrWebBuilder: (ctx) => buildDesktop(),
-      mobileBuilder: (ctx) => buildPhone(),
-    );
+    return buildBodyByOrientation(_initialOrientation);
   }
 }
