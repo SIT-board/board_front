@@ -1,0 +1,98 @@
+@startuml
+' 定义一个基本消息的包装类并实现json序列化反序列化的方法
+class BaseMessage {
+' 消息时间戳
++ DateTime ts;
+' 消息话题
++ String topic;
+' 发布者id
++ String publisher;
+' 接收者id，若为广播消息则记为字符串"+"
++ String sendTo;
+' 消息数据
++ dynamic data;
+' JSON序列化与反序列化
++ {static} fromJson();
++ toJson();
+}
+
+' 消息接收回调
+interface MessageCallback {
++ call(BaseMessage msg);
+}
+MessageCallback --> BaseMessage: 依赖
+
+' 基于mqtt实现的消息通信节点类
+class BoardUserNode {
+' 节点参与的房间id
++ String roomId;
+' 用户节点的id
++ String userNodeId;
+' 用户设置的用户别名
++ String username;
+' 该节点定时发送report消息的时间间隔
+' report消息用于广播用户的在线状态以及用户别名
++ Duration reportInterval;
+' 获取在线列表，若超过规定的超时时间则判定该用户已下线
++ Duration onlineListTimeout;
+
+
+' 连接服务器
++ Future<void> connect();
+' 断开连接服务器
++ void disconnect();
+' 获取所有在线用户的id
++ List<String> getOnlineList();
+' 根据用户id获取用户名
++ String getUsernameByUserId(String userId);
+' 注册接收某话题消息的回调函数
++ void registerForOnReceive(String topic, MessageCallback callback);
+' 发送某话题消息
++ void sendTo(String otherNodeId, String topic, dynamic jsonMessage);
+' 广播某话题消息
++ void broadcast(String topic, dynamic jsonMessage);
+}
+BoardUserNode --> MessageCallback: 依赖
+BoardUserNode --> BaseMessage: 依赖
+
+' Owner在白板场景下作为主持人，拥有完整的初始model状态数据
+class OwnerBoardNode {
+' 通信节点
++ BoardUserNode node;
+' model数据
++ Map model;
+' model被变更时
++ MessageCallback onChanged;
+
+' 每次被调用都执行一次diff算法并广播其变更
++ void broadcastSyncPatch()
+' 向某个目标发送完整的model数据
++ void sendModel(String targetId)
+}
+' 应该和BoardUserNode是聚合关系
+OwnerBoardNode *-- BoardUserNode: 聚合 >
+MessageCallback <-- OwnerBoardNode: 依赖
+
+
+' Member在白板场景下作为会议成员，其model状态需要和Owner保持同步
+class MemberBoardNode {
+' 通信节点
++ BoardUserNode node;
+' 被同步的model数据
++ Map model;
+' 当model收到响应进行完整刷新时的回调
++ MessageCallback onRefresh;
+' 当model发生变更时的回调，
+' 注意需要处理好已经发起白板请求但未收到白板数据中间时差的白板变更patch
++ MessageCallback onChanged;
+
+' 广播本地的变更
++ void broadcastSyncPatch()
+' 发送一个广播请求白板完整数据
++ void requestBoardModel()
+}
+' 应该和BoardUserNode是聚合关系
+MemberBoardNode *-- BoardUserNode: 聚合 >
+MessageCallback <-- MemberBoardNode: 依赖
+
+@enduml
