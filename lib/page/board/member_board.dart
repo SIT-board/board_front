@@ -279,6 +279,8 @@ class _MemberBoardPageState extends State<MemberBoardPage> {
           child: BoardBodyWidget(
             eventBus: eventBus,
             boardViewModel: pageSetViewModel.currentPage.board,
+            pluginManager: defaultModelPluginManager,
+
           ),
         ),
       ),

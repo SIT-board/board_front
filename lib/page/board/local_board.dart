@@ -15,6 +15,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
+import 'common.dart';
+
 class LocalBoardPage extends StatefulWidget {
   final String? initialFilePath;
   const LocalBoardPage({Key? key, this.initialFilePath}) : super(key: key);
@@ -256,6 +258,7 @@ class _LocalBoardPageState extends State<LocalBoardPage> {
           body: BoardBodyWidget(
             eventBus: eventBus,
             boardViewModel: pageSetViewModel.currentPage.board,
+            pluginManager: defaultModelPluginManager,
           ),
         ),
       ),

@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
 
+import 'common.dart';
+
 class SimpleBoardPage extends StatefulWidget {
   const SimpleBoardPage({Key? key}) : super(key: key);
 
@@ -161,6 +163,7 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
         body: BoardBodyWidget(
           eventBus: eventBus,
           boardViewModel: pageSetViewModel.currentPage.board,
+          pluginManager: defaultModelPluginManager,
         ),
       ),
     );

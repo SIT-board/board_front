@@ -1,4 +1,5 @@
 import 'package:board_front/component/board_page/data.dart';
+import 'package:board_front/component/board_page/plugins/plugins.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -134,3 +135,18 @@ Future<void> showProjectInfoDialog(BuildContext context, BoardPageSetViewModel p
         );
       });
 }
+
+final defaultModelPluginManager = BoardModelPluginManager(
+  initialPlugins: [
+    RectModelPlugin(),
+    LineModelPlugin(),
+    OvalModelPlugin(),
+    SvgModelPlugin(),
+    PlantUMLModelPlugin(),
+    ImageModelPlugin(),
+    AttachmentModelPlugin(),
+    FreeStyleModelPlugin(),
+    HtmlModelPlugin(),
+    MarkdownModelPlugin(),
+  ],
+);

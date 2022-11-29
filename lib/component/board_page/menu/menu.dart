@@ -10,12 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:quds_popup_menu/quds_popup_menu.dart';
 
+import '../plugins/model_plugin_manager.dart';
 import 'add_model.dart';
 
 class BoardMenu {
   final BuildContext context;
   final ValueGetter<BoardViewModel> boardViewModelGetter;
   final EventBus<BoardEventName> eventBus;
+  final BoardModelPluginManager pluginManager;
 
   BoardViewModel get boardViewModel => boardViewModelGetter();
 
@@ -23,6 +25,7 @@ class BoardMenu {
     required this.context,
     required this.boardViewModelGetter,
     required this.eventBus,
+    required this.pluginManager,
   });
 
   QudsPopupMenuItem? buildBoardPasteMenuItem(String? text, Offset position) {
@@ -63,6 +66,7 @@ class BoardMenu {
           boardViewModel: boardViewModel,
           eventBus: eventBus,
           offset: position,
+          pluginManager: pluginManager,
         ),
       ],
     );
@@ -85,6 +89,7 @@ class BoardMenu {
           boardViewModel: boardViewModel,
           eventBus: eventBus,
           offset: position,
+          pluginManager: pluginManager,
         ),
       ],
     );

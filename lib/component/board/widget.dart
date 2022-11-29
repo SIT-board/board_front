@@ -5,15 +5,17 @@ import 'package:board_front/util/menu.dart';
 import 'package:flutter/material.dart';
 
 import 'board_event.dart';
-import 'plugins/plugins.dart';
 
 class ModelWidget extends StatefulWidget {
   final Model model;
   final EventBus<BoardEventName> eventBus;
+  final Widget Function(Model, EventBus<BoardEventName>) Function(String type) modelWidgetBuilderBuilder;
+
   const ModelWidget({
     Key? key,
     required this.model,
     required this.eventBus,
+    required this.modelWidgetBuilderBuilder,
   }) : super(key: key);
 
   @override
@@ -158,10 +160,7 @@ class _ModelWidgetState extends State<ModelWidget> {
     return withController(
       child: Container(
         constraints: modelCommon.constraints,
-        child: defaultModelPlugins.getPluginByModelType(widget.model.type).buildModelView(
-              widget.model,
-              widget.eventBus,
-            ),
+        child: widget.modelWidgetBuilderBuilder(widget.model.type)(widget.model, widget.eventBus),
       ),
     );
   }
@@ -170,10 +169,13 @@ class _ModelWidgetState extends State<ModelWidget> {
 class BoardViewModelWidget extends StatefulWidget {
   final BoardViewModel viewModel;
   final EventBus<BoardEventName> eventBus;
+  final Widget Function(Model, EventBus<BoardEventName>) Function(String type) modelWidgetBuilderBuilder;
+
   const BoardViewModelWidget({
     Key? key,
     required this.viewModel,
     required this.eventBus,
+    required this.modelWidgetBuilderBuilder,
   }) : super(key: key);
 
   @override
@@ -302,6 +304,7 @@ class _BoardViewModelWidgetState extends State<BoardViewModelWidget> {
             child: ModelWidget(
               eventBus: widget.eventBus,
               model: e,
+              modelWidgetBuilderBuilder: widget.modelWidgetBuilderBuilder,
             ),
           ),
         );

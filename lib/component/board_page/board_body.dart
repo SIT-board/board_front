@@ -1,19 +1,20 @@
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
-import 'package:board_front/component/board/board_event.dart';
-import 'package:board_front/component/board/plugins/plugins.dart';
 import 'package:flutter/material.dart';
 
 import 'menu/menu.dart';
+import 'plugins/model_plugin_interface.dart';
+import 'plugins/model_plugin_manager.dart';
 
 class BoardBodyWidget extends StatefulWidget {
   final BoardViewModel boardViewModel;
   final EventBus<BoardEventName> eventBus;
-
+  final BoardModelPluginManager pluginManager;
   const BoardBodyWidget({
     Key? key,
     required this.boardViewModel,
     required this.eventBus,
+    required this.pluginManager,
   }) : super(key: key);
 
   @override
@@ -31,6 +32,7 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
     context: context,
     boardViewModelGetter: () => currentPageBoardViewModel,
     eventBus: eventBus,
+    pluginManager: widget.pluginManager,
   );
 
   void _onBoardMenu(arg) {
@@ -76,6 +78,7 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
       // 视口变换控制器
       viewModel: currentPageBoardViewModel,
       eventBus: eventBus,
+      modelWidgetBuilderBuilder: (String type) => widget.pluginManager.getPluginByModelType(type).buildModelView,
     );
   }
 
@@ -122,10 +125,9 @@ class _BoardBodyWidgetState extends State<BoardBodyWidget> {
           Expanded(
             flex: (s * 100).toInt(),
             child: SingleChildScrollView(
-              child: defaultModelPlugins.getPluginByModelType(selectedModel!.type).buildModelEditor(
-                    selectedModel!,
-                    eventBus,
-                  ),
+              child: widget.pluginManager
+                  .getPluginByModelType(selectedModel!.type)
+                  .buildModelEditor(selectedModel!, eventBus),
             ),
           ),
       ],

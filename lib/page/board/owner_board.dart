@@ -312,6 +312,8 @@ class _OwnerBoardPageState extends State<OwnerBoardPage> {
           body: BoardBodyWidget(
             eventBus: eventBus,
             boardViewModel: pageSetViewModel.currentPage.board,
+            pluginManager: defaultModelPluginManager,
+
           ),
         ),
       ),
