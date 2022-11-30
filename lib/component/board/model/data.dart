@@ -17,7 +17,7 @@ class Model extends HashMapData {
   set data(Map<String, dynamic> v) => map['data'] = v;
 
   /// 公共模型数据
-  CommonModelData get common => CommonModelData(map['common']);
+  CommonModelData get common => CommonModelData(map['common'] ??= <String, dynamic>{});
   set common(CommonModelData v) => map['common'] = v.map;
 
   Model(super.map);

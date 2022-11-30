@@ -16,7 +16,7 @@ class BoardViewModel extends HashMapData {
   set viewerTransform(Matrix4 v) => map['viewerTransform'] = v.storage;
 
   void addModel(Model model) {
-    map['modelMap'][model.id.toString()] = model.map;
+    (map['modelMap'] ??= <String, dynamic>{})[model.id.toString()] = model.map;
     modelIdList = [...modelIdList, model.id];
   }
 
