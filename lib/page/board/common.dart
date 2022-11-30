@@ -148,5 +148,6 @@ final defaultModelPluginManager = BoardModelPluginManager(
     FreeStyleModelPlugin(),
     HtmlModelPlugin(),
     MarkdownModelPlugin(),
+    SubBoardModelPlugin(),
   ],
 );

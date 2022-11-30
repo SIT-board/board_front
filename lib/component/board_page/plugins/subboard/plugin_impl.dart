@@ -1,37 +1,40 @@
-import 'dart:ui';
-
 import 'package:board_event_bus/board_event_bus.dart';
 import 'package:board_front/component/board/board.dart';
 import 'package:flutter/material.dart';
 
 import '../model_plugin_interface.dart';
-import 'data.dart';
-import 'editor.dart';
 import 'widget.dart';
 
-class MarkdownModelPlugin implements BoardModelPluginInterface {
+class SubBoardModelPlugin implements BoardModelPluginInterface {
   @override
   Model buildDefaultAddModel({required int modelId, required Offset position}) {
     return Model({})
       ..id = modelId
       ..common = (CommonModelData({})..position = position)
       ..type = modelTypeName
-      ..data = (MarkdownModelData({})..markdown = '# HelloWorld').map;
+      ..data = {};
   }
 
   @override
   Widget buildModelEditor(Model model, EventBus<BoardEventName> eventBus) {
-    return MarkdownModelEditor(eventBus: eventBus, model: model);
+    return Container();
   }
 
   @override
   Widget buildModelView(Model model, EventBus<BoardEventName> eventBus) {
-    return MarkdownModelWidget(data: MarkdownModelData(model.data));
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+        ),
+      ),
+      child: SubBoardWidget(model: model, eventBus: eventBus),
+    );
   }
 
   @override
-  String get inMenuName => 'Markdown文档';
+  String get inMenuName => '子画板';
 
   @override
-  String get modelTypeName => 'markdown';
+  String get modelTypeName => 'sub_board';
 }
