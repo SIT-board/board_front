@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:quds_popup_menu/quds_popup_menu.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import '../plugins/model_plugin_manager.dart';
 import 'add_model.dart';
@@ -47,15 +48,18 @@ class BoardMenu {
   }
 
   showBoardMenu(BuildContext context, Offset position) async {
-    final text = (await Clipboard.getData('text/plain'))?.text;
-    final pasteItem = buildBoardPasteMenuItem(text, position);
+    QudsPopupMenuItem? pasteItem;
+    if (!UniversalPlatform.isWeb) {
+      final text = (await Clipboard.getData('text/plain'))?.text;
+      pasteItem = buildBoardPasteMenuItem(text, position);
+    }
     showQudsPopupMenu(
       context: context,
       startOffset: position,
       endOffset: position,
       items: [
         QudsPopupMenuItem(
-          title: Text('清空画布'),
+          title: const Text('清空画布'),
           onPressed: () {
             boardViewModel.clear();
             eventBus.publish(BoardEventName.refreshBoard);

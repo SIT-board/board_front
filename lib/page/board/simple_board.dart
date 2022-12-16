@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:json_model_undo_redo/json_model_undo_redo.dart';
-
-import 'common.dart';
+import 'package:board_front/component/board_page/plugins/plugins.dart';
 
 class SimpleBoardPage extends StatefulWidget {
   const SimpleBoardPage({Key? key}) : super(key: key);
@@ -27,6 +26,19 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
 
   void _saveState(arg) => undoRedoManager.store();
   void _refreshBoard(arg) => setState(() {});
+  final pluginManager = BoardModelPluginManager(
+    initialPlugins: [
+      RectModelPlugin(),
+      LineModelPlugin(),
+      OvalModelPlugin(),
+      SvgModelPlugin(),
+      FreeStyleModelPlugin(),
+      HtmlModelPlugin(),
+      MarkdownModelPlugin(),
+      SubBoardModelPlugin(),
+    ],
+  );
+
   @override
   void initState() {
     eventBus.subscribe(BoardEventName.saveState, _saveState);
@@ -63,8 +75,8 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
     return BoardTitle(
       currentPageId: pageSetViewModel.currentPageId,
       pageIdList: pageSetViewModel.pageIdList,
-      pageNameMap: Map.fromEntries(
-          pageSetViewModel.pageIdList.map((id) => MapEntry(id, pageSetViewModel.getPageById(id).title))),
+      pageNameMap: Map.fromEntries(pageSetViewModel.pageIdList
+          .map((id) => MapEntry(id, pageSetViewModel.getPageById(id).title))),
       onChangeTitle: (title) {
         setState(() => pageSetViewModel.currentPage.title = title);
         undoRedoManager.store();
@@ -76,7 +88,8 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
       onAddPage: () {
         setState(() {
           final newPageId = pageSetViewModel.pageIdList.last + 1;
-          pageSetViewModel.addBoardPage(BoardPageViewModel.createNew(newPageId));
+          pageSetViewModel
+              .addBoardPage(BoardPageViewModel.createNew(newPageId));
           pageSetViewModel.currentPageId = newPageId;
         });
         undoRedoManager.store();
@@ -124,12 +137,16 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('项目信息', style: Theme.of(context).textTheme.headline5),
+                              Text('项目信息',
+                                  style: Theme.of(context).textTheme.headline5),
                               Text('页数：${pageSetViewModel.pageIdList.length}'),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('关闭')),
+                                  ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: const Text('关闭')),
                                 ],
                               ),
                             ],
@@ -163,7 +180,7 @@ class _SimpleBoardPageState extends State<SimpleBoardPage> {
         body: BoardBodyWidget(
           eventBus: eventBus,
           boardViewModel: pageSetViewModel.currentPage.board,
-          pluginManager: defaultModelPluginManager,
+          pluginManager: pluginManager,
         ),
       ),
     );
